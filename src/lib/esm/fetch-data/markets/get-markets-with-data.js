@@ -14,11 +14,12 @@ import { filterOnlyObjectProperties } from "../utils/filterOnlyObjectProperties"
 /**
  * @param comptrollerAddress - Comptroller to look for.
  * @param userAddress - User to get information for.
+ * @param addressToGetBalanceFor - Will be used to get total supplied/borrowed for address.
  * @returns - Async function call to get all public pools.
  */
-export function getMarketsWithData(comptrollerAddress) {
+export function getMarketsWithData(comptrollerAddress, options) {
     return __awaiter(this, void 0, void 0, function* () {
-        let assets = (yield this.contracts.fuseLensContract.callStatic.getPoolAssetsWithData(comptrollerAddress)).map(filterOnlyObjectProperties);
+        let assets = (yield this.contracts.fuseLensContract.callStatic.getPoolAssetsWithData(comptrollerAddress, options !== null && options !== void 0 ? options : {})).map(filterOnlyObjectProperties);
         const ethPrice = yield this.getEthUsdPriceBN();
         let totalLiquidityUSD = Zero;
         let totalSupplyBalanceUSD = Zero;

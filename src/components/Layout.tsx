@@ -42,7 +42,7 @@ const Header = () => {
                     </AppLink>
                     <Spacer />
                 </HStack>
-                <Button onClick={handleClick} ml="auto">{!!accountData ? truncate(address ?? '', 8) : 'Connect'}</Button>
+                <Button onClick={handleClick} ml="auto">{!!address ? truncate(address ?? '', 8) : 'Connect'}</Button>
             </HStack>
         </>
     )

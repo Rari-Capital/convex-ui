@@ -1,6 +1,6 @@
 import { useRari } from "context/RariContext";
 import { useMemo } from "react";
-import { Pool } from "../../esm";
+import { Pool } from "lib/esm";
 
 const usePool = (poolIndex: number) => {
   const { provider, chainId } = useRari();
