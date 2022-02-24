@@ -11,6 +11,8 @@ const ConnectModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => any
         onClose()
     }
 
+    console.log({ data, error })
+
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
@@ -29,7 +31,6 @@ const ConnectModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => any
                                 {!connector.ready && ' (unsupported)'}
                             </Button>
                         ))}
-
                         {error && <div>{error?.message ?? 'Failed to connect'}</div>}
                     </VStack>
                 </ModalBody>

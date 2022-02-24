@@ -3,8 +3,6 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { WalletLinkConnector } from "wagmi/connectors/walletLink";
 
-import { Example } from "./components";
-
 export const alchemyURL = `https://eth-mainnet.alchemyapi.io/v2/2Mt-6brbJvTA4w9cpiDtnbTo6qOoySnN`;
 
 // API key for Ethereum node
@@ -31,7 +29,7 @@ export const connectors = ({ chainId }: { chainId: number }) => {
     new WalletLinkConnector({
       options: {
         appName: "Rari Convex UI",
-        jsonRpcUrl: alchemyURL
+        jsonRpcUrl: rpcUrl
       },
     }),
   ];

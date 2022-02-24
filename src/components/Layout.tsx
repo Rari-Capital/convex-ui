@@ -1,7 +1,9 @@
-import { Button, HStack, useDisclosure, VStack, Box, Image } from '@chakra-ui/react'
+import { Button, HStack, useDisclosure, VStack, Box, Image, Text, Spacer } from '@chakra-ui/react'
+import { useRari } from 'context/RariContext'
 import React from 'react'
 import { truncate } from 'utils/stringUtils'
 import { useAccount } from 'wagmi'
+import AppLink from './common/AppLink'
 import ConnectModal from './modals/ConnectModal'
 
 export const Layout = ({ children }: { children: any }) => {
@@ -15,27 +17,11 @@ export const Layout = ({ children }: { children: any }) => {
 
 const Header = () => {
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const [{ data: accountData }, disconnect] = useAccount({
-        fetchEns: true,
-    })
-    // if (accountData) {
-    //     return (
-    //         <Box>
-    //             {accountData.ens?.avatar && <Image src={accountData.ens?.avatar} alt="ENS Avatar" />}
-    //             <Box>
-    //                 {accountData.ens?.name
-    //                     ? `${accountData.ens?.name} (${accountData.address})`
-    //                     : accountData.address}
-    //             </Box>
-    //             {/* <div>Connected to {accountData?.connector?.name}</div> */}
-    //             <Button onClick={disconnect}>Disconnect</Button>
-    //         </Box>
-    //     )
-    // }
+    const { address, accountData, logout } = useRari();
 
     const handleClick = () => {
-        if (accountData) {
-            disconnect()
+        if (!!accountData) {
+            logout()
         } else {
             onOpen()
         }
@@ -44,8 +30,20 @@ const Header = () => {
     return (
         <>
             <ConnectModal isOpen={isOpen} onClose={onClose} />
-            <HStack w="100%" justify="flex-end">
-                <Button onClick={handleClick}>{!!accountData ? truncate(accountData.address ?? '', 8) : 'Connect'}</Button>
+            <HStack w="100%" justify="space-between">
+                <HStack justify="flex-start">
+                    <AppLink href="/" >
+                        <Text>
+                            Tribe Convex Pool
+                        </Text>
+                    </AppLink>
+                    <Spacer />
+                    <AppLink href="/claim" >
+                        <Text>Claim</Text>
+                    </AppLink>
+                    <Spacer />
+                </HStack>
+                <Button onClick={handleClick} ml="auto">{!!accountData ? truncate(address ?? '', 8) : 'Connect'}</Button>
             </HStack>
         </>
     )
