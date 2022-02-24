@@ -2,7 +2,6 @@ import { Button, HStack, useDisclosure, VStack, Box, Image, Text, Spacer } from 
 import { useRari } from 'context/RariContext'
 import React from 'react'
 import { truncate } from 'utils/stringUtils'
-import { useAccount } from 'wagmi'
 import AppLink from './common/AppLink'
 import ConnectModal from './modals/ConnectModal'
 

@@ -11,8 +11,6 @@ const ConnectModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => any
         onClose()
     }
 
-    console.log({ data, error })
-
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />

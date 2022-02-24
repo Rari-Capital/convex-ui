@@ -1,17 +1,15 @@
 
+// React
 import { createContext, useContext, ReactNode, useMemo, useCallback } from "react";
+import { useRouter } from "next/router";
 
 // Wagmi
 import { useAccount, useProvider } from "wagmi";
 import { useNetwork } from "wagmi";
 
-// Fuse SDK
-import { Pool } from '../../esm';
-
-import { useQuery } from "react-query";
-import { providers } from "ethers";
+// Utils
 import { alchemyURL } from "utils/connectors";
-import { useRouter } from "next/router";
+import { providers } from "ethers";
 
 export const RariContext = createContext<undefined | any>(
   undefined
@@ -34,7 +32,6 @@ export const RariProvider = ({
 
   // logs out
   const logout = useCallback(() => disconnect(), [])
-
 
   const value = {
     provider,

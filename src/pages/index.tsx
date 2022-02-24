@@ -1,9 +1,8 @@
-import { Heading, VStack } from '@chakra-ui/react'
+import { VStack } from '@chakra-ui/react'
 import Pool from 'components/pages/Pool'
 import Head from 'next/head'
 
 function PoolPage() {
-
   return (
     <VStack>
       <Head>
