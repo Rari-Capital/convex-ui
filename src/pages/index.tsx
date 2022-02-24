@@ -1,8 +1,40 @@
+import { useRari } from 'context'
 import Head from 'next/head'
 import Image from 'next/image'
+import { useQuery } from 'react-query'
+import { useNetwork, useProvider } from 'wagmi'
 import styles from '../../styles/Home.module.css'
 
+
 export default function Home() {
+    const { PoolInstance } = useRari()
+
+    const {data: poolInfo} =  useQuery('Pool data', async () => {
+      const poolInfo = await PoolInstance.fetchFusePoolData()
+      return poolInfo
+    }, {refetchOnMount: false, refetchOnWindowFocus: false}) 
+
+
+    const {data: markets, isLoading} = useQuery('Pool Markets', async () => {
+      const markets = await PoolInstance.getMarketsWithData(poolInfo.comptroller)
+      return markets
+    },{
+      enabled: !!poolInfo,
+      refetchInterval: 60000
+    })
+
+    const {data: rds} = useQuery('Pool Rds', async () => {
+      const rds = await PoolInstance.fetchAvailableRds(poolInfo.comptroller)
+      return rds
+    },{
+      enabled: !!poolInfo,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false
+    })
+
+    console.log(markets, isLoading, rds)
+
+
   return (
     <div className={styles.container}>
       <Head>
