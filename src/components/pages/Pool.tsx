@@ -28,8 +28,6 @@ const Pool = () => {
         refetchOnWindowFocus: false
     })
 
-    console.log({ poolInfo, markets, rds })
-
     return (
         <>
             {
