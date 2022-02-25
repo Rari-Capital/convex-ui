@@ -37,4 +37,3 @@ failMessage) {
         return yield txObject(txArgs);
     });
 }
-//# sourceMappingURL=testForCTokenErrorAndSend.js.map

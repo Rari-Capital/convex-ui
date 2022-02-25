@@ -13,4 +13,3 @@ export const constructMantissa = (rewardSpeed, rewardEthPrice, underlyingTotalSu
     const newMantissa = (newRewardETHPerBlock * 1e18) / newUnderlyingTotalSupplyETH;
     return newMantissa;
 };
-//# sourceMappingURL=constructMantissa.js.map

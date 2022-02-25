@@ -26,4 +26,3 @@ export const filterPoolName = (name) => {
     }
     return filter.clean(name + "$W@G0N0M1C$").replace("$W@G0N0M1C$", "");
 };
-//# sourceMappingURL=filterPoolName.js.map

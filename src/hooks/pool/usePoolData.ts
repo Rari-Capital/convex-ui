@@ -17,7 +17,7 @@ const usePoolData = (poolIndex: number) => {
   const { data: markets, isLoading } = useQuery(
     `Pool Markets PoolID ${pool?.poolId} for address ${address}`,
     async () => {
-      if (pool)
+      if (pool && poolInfo)
         return await pool.getMarketsWithData(poolInfo.comptroller, {
           from: address,
         });
@@ -31,7 +31,8 @@ const usePoolData = (poolIndex: number) => {
   const { data: rds } = useQuery(
     `Pool RDs PoolID ${pool?.poolId}`,
     async () => {
-      if (pool) return await pool.fetchAvailableRds(poolInfo.comptroller);
+      if (pool && poolInfo)
+        return await pool.fetchAvailableRds(poolInfo.comptroller);
     },
     {
       enabled: !!poolInfo,
@@ -39,6 +40,8 @@ const usePoolData = (poolIndex: number) => {
       refetchOnWindowFocus: false,
     }
   );
+
+  console.log({ poolInfo, markets, rds });
 
   return {
     poolInfo,

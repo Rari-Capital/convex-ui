@@ -24,4 +24,3 @@ export function getDecimals(tokenAddress, provider) {
         return yield erc20Contract.callStatic.decimals();
     });
 }
-//# sourceMappingURL=getDecimals.js.map

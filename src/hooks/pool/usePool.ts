@@ -7,7 +7,7 @@ const usePool = (poolIndex: number) => {
 
   return useMemo(() => {
     if (!!provider && !!chainId) {
-      const pool = Pool(provider, chainId.toString(), poolIndex.toString());
+      const pool = Pool(provider, chainId, poolIndex);
       return pool;
     }
   }, [provider._network?.name, chainId]);

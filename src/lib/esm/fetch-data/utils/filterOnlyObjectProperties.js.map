@@ -1,1 +1,0 @@
-{"version":3,"file":"filterOnlyObjectProperties.js","sourceRoot":"","sources":["../../../../Pool/fetch-data/utils/filterOnlyObjectProperties.ts"],"names":[],"mappings":"AAAA,MAAM,UAAU,0BAA0B,CAAC,GAAQ;IAC/C,OAAO,MAAM,CAAC,WAAW,CACvB,MAAM,CAAC,OAAO,CAAC,GAAG,CAAC,CAAC,MAAM,CAAC,CAAC,CAAC,CAAC,CAAC,EAAE,EAAE,CAAC,KAAK,CAAC,CAAQ,CAAC,CAAC,CAC9C,CAAC;AACX,CAAC"}

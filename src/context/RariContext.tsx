@@ -25,11 +25,13 @@ export const RariProvider = ({
     fetchEns: true,
   })
 
-  const router = useRouter()
   const chainId = useMemo(() => data.chain?.id ?? 1, [data])
   const provider = useMemo(() => new providers.JsonRpcProvider(alchemyURL), [])
-  const address = useMemo(() => router?.query.address ?? accountData?.address, [router, accountData])
 
+  // Whether you have forced an address
+  const router = useRouter()
+  const address = useMemo(() => router?.query.address ?? accountData?.address, [router, accountData])
+  const previewMode = useMemo(() => !!address && address === router?.query.address, [router, address])
   const isAuthed = useMemo(() => !!accountData, [accountData])
 
   // logs out
@@ -41,6 +43,7 @@ export const RariProvider = ({
     address,
     accountData,
     isAuthed,
+    previewMode,
     logout
   }
 

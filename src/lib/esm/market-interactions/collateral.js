@@ -32,4 +32,3 @@ export function collateral(comptrollerAddress, marketAddress, action, provider) 
         }
     });
 }
-//# sourceMappingURL=collateral.js.map

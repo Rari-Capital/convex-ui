@@ -4,31 +4,20 @@ import {
   Image,
   Spacer,
   useDisclosure,
-  VStack,
 } from "@chakra-ui/react";
 import { useRari } from "context/RariContext";
-import usePoolData from "hooks/pool/usePoolData";
 import {
   Button,
-  Card,
-  Heading,
   Link,
-  Statistic,
-  Text,
   TokenGroup,
 } from "rari-components";
-import { shortUsdFormatter } from "utils/formatters";
 import { truncate } from "utils/stringUtils";
-import { useAccount } from "wagmi";
 import ConnectModal from "./modals/ConnectModal";
+import PoolOverview from "./PoolOverview";
 
 const Header = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isAuthed, address, logout } = useRari()
-
-  const { markets } = usePoolData(156)
-
-  console.log({ markets })
+  const { isAuthed, address, logout, previewMode } = useRari()
 
   const handleClick = () => {
     if (isAuthed) {
@@ -38,11 +27,6 @@ const Header = () => {
     }
   };
 
-  const supplyText = isAuthed ? "You Supplied" : "Total Supplied"
-  const supplyValue = shortUsdFormatter(isAuthed ? (markets?.supplyBalanceUSD?.toString() ?? 0) : (markets?.totalSuppliedUSD?.toString() ?? 0))
-
-  const borrowText = isAuthed ? "You Borrowed" : "Total Borrowed"
-  const borrowValue = shortUsdFormatter(isAuthed ? (markets?.borrowBalanceUSD?.toString() ?? 0) : (markets?.totalBorrowedUSD?.toString() ?? 0))
 
   return (
     <Box
@@ -87,22 +71,15 @@ const Header = () => {
           </HStack>
           <Link href="/">Rewards</Link>
           <Spacer />
-          <Button onClick={handleClick} variant="neutral">
-            {isAuthed ? truncate(address ?? "", 8) : "Connect"}
-          </Button>
+          <HStack align={"flex-start"}>
+            {/* <WarningIcon w={2} h={2} color="red.500" /> */}
+            <Button onClick={handleClick} variant="neutral" bg={previewMode ? 'orange' : ''}>
+              {!!address ? truncate(address ?? "", 8) : "Connect"}
+            </Button>
+          </HStack>
           <ConnectModal isOpen={isOpen} onClose={onClose} />
         </HStack>
-        <Box width="100%" paddingTop={16}>
-          <Heading size="md">Portfolio Overview</Heading>
-          <HStack paddingTop={8} spacing={8}>
-            <Card>
-              <Statistic title={supplyText} value={supplyValue} />
-            </Card>
-            <Card>
-              <Statistic title={borrowText} value={borrowValue} />
-            </Card>
-          </HStack>
-        </Box>
+        <PoolOverview />
       </Box>
     </Box>
   );

@@ -30,4 +30,3 @@ export function getRewardAPYForMarket() {
         };
     });
 }
-//# sourceMappingURL=getRewardAPYForMarket.js.map

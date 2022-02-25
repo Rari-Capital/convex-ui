@@ -23,4 +23,3 @@ export function fetchRewardTokenInRd(rdAddress) {
         return yield rdContract.callStatic.rewardToken();
     });
 }
-//# sourceMappingURL=fetchRewardTokenInRd.js.map

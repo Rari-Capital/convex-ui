@@ -46,7 +46,7 @@ export function fetchFusePoolData() {
         const comptrollerContract = new Contract(comptroller, comptrollerInterface, this._provider);
         // 3. Get Oracle and oracle model.
         let oracle = yield comptrollerContract.callStatic.oracle();
-        let oracleModel = yield this.getPriceOracle(oracle);
+        let oracleModel = yield this.identifyPriceOracle(oracle);
         // 4. Get pool's admin address.
         const admin = yield comptrollerContract.callStatic.admin();
         return {
@@ -59,4 +59,3 @@ export function fetchFusePoolData() {
     });
 }
 ;
-//# sourceMappingURL=fetch-fuse-pool-data.js.map
