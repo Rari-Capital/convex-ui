@@ -1,12 +1,18 @@
 import { Heading, Spinner } from '@chakra-ui/react'
 import { useRari } from 'context/RariContext'
 import usePoolData from 'hooks/pool/usePoolData'
-import React from 'react'
-import { useQuery } from 'react-query'
+import { Card } from 'rari-components'
+// import { useEffect } from 'react'
+// import { convexAPR } from 'utils/convex/convex2'
 
 const Pool = () => {
-    const { address } = useRari()
-    const { poolInfo, markets, rds } = usePoolData(156)
+    const { address, provider } = useRari()
+    const { poolInfo, markets } = usePoolData(156)
+    // useEffect(() => {
+    //     convexAPR("frax", provider).then((apr) => console.log({ apr }))
+    // }, [])
+
+    if (!poolInfo) return <Spinner />
 
     return (
         <>
@@ -18,3 +24,4 @@ const Pool = () => {
 }
 
 export default Pool
+
