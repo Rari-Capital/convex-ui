@@ -34,6 +34,8 @@ export const RariProvider = ({
   const previewMode = useMemo(() => !!address && address === router?.query.address, [router, address])
   const isAuthed = useMemo(() => !!accountData, [accountData])
 
+  const isAuthed = useMemo(() => !!accountData, [accountData])
+
   // logs out
   const logout = useCallback(() => disconnect(), [])
 
