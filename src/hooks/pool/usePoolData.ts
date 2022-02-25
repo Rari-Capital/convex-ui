@@ -41,6 +41,8 @@ const usePoolData = (poolIndex: number) => {
     }
   );
 
+  console.log({ poolInfo, markets, rds });
+
   return {
     poolInfo,
     markets,

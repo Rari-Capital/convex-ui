@@ -11,7 +11,6 @@ import {
   Link,
   TokenGroup,
 } from "rari-components";
-import { shortUsdFormatter } from "utils/formatters";
 import { truncate } from "utils/stringUtils";
 import ConnectModal from "./modals/ConnectModal";
 import PoolOverview from "./PoolOverview";
