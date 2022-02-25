@@ -11,6 +11,7 @@
     "@chakra-ui/react": "^1.8.5",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
+    "@next/bundle-analyzer": "^12.1.0",
     "bad-words": "^3.0.4",
     "ethers": "^5.5.4",
     "framer-motion": "^6",
