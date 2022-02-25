@@ -1,7 +1,5 @@
 import { Modal, ModalOverlay, ModalHeader, ModalCloseButton, ModalBody, ModalContent, ModalFooter, Button, Text, VStack } from '@chakra-ui/react'
-import React from 'react'
-
-import { useAccount, useConnect } from 'wagmi'
+import { useConnect } from 'wagmi'
 
 const ConnectModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => any }) => {
     const [{ data, error }, connect] = useConnect()
