@@ -88,8 +88,6 @@ const Header = () => {
             />
             <Link href="/">Tribe Convex Pool</Link>
           </HStack>
-          <Spacer />
-          <Link href="/">Market</Link>
           <Link href="/">Rewards</Link>
           <Spacer />
           <Button onClick={handleClick} variant="neutral">
