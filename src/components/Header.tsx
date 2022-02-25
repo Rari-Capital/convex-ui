@@ -6,6 +6,8 @@ import {
   useDisclosure,
   VStack,
 } from "@chakra-ui/react";
+import { useRari } from "context/RariContext";
+import usePoolData from "hooks/pool/usePoolData";
 import {
   Button,
   Card,
@@ -15,37 +17,32 @@ import {
   Text,
   TokenGroup,
 } from "rari-components";
+import { shortUsdFormatter } from "utils/formatters";
 import { truncate } from "utils/stringUtils";
 import { useAccount } from "wagmi";
 import ConnectModal from "./modals/ConnectModal";
 
 const Header = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
-  // if (accountData) {
-  //     return (
-  //         <Box>
-  //             {accountData.ens?.avatar && <Image src={accountData.ens?.avatar} alt="ENS Avatar" />}
-  //             <Box>
-  //                 {accountData.ens?.name
-  //                     ? `${accountData.ens?.name} (${accountData.address})`
-  //                     : accountData.address}
-  //             </Box>
-  //             {/* <div>Connected to {accountData?.connector?.name}</div> */}
-  //             <Button onClick={disconnect}>Disconnect</Button>
-  //         </Box>
-  //     )
-  // }
+  const { isAuthed, address, logout } = useRari()
+
+  const { markets } = usePoolData(156)
+
+  console.log({ markets })
 
   const handleClick = () => {
-    if (accountData) {
-      disconnect();
+    if (isAuthed) {
+      logout();
     } else {
       onOpen();
     }
   };
+
+  const supplyText = isAuthed ? "You Supplied" : "Total Supplied"
+  const supplyValue = shortUsdFormatter(isAuthed ? (markets?.supplyBalanceUSD?.toString() ?? 0) : (markets?.totalSuppliedUSD?.toString() ?? 0))
+
+  const borrowText = isAuthed ? "You Borrowed" : "Total Borrowed"
+  const borrowValue = shortUsdFormatter(isAuthed ? (markets?.borrowBalanceUSD?.toString() ?? 0) : (markets?.totalBorrowedUSD?.toString() ?? 0))
 
   return (
     <Box
@@ -91,7 +88,7 @@ const Header = () => {
           <Link href="/">Rewards</Link>
           <Spacer />
           <Button onClick={handleClick} variant="neutral">
-            {!!accountData ? truncate(accountData.address ?? "", 8) : "Connect"}
+            {isAuthed ? truncate(address ?? "", 8) : "Connect"}
           </Button>
           <ConnectModal isOpen={isOpen} onClose={onClose} />
         </HStack>
@@ -99,10 +96,10 @@ const Header = () => {
           <Heading size="md">Portfolio Overview</Heading>
           <HStack paddingTop={8} spacing={8}>
             <Card>
-              <Statistic title="You supplied" value="$23,556" />
+              <Statistic title={supplyText} value={supplyValue} />
             </Card>
             <Card>
-              <Statistic title="You borrowed" value="$13,556" />
+              <Statistic title={borrowText} value={borrowValue} />
             </Card>
           </HStack>
         </Box>

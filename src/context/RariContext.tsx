@@ -30,6 +30,8 @@ export const RariProvider = ({
   const provider = useMemo(() => new providers.JsonRpcProvider(alchemyURL), [])
   const address = useMemo(() => router?.query.address ?? accountData?.address, [router, accountData])
 
+  const isAuthed = useMemo(() => !!accountData, [accountData])
+
   // logs out
   const logout = useCallback(() => disconnect(), [])
 
@@ -38,6 +40,7 @@ export const RariProvider = ({
     chainId,
     address,
     accountData,
+    isAuthed,
     logout
   }
 
