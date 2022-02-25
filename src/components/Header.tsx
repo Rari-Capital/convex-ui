@@ -13,7 +13,7 @@ import {
 } from "rari-components";
 import { truncate } from "utils/stringUtils";
 import ConnectModal from "./modals/ConnectModal";
-import PoolOverview from "./PoolOverview";
+import { PoolOverview } from "./PoolOverview";
 
 const Header = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();

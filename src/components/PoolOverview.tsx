@@ -1,3 +1,4 @@
+import { animate } from "framer-motion";
 import { useEffect, useRef } from "react";
 import {
     Card,
@@ -9,35 +10,30 @@ import {
     HStack,
     Text
 } from "@chakra-ui/react";
-
-import usePoolData from "hooks/pool/usePoolData";
 import { useRari } from 'context/RariContext';
+import { usePoolContext } from "context/PoolContext";
 import { shortUsdFormatter } from 'utils/formatters';
-import { animate } from "framer-motion";
 
-export function Counter({ from, to }: { from: number, to: number }) {
-    const nodeRef = useRef<null | HTMLParagraphElement>(null);
+function Counter({ from, to }: { from: number, to: number }) {
+    const nodeRef = useRef<HTMLParagraphElement>(null);
+    useEffect(() => {
+        const controls = animate(from, to, {
+            duration: 1,
+            onUpdate(_value) {
+                let value = _value ?? 0
+                if (nodeRef.current)
+                    nodeRef.current.textContent = '$' + value.toFixed(2);
+            }
+        });
 
-    // TODO - figure out why its not working when uncommented
-    // useEffect(() => {
-    //     if (!nodeRef.current) return
-    //     const controls = animate(from, to, {
-    //         duration: 1,
-    //         onUpdate(value) {
-    //             if (nodeRef.current)
-    //                 nodeRef.current.textContent = '$' + value.toFixed(2);
-    //         }
-    //     });
-
-    //     return () => controls.stop();
-    // }, [from, to, nodeRef]);
-
+        return () => controls.stop();
+    }, [from, to, nodeRef]);
     return <Text ref={nodeRef} />
 }
 
-const PoolOverview = () => {
+export const PoolOverview = () => {
     const { address } = useRari()
-    const { markets } = usePoolData(156)
+    const { markets } = usePoolContext()
 
     const heading = !!address ? "Portfolio Overview" : "Pool Overview"
 
