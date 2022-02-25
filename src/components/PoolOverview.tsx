@@ -1,65 +1,88 @@
-import { animate } from "framer-motion";
-import { useEffect, useRef } from "react";
-import {
-    Card,
-    Heading,
-    Statistic,
-} from "rari-components";
-import {
-    Box,
-    HStack,
-    Text
-} from "@chakra-ui/react";
-import { useRari } from 'context/RariContext';
+import { animate, useMotionValue } from "framer-motion";
+import { useEffect, useState } from "react";
+import { Card, Heading, Statistic } from "rari-components";
+import { Box, HStack } from "@chakra-ui/react";
+import { useRari } from "context/RariContext";
 import { usePoolContext } from "context/PoolContext";
-import { shortUsdFormatter } from 'utils/formatters';
-
-function Counter({ from, to }: { from: number, to: number }) {
-    const nodeRef = useRef<HTMLParagraphElement>(null);
-    useEffect(() => {
-        const controls = animate(from, to, {
-            duration: 1,
-            onUpdate(_value) {
-                let value = _value ?? 0
-                if (nodeRef.current)
-                    nodeRef.current.textContent = '$' + value.toFixed(2);
-            }
-        });
-
-        return () => controls.stop();
-    }, [from, to, nodeRef]);
-    return <Text ref={nodeRef} />
-}
+import { smallUsdFormatter } from "utils/formatters";
 
 export const PoolOverview = () => {
-    const { address } = useRari()
-    const { markets } = usePoolContext()
+  const { address } = useRari();
+  const { markets } = usePoolContext();
 
-    const heading = !!address ? "Portfolio Overview" : "Pool Overview"
+  // Show total market statistics if user's wallet is not connected.
+  const heading = !!address ? "Portfolio Overview" : "Pool Overview";
+  const supplyStatisticTitle = !!address ? "You Supplied" : "Total Supplied";
+  const borrowStatisticTitle = !!address ? "You Borrowed" : "Total Borrowed";
+  const supplyStatisticValue =
+    (!!address
+      ? markets?.totalSupplyBalanceUSD
+      : markets?.totalSuppliedUSD
+    )?.toNumber() ?? 0;
+  const borrowStatisticValue =
+    (!!address
+      ? markets?.totalBorrowBalanceUSD
+      : markets?.totalBorrowedUSD
+    )?.toNumber() ?? 0;
 
-    const supplyText = !!address ? "You Supplied" : "Total Supplied"
-    const supplyNum = !!address ? parseFloat(markets?.totalSupplyBalanceUSD?.toString() ?? '0') : parseFloat(markets?.totalSuppliedUSD?.toString() ?? '0')
-    const supplyValue = shortUsdFormatter(supplyNum)
+  // Initialize animated values at 0.
+  const supplyStatisticInitialValue = useMotionValue(0);
+  const borrowStatisticInitialValue = useMotionValue(0);
 
-    const borrowText = !!address ? "You Borrowed" : "Total Borrowed"
-    const borrowNum = !!address ? parseFloat(markets?.totalBorrowBalanceUSD?.toString() ?? '0') : parseFloat(markets?.totalBorrowedUSD?.toString() ?? '0')
-    const borrowValue = shortUsdFormatter(borrowNum)
+  // Store displayed values in state
+  const [supplyStatisticDisplayedValue, setSupplyStatisticDisplayedValue] =
+    useState(supplyStatisticInitialValue.get());
+  const [borrowStatisticDisplayedValue, setBorrowStatisticDisplayedValue] =
+    useState(borrowStatisticInitialValue.get());
 
-    return (
-        <Box width="100%" paddingTop={16}>
-            <Heading size="md">{heading}</Heading>
-            <HStack paddingTop={8} spacing={8}>
-                <Card minW={'225px'} minH="130px">
-                    <Statistic title={supplyText} value={supplyValue} />
-                    <Counter from={0} to={supplyNum} />
-                </Card>
-                <Card minW={'225px'}>
-                    <Statistic title={borrowText} value={borrowValue} />
-                    <Counter from={0} to={borrowNum} />
-                </Card>
-            </HStack>
-        </Box>
-    )
-}
+  useEffect(() => {
+    // Animate displayed values up to actual values. `duration` is in seconds.
+    const supplyStatisticValueAnimation = animate(
+      supplyStatisticInitialValue,
+      supplyStatisticValue,
+      {
+        duration: 1,
+        onUpdate(value) {
+          setSupplyStatisticDisplayedValue(value);
+        },
+      }
+    );
+    const borrowStatisticValueAnimation = animate(
+      borrowStatisticInitialValue,
+      borrowStatisticValue,
+      {
+        duration: 1,
+        onUpdate(value) {
+          setBorrowStatisticDisplayedValue(value);
+        },
+      }
+    );
 
-export default PoolOverview
+    return () => {
+      supplyStatisticValueAnimation.stop();
+      borrowStatisticValueAnimation.stop();
+    };
+  }, [supplyStatisticValue, borrowStatisticValue]);
+
+  return (
+    <Box width="100%" paddingTop={16}>
+      <Heading size="md">{heading}</Heading>
+      <HStack paddingTop={8} spacing={8}>
+        <Card minW={"225px"} minH="130px">
+          <Statistic
+            title={supplyStatisticTitle}
+            value={smallUsdFormatter(supplyStatisticDisplayedValue)}
+          />
+        </Card>
+        <Card minW={"225px"}>
+          <Statistic
+            title={borrowStatisticTitle}
+            value={smallUsdFormatter(borrowStatisticDisplayedValue)}
+          />
+        </Card>
+      </HStack>
+    </Box>
+  );
+};
+
+export default PoolOverview;
