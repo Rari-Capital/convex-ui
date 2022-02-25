@@ -13,7 +13,7 @@ import {
 } from "rari-components";
 import { truncate } from "utils/stringUtils";
 import ConnectModal from "./modals/ConnectModal";
-import PoolOverview from "./PoolOverview";
+import { PoolOverview } from "./PoolOverview";
 
 const Header = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -69,7 +69,7 @@ const Header = () => {
             />
             <Link href="/">Tribe Convex Pool</Link>
           </HStack>
-          <Link href="/">Rewards</Link>
+          <Link href="/claim">Rewards</Link>
           <Spacer />
           <HStack align={"flex-start"}>
             {/* <WarningIcon w={2} h={2} color="red.500" /> */}

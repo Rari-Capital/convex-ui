@@ -8,6 +8,7 @@ import { connectors } from "utils\/connectors";
 import { RariProvider } from "context/RariContext";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools"
+import { PoolProvider } from "context/PoolContext";
 
 function MyApp({ Component, pageProps }: any) {
 
@@ -18,9 +19,11 @@ function MyApp({ Component, pageProps }: any) {
         <QueryClientProvider client={queryClient}>
           <ReactQueryDevtools initialIsOpen={false} />
           <RariProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
+            <PoolProvider poolIndex={156}>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </PoolProvider>
           </RariProvider>
         </QueryClientProvider>
       </Provider>

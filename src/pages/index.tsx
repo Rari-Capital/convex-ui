@@ -4,7 +4,7 @@ import Head from 'next/head'
 
 function PoolPage() {
   return (
-    <VStack>
+    <VStack w="100%" h="100%">
       <Head>
         <title>Tribe Convex Pool</title>
         <meta name="description" content="Tribe Convex Pool" />

@@ -1,6 +1,6 @@
-import { useRari } from "context/RariContext";
-import { useQuery } from "react-query";
-import usePool from "./usePool";
+import { useRari } from 'context/RariContext';
+import { useQuery } from 'react-query';
+import usePool from './usePool';
 
 const usePoolData = (poolIndex: number) => {
   const { address } = useRari();
@@ -28,25 +28,9 @@ const usePoolData = (poolIndex: number) => {
     }
   );
 
-  const { data: rds } = useQuery(
-    `Pool RDs PoolID ${pool?.poolId}`,
-    async () => {
-      if (pool && poolInfo)
-        return await pool.fetchAvailableRds(poolInfo.comptroller);
-    },
-    {
-      enabled: !!poolInfo,
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-    }
-  );
-
-  console.log({ poolInfo, markets, rds });
-
   return {
     poolInfo,
     markets,
-    rds,
   };
 };
 
