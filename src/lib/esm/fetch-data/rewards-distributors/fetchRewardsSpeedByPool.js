@@ -24,4 +24,3 @@
 //       comptrollerAddress
 //     );
 //   }
-//# sourceMappingURL=fetchRewardsSpeedByPool.js.map

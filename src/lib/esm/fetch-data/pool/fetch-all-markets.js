@@ -23,4 +23,3 @@ export function fetchAllMarkets(comptrollerAddress) {
         return availableMarkets;
     });
 }
-//# sourceMappingURL=fetch-all-markets.js.map

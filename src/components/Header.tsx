@@ -4,48 +4,29 @@ import {
   Image,
   Spacer,
   useDisclosure,
-  VStack,
 } from "@chakra-ui/react";
+import { useRari } from "context/RariContext";
 import {
   Button,
-  Card,
-  Heading,
   Link,
-  Statistic,
-  Text,
   TokenGroup,
 } from "rari-components";
 import { truncate } from "utils/stringUtils";
-import { useAccount } from "wagmi";
 import ConnectModal from "./modals/ConnectModal";
+import PoolOverview from "./PoolOverview";
 
 const Header = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [{ data: accountData }, disconnect] = useAccount({
-    fetchEns: true,
-  });
-  // if (accountData) {
-  //     return (
-  //         <Box>
-  //             {accountData.ens?.avatar && <Image src={accountData.ens?.avatar} alt="ENS Avatar" />}
-  //             <Box>
-  //                 {accountData.ens?.name
-  //                     ? `${accountData.ens?.name} (${accountData.address})`
-  //                     : accountData.address}
-  //             </Box>
-  //             {/* <div>Connected to {accountData?.connector?.name}</div> */}
-  //             <Button onClick={disconnect}>Disconnect</Button>
-  //         </Box>
-  //     )
-  // }
+  const { isAuthed, address, logout, previewMode } = useRari()
 
   const handleClick = () => {
-    if (accountData) {
-      disconnect();
+    if (isAuthed) {
+      logout();
     } else {
       onOpen();
     }
   };
+
 
   return (
     <Box
@@ -90,22 +71,15 @@ const Header = () => {
           </HStack>
           <Link href="/">Rewards</Link>
           <Spacer />
-          <Button onClick={handleClick} variant="neutral">
-            {!!accountData ? truncate(accountData.address ?? "", 8) : "Connect"}
-          </Button>
+          <HStack align={"flex-start"}>
+            {/* <WarningIcon w={2} h={2} color="red.500" /> */}
+            <Button onClick={handleClick} variant="neutral" bg={previewMode ? 'orange' : ''}>
+              {!!address ? truncate(address ?? "", 8) : "Connect"}
+            </Button>
+          </HStack>
           <ConnectModal isOpen={isOpen} onClose={onClose} />
         </HStack>
-        <Box width="100%" paddingTop={16}>
-          <Heading size="md">Portfolio Overview</Heading>
-          <HStack paddingTop={8} spacing={8}>
-            <Card>
-              <Statistic title="You supplied" value="$23,556" />
-            </Card>
-            <Card>
-              <Statistic title="You borrowed" value="$13,556" />
-            </Card>
-          </HStack>
-        </Box>
+        <PoolOverview />
       </Box>
     </Box>
   );

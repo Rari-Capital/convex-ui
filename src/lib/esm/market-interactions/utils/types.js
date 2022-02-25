@@ -43,4 +43,3 @@ export var CTokenErrorCodes;
     CTokenErrorCodes[CTokenErrorCodes["TOKEN_TRANSFER_OUT_FAILED"] = 16] = "TOKEN_TRANSFER_OUT_FAILED";
     CTokenErrorCodes[CTokenErrorCodes["UTILIZATION_ABOVE_MAX"] = 17] = "UTILIZATION_ABOVE_MAX";
 })(CTokenErrorCodes || (CTokenErrorCodes = {}));
-//# sourceMappingURL=types.js.map

@@ -1,5 +1,5 @@
 export function getAddresses(id) {
-    const addresses = id === "1" ? mainnet : id === "31337" ? hardhat : arbitrum;
+    const addresses = id === 1 ? mainnet : id === 31337 ? hardhat : arbitrum;
     return Object.assign({}, addresses);
 }
 const mainnet = {
@@ -14,4 +14,3 @@ const hardhat = {
     FUSE_POOL_DIRECTORY_CONTRACT_ADDRESS: "0xca8c8688914e0f7096c920146cd0ad85cd7ae8b9",
     FUSE_POOL_LENS_CONTRACT_ADDRESS: "0x976fcd02f7c4773dd89c309fbf55d5923b4c98a1"
 };
-//# sourceMappingURL=getAddresses.js.map

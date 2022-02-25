@@ -29,4 +29,3 @@ export function fetchRewardSpeedInMarket(rdAddress, marketAddress, type) {
             : rdContract.callStatic.compBorrowSpeeds(marketAddress);
     });
 }
-//# sourceMappingURL=fetchRewardSpeedsInMarket.js.map

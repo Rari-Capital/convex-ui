@@ -29,4 +29,3 @@ export function getPool() {
         return parsedPoolInformation;
     });
 }
-//# sourceMappingURL=get-pool.js.map

@@ -30,4 +30,3 @@ export const Pool = function (provider, id, poolId) {
         oracleHashes }, fetching), market);
     return instance;
 };
-//# sourceMappingURL=index.js.map

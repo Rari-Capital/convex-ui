@@ -22,4 +22,3 @@ export const getEthUsdPriceBN = function () {
         return usdPriceBN;
     });
 };
-//# sourceMappingURL=get-usd-price-bn.js.map

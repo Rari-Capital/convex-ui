@@ -11,4 +11,3 @@ export const convertMantissaToAPR = (mantissa) => {
     const parsedMantissa = toInt(mantissa);
     return (parsedMantissa * 2372500) / 1e16;
 };
-//# sourceMappingURL=convertMantissa.js.map

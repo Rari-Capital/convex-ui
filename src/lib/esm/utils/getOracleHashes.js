@@ -1,5 +1,5 @@
 export function getOracleHashes(id) {
-    const PRICE_ORACLE_RUNTIME_BYTECODE_HASHES = id === "1" || id === "31337"
+    const PRICE_ORACLE_RUNTIME_BYTECODE_HASHES = id === 1 || id === 31337
         ? mainnetHashes
         : arbitrumHashes;
     return PRICE_ORACLE_RUNTIME_BYTECODE_HASHES;
@@ -61,4 +61,3 @@ const arbitrumHashes = {
     GOhmPriceOracleArbitrum: "0xce075a561806260b1d4472b68c07b3784c1f5b2065500f2f217085fcf78e4470",
     UniswapTwapPriceOracleV2_SushiSwap: "0x9fd6d9f10e83d15240e17ade5fbacf6ad30dbffa3b3596ebc985cce96f4aaef2",
 };
-//# sourceMappingURL=getOracleHashes.js.map

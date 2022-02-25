@@ -15,4 +15,3 @@ export function getPriceFromOracle(tokenAddress, oracleAddress) {
     const oracleContract = new Contract(oracleAddress, oracleInterface, this._provider);
     return oracleContract.callStatic.price(tokenAddress);
 }
-//# sourceMappingURL=get-price-from-oracle.js.map

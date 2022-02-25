@@ -23,4 +23,3 @@ export function fetchRewardedMarketsInRd(rdAddress) {
         return yield rdContract.callStatic.getAllMarkets();
     });
 }
-//# sourceMappingURL=fetchRewardedMarketsInRd.js.map
