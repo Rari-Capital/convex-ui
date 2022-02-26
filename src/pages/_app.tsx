@@ -11,8 +11,6 @@ import { ReactQueryDevtools } from "react-query/devtools";
 import { PoolProvider } from "context/PoolContext";
 
 function MyApp({ Component, pageProps }: any) {
-  console.log({ theme });
-
   const queryClient = new QueryClient();
   return (
     <ChakraProvider theme={theme}>
