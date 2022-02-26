@@ -1,19 +1,18 @@
-import { VStack } from '@chakra-ui/react'
-import Pool from 'components/pages/Pool'
-import Head from 'next/head'
+import { Box } from "@chakra-ui/react";
+import Pool from "components/pages/Pool";
+import Head from "next/head";
 
 function PoolPage() {
   return (
-    <VStack w="100%" h="100%">
+    <Box>
       <Head>
         <title>Tribe Convex Pool</title>
         <meta name="description" content="Tribe Convex Pool" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Pool />
-    </VStack>
-  )
+    </Box>
+  );
 }
 
-
-export default PoolPage
+export default PoolPage;
