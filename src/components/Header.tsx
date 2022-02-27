@@ -30,6 +30,7 @@ const Header: React.FC<BoxProps> = (props) => {
       color="white"
       paddingTop={4}
       position="relative"
+      overflowX="hidden"
       {...props}
     >
       <Image

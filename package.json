@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@chakra-ui/icons": "^1.1.7",
     "@chakra-ui/react": "^1.8.5",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
@@ -15,7 +16,7 @@
     "ethers": "^5.5.4",
     "framer-motion": "^6",
     "next": "12.1.0",
-    "rari-components": "git+https://github.com/Rari-Capital/rari-components#73d49ad84066472cfb6c133f1a56b628e63acaf9",
+    "rari-components": "git+https://github.com/Rari-Capital/rari-components#0f5860acbe3d1d12b759fd5d4f3736c33237cc16",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-query": "^3.34.16",
