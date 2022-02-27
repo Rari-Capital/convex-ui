@@ -1,8 +1,8 @@
-import { Box, Spinner, VStack } from "@chakra-ui/react";
+import { Box, Flex, Spinner, VStack } from "@chakra-ui/react";
 import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
 import usePoolData from "hooks/pool/usePoolData";
-import { Card, Heading } from "rari-components";
+import { Card, Heading, TokenIcon } from "rari-components";
 // import { useEffect } from 'react'
 // import { convexAPR } from 'utils/convex/convex2'
 
@@ -14,6 +14,8 @@ const Pool = () => {
   // }, [])
 
   if (!poolInfo) return <Spinner />;
+
+  console.log({ markets });
 
   return (
     <Box>
@@ -32,12 +34,14 @@ const Pool = () => {
         Markets
       </Heading>
       <VStack mt={4} align="stretch" spacing={4}>
-        <Card variant="light">
-          <Heading size="lg">FRAX3CRV</Heading>
-        </Card>
-        <Card variant="light">
-          <Heading size="lg">DAI</Heading>
-        </Card>
+        {markets?.assets?.map((asset) => (
+          <Card variant="light">
+            <Flex alignItems="center">
+              <TokenIcon address={asset.underlyingToken} mr={4} />
+              <Heading size="lg">{asset.underlyingSymbol}</Heading>
+            </Flex>
+          </Card>
+        ))}
       </VStack>
     </Box>
   );
