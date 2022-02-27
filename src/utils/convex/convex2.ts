@@ -67,12 +67,24 @@ async function convexAPRWithPrice(
   if (cvxPrice <= 0) cvxPrice = await getPrice(cvxAddress, pool.currency);
   if (crvPrice <= 0) crvPrice = await getPrice(crvAddress, pool.currency);
 
-  console.log({ stakingContractAddress, poolName, cvxPrice, crvPrice });
-
   let crvAPR = crvPerYear * crvPrice;
   let cvxAPR = cvxPerYear * cvxPrice;
-
+  console.log({
+    poolName,
+    cvxPrice,
+    crvPrice,
+    rate,
+    lpVirtualPrice,
+    supply,
+    virtualSupplyUSD,
+    crvPerUnderlying,
+    crvPerYear,
+    cvxPerYear,
+    cvxAPR,
+    crvAPR,
+  });
   let apr = crvAPR + cvxAPR;
+
   console.log("apr of crv/cvx: ", { crvAPR, cvxAPR, apr, poolName });
   if (pool.extras != undefined && pool.extras.length > 0) {
     for (var i in pool.extras) {
@@ -81,15 +93,18 @@ async function convexAPRWithPrice(
       var perUnderlying = exrate / supply;
       var perYear = perUnderlying * 86400 * 365;
       var price = await getPrice(ex.token, pool.currency);
-      console.log({ ex, exrate, supply, perUnderlying, perYear, price });
-      console.log(
-        `extra ${ex.name} per year: ` +
-          perYear +
-          "  price: " +
-          price +
-          " apr: " +
-          perYear * price
-      );
+      // console.log({ ex, exrate, supply, perUnderlying, perYear, price });
+      // console.log(
+      //   `extra ${ex.name} per year: ` +
+      //     perYear +
+      //     "  price: " +
+      //     price +
+      //     " apr: " +
+      //     perYear * price
+      // );
+      //extra APR  = underlying per yr in units/second * price
+      var extraApr = perYear * price;
+      // console.log('extra', ex.name, extraApr);
       apr += perYear * price;
     }
   }
@@ -208,7 +223,7 @@ async function balanceOf(
 
 // Fetches price from coingecko
 async function getPrice(tokenAddress: string, vsCoin: string) {
-  console.log({ tokenAddress, vsCoin });
+  // console.log({ tokenAddress, vsCoin });
   var url =
     "https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=" +
     tokenAddress +
