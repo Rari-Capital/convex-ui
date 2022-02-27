@@ -1,6 +1,6 @@
 import { BigNumber, Contract } from "ethers";
 import { ConvexPool, pools } from "./convexpools";
-import { formatUnits } from "ethers/lib/utils";
+import { formatEther, formatUnits } from "ethers/lib/utils";
 
 import BaseRewardPoolABI from "./abis/convex/BaseRewardPool.json";
 import SwapABI from "./abis/convex/Swap.json";
@@ -22,6 +22,8 @@ export interface ConvexData {
   crvPerUnderlying: number;
   crvPerYear: number;
   cvxPerYear: number;
+  crvAPR: number;
+  cvxAPR: number;
   apr: number;
 }
 
@@ -34,10 +36,12 @@ async function convexAPRWithPrice(
   var pool = pools.find((pool) => pool.name == poolName);
   if (!pool) return;
   var curveSwap = pool.swap;
-  var stakeContractAddress = pool.crvRewards;
+  var stakingContractAddress = pool.crvRewards;
 
   //get reward rate
-  const rate = await rewardRate(stakeContractAddress, provider);
+  const rate = await rewardRate(stakingContractAddress, provider);
+
+  // console.log({ poolName, rate });
 
   //get LP Virtual price
   let lpVirtualPrice = 1;
@@ -48,7 +52,7 @@ async function convexAPRWithPrice(
   }
 
   //get LP Token supply
-  let supply = await supplyOf(stakeContractAddress, provider);
+  let supply = await supplyOf(stakingContractAddress, provider);
 
   // Get LP virtual Supply USD
   let virtualSupplyUSD = supply * lpVirtualPrice;
@@ -61,10 +65,15 @@ async function convexAPRWithPrice(
   let cvxPerYear = await getCVXMintAmount(crvPerYear, provider);
 
   if (cvxPrice <= 0) cvxPrice = await getPrice(cvxAddress, pool.currency);
+  if (crvPrice <= 0) crvPrice = await getPrice(crvAddress, pool.currency);
 
-  var apr = crvPerYear * crvPrice;
-  apr += cvxPerYear * cvxPrice;
-  console.log("apr of crv/cvx: " + apr);
+  console.log({ stakingContractAddress, poolName, cvxPrice, crvPrice });
+
+  let crvAPR = crvPerYear * crvPrice;
+  let cvxAPR = cvxPerYear * cvxPrice;
+
+  let apr = crvAPR + cvxAPR;
+  console.log("apr of crv/cvx: ", { crvAPR, cvxAPR, apr, poolName });
   if (pool.extras != undefined && pool.extras.length > 0) {
     for (var i in pool.extras) {
       var ex = pool.extras[i];
@@ -72,8 +81,9 @@ async function convexAPRWithPrice(
       var perUnderlying = exrate / supply;
       var perYear = perUnderlying * 86400 * 365;
       var price = await getPrice(ex.token, pool.currency);
+      console.log({ ex, exrate, supply, perUnderlying, perYear, price });
       console.log(
-        "extra per year: " +
+        `extra ${ex.name} per year: ` +
           perYear +
           "  price: " +
           price +
@@ -100,22 +110,22 @@ async function convexAPRWithPrice(
     crvPerUnderlying,
     crvPerYear,
     cvxPerYear,
+    crvAPR,
+    cvxAPR,
     apr,
   };
 
   return result;
 }
 
-async function rewardRate(stakeContractAddress: string, provider: any) {
-  const stakeContract = new Contract(
-    stakeContractAddress,
+async function rewardRate(stakingContractAddress: string, provider: any) {
+  const stakingContract = new Contract(
+    stakingContractAddress,
     BaseRewardPoolABI,
     provider
   );
-  const rewardRate: BigNumber = await stakeContract.callStatic.rewardRate();
-  console.log({ rewardRate }, rewardRate.toString());
-  const decimal = Math.pow(10, 18);
-  const rate = parseInt(rewardRate._hex, 16) / decimal;
+  const rewardRate: BigNumber = await stakingContract.callStatic.rewardRate();
+  const rate = parseFloat(formatEther(rewardRate.toString())); // assume 1e18
   return rate;
 }
 
@@ -198,12 +208,13 @@ async function balanceOf(
 
 // Fetches price from coingecko
 async function getPrice(tokenAddress: string, vsCoin: string) {
+  console.log({ tokenAddress, vsCoin });
   var url =
     "https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=" +
     tokenAddress +
     "&vs_currencies=" +
     vsCoin;
-  console.log("getPrice", { url });
+  // console.log("getPrice", { url });
   try {
     const response = await fetch(url);
     const data = await response.json();

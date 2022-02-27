@@ -38,11 +38,14 @@ export function usdFormatter(num: number) {
   return formatter.format(num);
 }
 
-export function shortUsdFormatter(num: number | string) {
+export function shortUsdFormatter(num: number | string | BigNumber) {
   if (typeof num === typeof "") {
     return "$" + shortFormatter.format(parseFloat(num as string));
+  } else if (typeof num === typeof 69) {
+    return "$" + shortFormatter.format(num as number);
+  } else {
+    return "$" + shortFormatter.format(parseFloat(num.toString()));
   }
-  return "$" + shortFormatter.format(num as number);
 }
 
 export const abbreviateAmount = (amount: number) => {

@@ -5,15 +5,16 @@ import usePoolData from 'hooks/pool/usePoolData'
 import { Card } from 'rari-components'
 import { useEffect, useState } from 'react'
 import { convexAPR, ConvexData } from 'utils/convex/convex2'
+import { shortUsdFormatter } from 'utils/formatters'
 
 
 // Convex Pools to get rewards APR from
-const pools = ["frax", "steth", 'ust', 'tricrypto2']
+const pools = ["frax", "steth", 'ust', 'tricrypto2', 'fei', 'alusd']
 
 
 const Pool = () => {
     const { provider } = useRari()
-    const { poolInfo } = usePoolContext();
+    const { poolInfo, markets } = usePoolContext();
 
     const [convexPools, setConvexPools] = useState<(ConvexData | undefined)[]>([])
 
@@ -29,6 +30,7 @@ const Pool = () => {
             {
                 !!poolInfo ? <Heading>{poolInfo.name}</Heading> : <Spinner />
             }
+
             {convexPools.map((cvxPool) => {
                 if (!cvxPool) return
                 return (
@@ -36,7 +38,9 @@ const Pool = () => {
                         <Heading>{cvxPool.poolName}</Heading>
                         <HStack justify={"space-around"}>
                             <VStack align="flex-start">
-                                <Text>APR: {cvxPool.apr.toFixed(2)} %</Text>
+                                <Text>APR: {(cvxPool.apr * 100).toFixed(2)} %</Text>
+                                <Text>CRV APR: {(cvxPool.crvAPR * 100).toFixed(2)} %</Text>
+                                <Text>CVX APR: {(cvxPool.cvxAPR * 100).toFixed(2)} %</Text>
                                 <Text>Reward Rate: {cvxPool.rate}</Text>
                                 <Text>Supply: {cvxPool.supply}</Text>
                                 <Text>Virtual Supply: {cvxPool.virtualSupplyUSD}</Text>

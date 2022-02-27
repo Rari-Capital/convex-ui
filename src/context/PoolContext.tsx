@@ -1,9 +1,15 @@
+import { Context } from "@popperjs/core";
 import usePoolData from "hooks/pool/usePoolData";
+import { FusePoolData, MarketsWithData } from "lib/esm/types";
 import { createContext, ReactChildren, useContext, useMemo } from "react";
 
-export const PoolContext = createContext<undefined | any>(
+export const PoolContext = createContext<undefined | PoolContextData>(
     undefined
 );
+
+type PoolContextData = {
+    poolInfo: FusePoolData | undefined, markets: MarketsWithData | undefined
+}
 
 export const PoolProvider = ({
     poolIndex,
@@ -16,7 +22,7 @@ export const PoolProvider = ({
     const value = useMemo(() => ({
         poolInfo, markets
     }), [poolInfo, markets])
-    
+
     return <PoolContext.Provider value={value}>{children}</PoolContext.Provider>;
 };
 
