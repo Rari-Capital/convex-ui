@@ -1,9 +1,18 @@
-import { Heading } from '@chakra-ui/react'
+import { Box } from "@chakra-ui/react";
+import Claim from "components/pages/Claim";
+import Head from "next/head";
 
-const claim = () => {
+const ClaimPage = () => {
   return (
-    <Heading>CLAIM</Heading>
-  )
-}
+    <Box>
+      <Head>
+        <title>Tribe Convex Pool</title>
+        <meta name="description" content="Tribe Convex Pool" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Claim />
+    </Box>
+  );
+};
 
-export default claim
+export default ClaimPage;
