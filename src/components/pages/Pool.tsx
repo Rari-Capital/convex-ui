@@ -206,3 +206,81 @@ const Pool = () => {
 };
 
 export default Pool;
+
+const MarketCard = ({
+  marketStaticData,
+  marketsDynamicData,
+  type
+} : {
+  marketStaticData: StaticData,
+  marketsDynamicData: USDPricedFuseAsset
+  type: "supply" | "borrow"
+}) => {
+  return (
+    <ExpandableCard
+        width="100%"
+        variant="light"
+        expandableChildren={
+          <VStack spacing={4} alignItems="stretch">
+            <TokenAmountInput
+              variant="light"
+              tokenSymbol={ marketStaticData.underlyingSymbol}
+              tokenAddress={marketStaticData.underlyingToken}
+              onClickMax={() => {}}
+            />
+            <StatisticTable
+              variant="light"
+              statistics={[
+                ["Supply Balance", "$24,456"],
+                ["Borrow Limit", "$18,543"],
+              ]}
+            />
+            <Button>Approve</Button>
+          </VStack>
+        }
+      >
+        <Flex alignItems="center" id="hello" width="100%">
+          <TokenIcon tokenAddress={marketStaticData.underlyingToken} mr={4} />
+          <Flex direction="column" width="100%">
+            <Flex width="auto">
+              <Heading size="lg" mr={4}>
+                {marketStaticData.underlyingSymbol}
+              </Heading>
+              <Box alignSelf="center">
+                <Badge variant={type === "supply" ? "success" : "warning"}>
+                  {type}
+                </Badge>
+              </Box>
+            </Flex>
+            <Flex>
+              <Text variant="secondary" textAlign="left">
+              {parseFloat(utils.formatEther(marketStaticData.collateralFactor))* 100}% LTV
+              </Text>
+
+              &middot;
+
+              <Text>
+              {utils.formatEther(marketsDynamicData.supplyRatePerBlock.mul(100))} Supply APY
+              </Text>
+
+              &middot;
+              
+              <Text>
+              {marketsDynamicData.totalSupplyUSD.toString()}M Supplied
+              </Text>
+            </Flex>
+          </Flex>
+        </Flex>
+      </ExpandableCard>
+  )
+}
+
+const Separator = () => {
+  return (
+    <Text
+      opacity="0.5"
+    >
+      ●
+    </Text>
+  )
+}
