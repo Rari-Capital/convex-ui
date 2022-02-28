@@ -44,7 +44,7 @@ const Pool = () => {
                 onClickMax={() => {}}
               />
               <StatisticTable
-                variant="light"
+                variant="active"
                 statistics={[
                   ["Supply Balance", "$24,456"],
                   ["Borrow Limit", "$18,543"],
@@ -84,7 +84,7 @@ const Pool = () => {
                 onClickMax={() => {}}
               />
               <StatisticTable
-                variant="light"
+                variant="active"
                 statistics={[
                   ["Supply Balance", "$24,456"],
                   ["Borrow Limit", "$18,543"],
@@ -118,14 +118,27 @@ const Pool = () => {
       </Heading>
       <Stack mt={4} width="100%" direction={["column", "row"]} spacing={4}>
         <VStack alignItems="stretch" spacing={4} flex={1}>
-          {marketsStaticData ? marketsDynamicData?.markets?.map((market, i) => (
-            <MarketCard marketStaticData={marketsStaticData[i]} marketsDynamicData={market} key={i} type="supply"/>
-          )): null}
+          {marketsStaticData
+            ? marketsDynamicData?.markets?.map((market, i) => (
+                <MarketCard
+                  marketStaticData={marketsStaticData[i]}
+                  marketsDynamicData={market}
+                  key={i}
+                  type="supply"
+                />
+              ))
+            : null}
         </VStack>
         <VStack alignItems="stretch" spacing={4} flex={1}>
-          { marketsStaticData ?marketsDynamicData?.markets?.map((market, i) => (
-            <MarketCard marketStaticData={marketsStaticData[i]} marketsDynamicData={market} type="borrow"/>
-          )) : null }
+          {marketsStaticData
+            ? marketsDynamicData?.markets?.map((market, i) => (
+                <MarketCard
+                  marketStaticData={marketsStaticData[i]}
+                  marketsDynamicData={market}
+                  type="borrow"
+                />
+              ))
+            : null}
         </VStack>
       </Stack>
     </Box>
@@ -137,67 +150,64 @@ export default Pool;
 const MarketCard = ({
   marketStaticData,
   marketsDynamicData,
-  type
-} : {
-  marketStaticData: StaticData,
-  marketsDynamicData: USDPricedFuseAsset
-  type: "supply" | "borrow"
+  type,
+}: {
+  marketStaticData: StaticData;
+  marketsDynamicData: USDPricedFuseAsset;
+  type: "supply" | "borrow";
 }) => {
   return (
     <ExpandableCard
-        width="100%"
-        variant="light"
-        expandableChildren={
-          <VStack spacing={4} alignItems="stretch">
-            <TokenAmountInput
-              variant="light"
-              tokenSymbol={ marketStaticData.underlyingSymbol}
-              tokenAddress={marketStaticData.underlyingToken}
-              onClickMax={() => {}}
-            />
-            <StatisticTable
-              variant="light"
-              statistics={[
-                ["Supply Balance", "$24,456"],
-                ["Borrow Limit", "$18,543"],
-              ]}
-            />
-            <Button>Approve</Button>
-          </VStack>
-        }
-      >
-        <Flex alignItems="center" id="hello" width="100%">
-          <TokenIcon tokenAddress={marketStaticData.underlyingToken} mr={4} />
-          <Flex direction="column" width="100%">
-            <Flex width="auto">
-              <Heading size="lg" mr={4}>
-                {marketStaticData.underlyingSymbol}
-              </Heading>
-              <Box alignSelf="center">
-                <Badge variant={type === "supply" ? "success" : "warning"}>
-                  {type}
-                </Badge>
-              </Box>
-            </Flex>
-            <Text variant="secondary" textAlign="left">
-              {parseFloat(utils.formatEther(marketStaticData.collateralFactor))* 100}% LTV
-              &middot;
-              {utils.formatEther(marketsDynamicData.supplyRatePerBlock.mul(100))} Supply APY
-              &middot;
-              {marketsDynamicData.totalSupplyUSD.toString()}M Supplied
-            </Text>
+      width="100%"
+      variant="light"
+      expandableChildren={
+        <VStack spacing={4} alignItems="stretch">
+          <TokenAmountInput
+            variant="light"
+            tokenSymbol={marketStaticData.underlyingSymbol}
+            tokenAddress={marketStaticData.underlyingToken}
+            onClickMax={() => {}}
+          />
+          <StatisticTable
+            variant="light"
+            statistics={[
+              ["Supply Balance", "$24,456"],
+              ["Borrow Limit", "$18,543"],
+            ]}
+          />
+          <Button>Approve</Button>
+        </VStack>
+      }
+    >
+      <Flex alignItems="center" id="hello" width="100%">
+        <TokenIcon tokenAddress={marketStaticData.underlyingToken} mr={4} />
+        <Flex direction="column" width="100%">
+          <Flex width="auto">
+            <Heading size="lg" mr={4}>
+              {marketStaticData.underlyingSymbol}
+            </Heading>
+            <Box alignSelf="center">
+              <Badge variant={type === "supply" ? "success" : "warning"}>
+                {type}
+              </Badge>
+            </Box>
           </Flex>
+          <Text variant="secondary" textAlign="left">
+            {parseFloat(utils.formatEther(marketStaticData.collateralFactor)) *
+              100}
+            % LTV &middot;
+            {utils.formatEther(
+              marketsDynamicData.supplyRatePerBlock.mul(100)
+            )}{" "}
+            Supply APY &middot;
+            {marketsDynamicData.totalSupplyUSD.toString()}M Supplied
+          </Text>
         </Flex>
-      </ExpandableCard>
-  )
-}
+      </Flex>
+    </ExpandableCard>
+  );
+};
 
 const Separator = () => {
-  return (
-    <Text
-      opacity="0.5"
-    >
-      ●
-    </Text>
-  )
-}
+  return <Text opacity="0.5">●</Text>;
+};
