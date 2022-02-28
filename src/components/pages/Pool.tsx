@@ -1,14 +1,15 @@
-import { Box, Flex, Spacer, Spinner, Stack, Tag, VStack } from "@chakra-ui/react";
+import { Box, Flex, Spacer, Spinner, Stack, VStack } from "@chakra-ui/react";
 import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
 import { utils } from "ethers";
 import usePoolData from "hooks/pool/usePoolData";
 import { MarketsWithData, StaticData, USDPricedFuseAsset } from "lib/esm/types";
 import {
+  Badge,
   Button,
-  Card,
   ExpandableCard,
   Heading,
+  StatisticTable,
   Text,
   TokenAmountInput,
   TokenIcon,
@@ -34,7 +35,7 @@ const Pool = () => {
         <ExpandableCard
           variant="active"
           expandableChildren={
-            <VStack spacing={4}>
+            <VStack spacing={4} alignItems="stretch">
               <TokenAmountInput
                 size="lg"
                 variant="light"
@@ -42,7 +43,14 @@ const Pool = () => {
                 tokenAddress="0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
                 onClickMax={() => {}}
               />
-              <Button alignSelf="flex-start">Approve</Button>
+              <StatisticTable
+                variant="light"
+                statistics={[
+                  ["Supply Balance", "$24,456"],
+                  ["Borrow Limit", "$18,543"],
+                ]}
+              />
+              <Button alignSelf="stretch">Approve</Button>
             </VStack>
           }
         >
@@ -51,7 +59,10 @@ const Pool = () => {
               tokenAddress="0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
               mr={4}
             />
-            <Heading size="xl">UST</Heading>
+            <Heading size="xl" mr={4}>
+              UST
+            </Heading>
+            <Badge variant="success">Supply</Badge>
             <Spacer />
             <Box mr={8}>
               <Text variant="secondary" mb={1}>
@@ -64,7 +75,7 @@ const Pool = () => {
         <ExpandableCard
           variant="active"
           expandableChildren={
-            <VStack spacing={4}>
+            <VStack spacing={4} alignItems="stretch">
               <TokenAmountInput
                 size="lg"
                 variant="light"
@@ -72,7 +83,14 @@ const Pool = () => {
                 tokenAddress="0xD533a949740bb3306d119CC777fa900bA034cd52"
                 onClickMax={() => {}}
               />
-              <Button alignSelf="flex-start">Approve</Button>
+              <StatisticTable
+                variant="light"
+                statistics={[
+                  ["Supply Balance", "$24,456"],
+                  ["Borrow Limit", "$18,543"],
+                ]}
+              />
+              <Button alignSelf="stretch">Approve</Button>
             </VStack>
           }
         >
@@ -81,11 +99,14 @@ const Pool = () => {
               tokenAddress="0xD533a949740bb3306d119CC777fa900bA034cd52"
               mr={4}
             />
-            <Heading size="xl">FEI3CRV</Heading>
+            <Heading size="xl" mr={4}>
+              FEI3CRV
+            </Heading>
+            <Badge variant="warning">Borrow</Badge>
             <Spacer />
             <Box mr={8}>
               <Text variant="secondary" mb={1}>
-                Supply APY
+                Borrow APR
               </Text>
               <Heading size="lg">27.6%</Heading>
             </Box>
@@ -127,58 +148,44 @@ const MarketCard = ({
         width="100%"
         variant="light"
         expandableChildren={
-          <VStack spacing={4}>
+          <VStack spacing={4} alignItems="stretch">
             <TokenAmountInput
               variant="light"
               tokenSymbol={ marketStaticData.underlyingSymbol}
               tokenAddress={marketStaticData.underlyingToken}
               onClickMax={() => {}}
             />
+            <StatisticTable
+              variant="light"
+              statistics={[
+                ["Supply Balance", "$24,456"],
+                ["Borrow Limit", "$18,543"],
+              ]}
+            />
             <Button>Approve</Button>
           </VStack>
         }
       >
         <Flex alignItems="center" id="hello" width="100%">
-            <TokenIcon tokenAddress={marketStaticData.underlyingToken} mr={4} />
+          <TokenIcon tokenAddress={marketStaticData.underlyingToken} mr={4} />
           <Flex direction="column" width="100%">
             <Flex width="auto">
-              <Heading 
-                size="lg" 
-                mr="3vh"
-              >
+              <Heading size="lg" mr={4}>
                 {marketStaticData.underlyingSymbol}
               </Heading>
               <Box alignSelf="center">
-                <Tag 
-                  size="sm" 
-                  variant="solid" 
-                  backgroundColor={type === "supply" ? "#002F17": "#2F1C00"} 
-                  color={type === "supply" ? "#4CD791" : "#FFBE5E"}
-                >
+                <Badge variant={type === "supply" ? "success" : "warning"}>
                   {type}
-                </Tag>
+                </Badge>
               </Box>
             </Flex>
-            <Flex>
-              <Text
-                display="block"
-              >
-                {parseFloat(utils.formatEther(marketStaticData.collateralFactor))* 100}% LTV
-              </Text>
-              <Separator/>
-
-              <Text
-                display="block"
-              >
-                {utils.formatEther(marketsDynamicData.supplyRatePerBlock.mul(100))} Supply APY
-              </Text>
-              <Separator/>
-              <Text
-                display="block"
-              >
-                {marketsDynamicData.totalSupplyUSD.toString()}M Supplied
-              </Text>
-            </Flex>
+            <Text variant="secondary" textAlign="left">
+              {parseFloat(utils.formatEther(marketStaticData.collateralFactor))* 100}% LTV
+              &middot;
+              {utils.formatEther(marketsDynamicData.supplyRatePerBlock.mul(100))} Supply APY
+              &middot;
+              {marketsDynamicData.totalSupplyUSD.toString()}M Supplied
+            </Text>
           </Flex>
         </Flex>
       </ExpandableCard>
