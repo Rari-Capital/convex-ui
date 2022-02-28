@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { Interface } from "@ethersproject/abi";
 import { Contract } from "@ethersproject/contracts";
 import { callInterfaceWithMulticall, } from "../../../utils/multicall";
-import { providers } from "@0xsequence/multicall";
 /**
  *
  * @param marketAddress - The market contract address to query.
@@ -18,9 +17,8 @@ import { providers } from "@0xsequence/multicall";
  * @param oracleAddress - The pool's oracle address.
  * @returns - The markets static data. Oracle, collateral factor, etc.
  */
-export function fetchStaticMarketData(marketAddress, provider, oracleAddress) {
+export function fetchStaticMarketData(marketAddress, provider, oracleAddress, comptrollerAddress) {
     return __awaiter(this, void 0, void 0, function* () {
-        const multicallProvider = new providers.MulticallProvider(provider);
         const cTokenInterface = new Interface([
             "function isCEther() external view returns (bool)",
             "function underlying() external view returns (address)",
@@ -35,6 +33,11 @@ export function fetchStaticMarketData(marketAddress, provider, oracleAddress) {
             "fuseFeeMantissa",
             "reserveFactorMantissa",
         ], [[], [], [], [], []]);
+        const comptrollerInterface = new Interface([
+            "function markets(address cToken) external view returns (bool, uint)"
+        ]);
+        const comptrollerContract = new Contract(comptrollerAddress, comptrollerInterface, provider);
+        const [isListed, collateralFactor] = yield comptrollerContract.callStatic.markets(marketAddress);
         const isCEther = cTokenData[0][0];
         const underlying = cTokenData[1][0];
         const adminFeeMantissa = cTokenData[2][0];
@@ -74,6 +77,7 @@ export function fetchStaticMarketData(marketAddress, provider, oracleAddress) {
             adminFeeMantissa,
             fuseFeeMantissa,
             reserveFactor,
+            collateralFactor,
             oracle,
             underlyingToken,
             underlyingName,

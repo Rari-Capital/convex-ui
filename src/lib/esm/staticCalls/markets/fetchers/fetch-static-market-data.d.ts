@@ -6,4 +6,4 @@ import { StaticData } from "../../../types";
  * @param oracleAddress - The pool's oracle address.
  * @returns - The markets static data. Oracle, collateral factor, etc.
  */
-export declare function fetchStaticMarketData(marketAddress: string, provider: any, oracleAddress: string): Promise<StaticData>;
+export declare function fetchStaticMarketData(marketAddress: string, provider: any, oracleAddress: string, comptrollerAddress: string): Promise<StaticData>;

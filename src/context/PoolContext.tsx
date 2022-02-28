@@ -1,5 +1,5 @@
 import usePoolData from "hooks/pool/usePoolData";
-import { FusePoolData, MarketsWithData } from "lib/esm/types";
+import { FusePoolData, MarketsWithData, StaticData } from "lib/esm/types";
 import { createContext, ReactChildren, useContext, useMemo } from "react";
 
 export const PoolContext = createContext<undefined | PoolContextData>(
@@ -8,7 +8,8 @@ export const PoolContext = createContext<undefined | PoolContextData>(
 
 type PoolContextData = {
   poolInfo?: FusePoolData;
-  markets?: MarketsWithData;
+  marketsDynamicData?: MarketsWithData;
+  marketsStaticData?: StaticData[]
 };
 
 export const PoolProvider = ({
@@ -18,13 +19,14 @@ export const PoolProvider = ({
   poolIndex: number;
   children: ReactChildren;
 }) => {
-  const { poolInfo, markets } = usePoolData(poolIndex);
+  const { poolInfo, marketsDynamicData, marketsStaticData } = usePoolData(poolIndex);
   const value = useMemo(
     () => ({
       poolInfo,
-      markets,
+      marketsDynamicData,
+      marketsStaticData
     }),
-    [poolInfo, markets]
+    [poolInfo, marketsDynamicData, marketsStaticData]
   );
 
   return <PoolContext.Provider value={value}>{children}</PoolContext.Provider>;

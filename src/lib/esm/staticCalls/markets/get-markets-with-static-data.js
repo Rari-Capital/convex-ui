@@ -21,7 +21,7 @@ export function getAllMarketsWithStaticData(comptrollerAddress, oracleAddress) {
         const markets = yield fetchAllMarkets(comptrollerAddress, this._provider);
         let marketsWithStaticData = [];
         for (const market of markets) {
-            const staticData = yield fetchStaticMarketData(market, this._provider, oracleAddress);
+            const staticData = yield fetchStaticMarketData(market, this._provider, oracleAddress, comptrollerAddress);
             marketsWithStaticData.push(staticData);
         }
         return marketsWithStaticData;

@@ -1,9 +1,12 @@
-import { Box, Flex, Spacer, Spinner, Stack, VStack } from "@chakra-ui/react";
+import { Box, Flex, Spacer, Spinner, Stack, Tag, VStack } from "@chakra-ui/react";
 import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
+import { utils } from "ethers";
 import usePoolData from "hooks/pool/usePoolData";
+import { MarketsWithData, StaticData, USDPricedFuseAsset } from "lib/esm/types";
 import {
   Button,
+  Card,
   ExpandableCard,
   Heading,
   Text,
@@ -15,7 +18,7 @@ import {
 
 const Pool = () => {
   const { address, provider } = useRari();
-  const { poolInfo, markets } = usePoolContext();
+  const { poolInfo, marketsDynamicData, marketsStaticData } = usePoolContext();
   // useEffect(() => {
   //     convexAPR("frax", provider).then((apr) => console.log({ apr }))
   // }, [])
@@ -94,60 +97,14 @@ const Pool = () => {
       </Heading>
       <Stack mt={4} width="100%" direction={["column", "row"]} spacing={4}>
         <VStack alignItems="stretch" spacing={4} flex={1}>
-          {markets?.assets?.map((asset) => (
-            <ExpandableCard
-              variant="light"
-              expandableChildren={
-                <VStack spacing={4}>
-                  <TokenAmountInput
-                    variant="light"
-                    tokenSymbol={asset.underlyingSymbol}
-                    tokenAddress={asset.underlyingToken}
-                    onClickMax={() => {}}
-                  />
-                  <Button alignSelf="flex-start">Approve</Button>
-                </VStack>
-              }
-            >
-              <Flex alignItems="center">
-                <TokenIcon tokenAddress={asset.underlyingToken} mr={4} />
-                <Box textAlign="left">
-                  <Heading size="lg">{asset.underlyingSymbol}</Heading>
-                  <Text variant="secondary">
-                    60% LTV &middot; 37.6% Supply APY &middot; 32M Supplied
-                  </Text>
-                </Box>
-              </Flex>
-            </ExpandableCard>
-          ))}
+          {marketsStaticData ? marketsDynamicData?.markets?.map((market, i) => (
+            <MarketCard marketStaticData={marketsStaticData[i]} marketsDynamicData={market} key={i} type="supply"/>
+          )): null}
         </VStack>
         <VStack alignItems="stretch" spacing={4} flex={1}>
-          {markets?.assets?.map((asset) => (
-            <ExpandableCard
-              variant="light"
-              expandableChildren={
-                <VStack spacing={4}>
-                  <TokenAmountInput
-                    variant="light"
-                    tokenSymbol={asset.underlyingSymbol}
-                    tokenAddress={asset.underlyingToken}
-                    onClickMax={() => {}}
-                  />
-                  <Button alignSelf="flex-start">Approve</Button>
-                </VStack>
-              }
-            >
-              <Flex alignItems="center">
-                <TokenIcon tokenAddress={asset.underlyingToken} mr={4} />
-                <Box textAlign="left">
-                  <Heading size="lg">{asset.underlyingSymbol}</Heading>
-                  <Text variant="secondary">
-                    7.2M Liquidity &middot; 37.6% Borrow APR
-                  </Text>
-                </Box>
-              </Flex>
-            </ExpandableCard>
-          ))}
+          { marketsStaticData ?marketsDynamicData?.markets?.map((market, i) => (
+            <MarketCard marketStaticData={marketsStaticData[i]} marketsDynamicData={market} type="borrow"/>
+          )) : null }
         </VStack>
       </Stack>
     </Box>
@@ -155,3 +112,85 @@ const Pool = () => {
 };
 
 export default Pool;
+
+const MarketCard = ({
+  marketStaticData,
+  marketsDynamicData,
+  type
+} : {
+  marketStaticData: StaticData,
+  marketsDynamicData: USDPricedFuseAsset
+  type: "supply" | "borrow"
+}) => {
+  return (
+    <ExpandableCard
+        width="100%"
+        variant="light"
+        expandableChildren={
+          <VStack spacing={4}>
+            <TokenAmountInput
+              variant="light"
+              tokenSymbol={ marketStaticData.underlyingSymbol}
+              tokenAddress={marketStaticData.underlyingToken}
+              onClickMax={() => {}}
+            />
+            <Button>Approve</Button>
+          </VStack>
+        }
+      >
+        <Flex alignItems="center" id="hello" width="100%">
+            <TokenIcon tokenAddress={marketStaticData.underlyingToken} mr={4} />
+          <Flex direction="column" width="100%">
+            <Flex width="auto">
+              <Heading 
+                size="lg" 
+                mr="3vh"
+              >
+                {marketStaticData.underlyingSymbol}
+              </Heading>
+              <Box alignSelf="center">
+                <Tag 
+                  size="sm" 
+                  variant="solid" 
+                  backgroundColor={type === "supply" ? "#002F17": "#2F1C00"} 
+                  color={type === "supply" ? "#4CD791" : "#FFBE5E"}
+                >
+                  {type}
+                </Tag>
+              </Box>
+            </Flex>
+            <Flex>
+              <Text
+                display="block"
+              >
+                {parseFloat(utils.formatEther(marketStaticData.collateralFactor))* 100}% LTV
+              </Text>
+              <Separator/>
+
+              <Text
+                display="block"
+              >
+                {utils.formatEther(marketsDynamicData.supplyRatePerBlock.mul(100))} Supply APY
+              </Text>
+              <Separator/>
+              <Text
+                display="block"
+              >
+                {marketsDynamicData.totalSupplyUSD.toString()}M Supplied
+              </Text>
+            </Flex>
+          </Flex>
+        </Flex>
+      </ExpandableCard>
+  )
+}
+
+const Separator = () => {
+  return (
+    <Text
+      opacity="0.5"
+    >
+      ●
+    </Text>
+  )
+}

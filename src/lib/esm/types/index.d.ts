@@ -154,6 +154,7 @@ export declare type StaticData = {
     adminFeeMantissa: BigNumber;
     fuseFeeMantissa: BigNumber;
     reserveFactor: BigNumber;
+    collateralFactor: BigNumber;
     oracle: string;
     underlyingToken: string;
     underlyingName: string;

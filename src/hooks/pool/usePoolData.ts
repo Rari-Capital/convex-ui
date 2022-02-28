@@ -3,8 +3,9 @@ import { useQuery } from 'react-query';
 import usePool from './usePool';
 
 const usePoolData = (poolIndex: number) => {
-  const { address } = useRari();
+  // const { address } = useRari();
   const pool = usePool(poolIndex);
+  const address = '0xb290f2f3fad4e540d0550985951cdad2711ac34a'
 
   const { data: poolInfo } = useQuery(
     `Pool data PoolID ${pool?.poolId}`,
@@ -14,23 +15,38 @@ const usePoolData = (poolIndex: number) => {
     { refetchOnMount: false, refetchOnWindowFocus: false, enabled: !!pool }
   );
 
-  const { data: markets, isLoading } = useQuery(
+  const { data: marketsDynamicData , isLoading } = useQuery(
     `Pool Markets PoolID ${pool?.poolId} for address ${address}`,
     async () => {
-      if (pool && poolInfo)
-        return await pool.getMarketsWithData(poolInfo.comptroller, {
-          from: address,
-        });
-    },
+      if (pool && poolInfo) {
+        return await pool.getAllMarketsWithDynamicData(poolInfo.comptroller, address, poolInfo.oracle)
+    }},
     {
-      enabled: !!poolInfo,
+      enabled: poolInfo ? true : false,
       refetchInterval: 60000,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false, 
     }
   );
 
+  const { data: marketsStaticData, isLoading: staticLoading } = useQuery(
+    `Pool Static Data ${pool?.poolId}`,
+    async () => {
+      if(pool && poolInfo){
+        return await pool.getAllMarketsWithStaticData(poolInfo.comptroller, poolInfo.oracle)
+      }
+    },
+    {
+      enabled: !!poolInfo && !!marketsDynamicData,
+      refetchOnMount: false, 
+      refetchOnWindowFocus: false, 
+    }
+  )
+
   return {
     poolInfo,
-    markets,
+    marketsDynamicData,
+    marketsStaticData
   };
 };
 
