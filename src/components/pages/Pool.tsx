@@ -4,9 +4,9 @@ import { useRari } from "context/RariContext";
 import usePoolData from "hooks/pool/usePoolData";
 import {
   Button,
-  Card,
   ExpandableCard,
   Heading,
+  Text,
   TokenAmountInput,
   TokenIcon,
 } from "rari-components";
@@ -28,11 +28,65 @@ const Pool = () => {
         Active Positions
       </Heading>
       <VStack mt={4} mb={8} align="stretch" spacing={4}>
-        <ExpandableCard variant="active" expandableChildren={<></>}>
-          <Heading size="lg">UST</Heading>
+        <ExpandableCard
+          variant="active"
+          expandableChildren={
+            <VStack spacing={4}>
+              <TokenAmountInput
+                size="lg"
+                variant="light"
+                tokenSymbol="UST"
+                tokenAddress="0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
+                onClickMax={() => {}}
+              />
+              <Button alignSelf="flex-start">Approve</Button>
+            </VStack>
+          }
+        >
+          <Flex alignItems="center">
+            <TokenIcon
+              tokenAddress="0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
+              mr={4}
+            />
+            <Heading size="xl">UST</Heading>
+            <Spacer />
+            <Box mr={8}>
+              <Text variant="secondary" mb={1}>
+                Supply APY
+              </Text>
+              <Heading size="lg">27.6%</Heading>
+            </Box>
+          </Flex>
         </ExpandableCard>
-        <ExpandableCard variant="active" expandableChildren={<></>}>
-          <Heading size="lg">FEI3CRV</Heading>
+        <ExpandableCard
+          variant="active"
+          expandableChildren={
+            <VStack spacing={4}>
+              <TokenAmountInput
+                size="lg"
+                variant="light"
+                tokenSymbol="FEI3CRV"
+                tokenAddress="0xD533a949740bb3306d119CC777fa900bA034cd52"
+                onClickMax={() => {}}
+              />
+              <Button alignSelf="flex-start">Approve</Button>
+            </VStack>
+          }
+        >
+          <Flex alignItems="center">
+            <TokenIcon
+              tokenAddress="0xD533a949740bb3306d119CC777fa900bA034cd52"
+              mr={4}
+            />
+            <Heading size="xl">FEI3CRV</Heading>
+            <Spacer />
+            <Box mr={8}>
+              <Text variant="secondary" mb={1}>
+                Supply APY
+              </Text>
+              <Heading size="lg">27.6%</Heading>
+            </Box>
+          </Flex>
         </ExpandableCard>
       </VStack>
       <Heading size="md" color="black">
@@ -51,13 +105,18 @@ const Pool = () => {
                     tokenAddress={asset.underlyingToken}
                     onClickMax={() => {}}
                   />
-                  <Button>Approve</Button>
+                  <Button alignSelf="flex-start">Approve</Button>
                 </VStack>
               }
             >
               <Flex alignItems="center">
                 <TokenIcon tokenAddress={asset.underlyingToken} mr={4} />
-                <Heading size="lg">{asset.underlyingSymbol}</Heading>
+                <Box textAlign="left">
+                  <Heading size="lg">{asset.underlyingSymbol}</Heading>
+                  <Text variant="secondary">
+                    60% LTV &middot; 37.6% Supply APY &middot; 32M Supplied
+                  </Text>
+                </Box>
               </Flex>
             </ExpandableCard>
           ))}
@@ -74,13 +133,18 @@ const Pool = () => {
                     tokenAddress={asset.underlyingToken}
                     onClickMax={() => {}}
                   />
-                  <Button>Approve</Button>
+                  <Button alignSelf="flex-start">Approve</Button>
                 </VStack>
               }
             >
               <Flex alignItems="center">
                 <TokenIcon tokenAddress={asset.underlyingToken} mr={4} />
-                <Heading size="lg">{asset.underlyingSymbol}</Heading>
+                <Box textAlign="left">
+                  <Heading size="lg">{asset.underlyingSymbol}</Heading>
+                  <Text variant="secondary">
+                    7.2M Liquidity &middot; 37.6% Borrow APR
+                  </Text>
+                </Box>
               </Flex>
             </ExpandableCard>
           ))}
