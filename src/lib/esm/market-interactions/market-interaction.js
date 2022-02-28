@@ -12,8 +12,8 @@ import { Contract } from "@ethersproject/contracts";
 import { Interface } from "@ethersproject/abi";
 import { parseEther, parseUnits } from "@ethersproject/units";
 // Fuse SDK
-import { testForCTokenErrorAndSend } from "./utils/testForCTokenErrorAndSend";
-import { getDecimals } from "../fetch-data/misc/getDecimals";
+import { testForCTokenErrorAndSend } from "../utils/testForCTokenErrorAndSend";
+import { getDecimals } from "../staticCalls/misc/get-decimals";
 /**
  * @param action - Type of action to perform. i.e borrow, withdraw, repay.
  * @param cTokenAddress - Address of market to withdraw from.
@@ -38,7 +38,7 @@ export function marketInteraction(action, cTokenAddress, amount, tokenAddress, d
         // 2. Parse given amount to the underlying asset's notation.
         // Fetch decimals if not given.
         if (!decimals && !isEth) {
-            decimals = yield getDecimals(tokenAddress, this._provider);
+            decimals = yield getDecimals(tokenAddress);
         }
         // 3. Parse given amount.
         const parsedAmount = decimals === 18 || isEth

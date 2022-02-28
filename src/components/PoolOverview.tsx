@@ -8,7 +8,7 @@ import { smallUsdFormatter } from "utils/formatters";
 
 export const PoolOverview = () => {
   const { address } = useRari();
-  const { markets } = usePoolContext();
+  const { marketsDynamicData } = usePoolContext();
 
   // Show total market statistics if user's wallet is not connected.
   const heading = !!address ? "Portfolio Overview" : "Pool Overview";
@@ -16,13 +16,13 @@ export const PoolOverview = () => {
   const borrowStatisticTitle = !!address ? "You Borrowed" : "Total Borrowed";
   const supplyStatisticValue =
     (!!address
-      ? markets?.totalSupplyBalanceUSD
-      : markets?.totalSuppliedUSD
+      ? marketsDynamicData?.totalSupplyBalanceUSD
+      : marketsDynamicData?.totalSuppliedUSD
     )?.toNumber() ?? 0;
   const borrowStatisticValue =
     (!!address
-      ? markets?.totalBorrowBalanceUSD
-      : markets?.totalBorrowedUSD
+      ? marketsDynamicData?.totalBorrowBalanceUSD
+      : marketsDynamicData?.totalBorrowedUSD
     )?.toNumber() ?? 0;
 
   // Initialize animated values at 0.

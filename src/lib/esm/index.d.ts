@@ -6,4 +6,4 @@ import { PoolInstance } from "./types";
  * @param poolId - The pool's id.
  * @returns An interface that'll let apps interact with fuse pools. (read/write functions).
  */
-export declare const Pool: (provider: Web3Provider | JsonRpcProvider, id: number, poolId: number) => PoolInstance;
+export declare const Pool: (provider: Web3Provider | JsonRpcProvider, id: number, poolId: number) => PoolInstance | undefined;
