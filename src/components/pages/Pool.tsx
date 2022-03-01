@@ -14,6 +14,9 @@ import {
 import MarketCard from "components/MarketCard";
 import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
+import { BigNumber, utils } from "ethers";
+import usePoolData from "hooks/pool/usePoolData";
+import { FusePoolData, MarketsWithData, USDPricedFuseAsset } from "lib/esm/types";
 import {
   Badge,
   Button,
@@ -208,14 +211,13 @@ const Pool = () => {
 export default Pool;
 
 const MarketCard = ({
-  marketStaticData,
-  marketsDynamicData,
+  marketData,
   type
 } : {
-  marketStaticData: StaticData,
-  marketsDynamicData: USDPricedFuseAsset
+  marketData: USDPricedFuseAsset
   type: "supply" | "borrow"
 }) => {
+
   return (
     <ExpandableCard
         width="100%"
@@ -224,8 +226,8 @@ const MarketCard = ({
           <VStack spacing={4} alignItems="stretch">
             <TokenAmountInput
               variant="light"
-              tokenSymbol={ marketStaticData.underlyingSymbol}
-              tokenAddress={marketStaticData.underlyingToken}
+              tokenSymbol={ marketData.underlyingSymbol}
+              tokenAddress={marketData.underlyingToken}
               onClickMax={() => {}}
             />
             <StatisticTable
@@ -239,48 +241,100 @@ const MarketCard = ({
           </VStack>
         }
       >
-        <Flex alignItems="center" id="hello" width="100%">
-          <TokenIcon tokenAddress={marketStaticData.underlyingToken} mr={4} />
+        <Flex alignItems="flex-start" id="hello" width="100%">
+          <TokenIcon tokenAddress={marketData.underlyingToken} mr={4} />
           <Flex direction="column" width="100%">
-            <Flex width="auto">
-              <Heading size="lg" mr={4}>
-                {marketStaticData.underlyingSymbol}
-              </Heading>
-              <Box alignSelf="center">
-                <Badge variant={type === "supply" ? "success" : "warning"}>
-                  {type}
-                </Badge>
-              </Box>
+            <Flex direction="column" width="100%">
+              <Flex width="auto">
+                <Heading size="lg" mr={4}>
+                  {marketData.underlyingSymbol}
+                </Heading>
+                <Box alignSelf="center">
+                  <Badge variant={type === "supply" ? "success" : "warning"}>
+                    {type}
+                  </Badge>
+                </Box>
+              </Flex>
             </Flex>
-            <Flex>
-              <Text variant="secondary" textAlign="left">
-              {parseFloat(utils.formatEther(marketStaticData.collateralFactor))* 100}% LTV
-              </Text>
-
-              &middot;
-
-              <Text>
-              {utils.formatEther(marketsDynamicData.supplyRatePerBlock.mul(100))} Supply APY
-              </Text>
-
-              &middot;
-              
-              <Text>
-              {marketsDynamicData.totalSupplyUSD.toString()}M Supplied
-              </Text>
-            </Flex>
+            <MarketTLDR 
+              marketData={marketData} 
+              type={type}
+            />
           </Flex>
         </Flex>
       </ExpandableCard>
   )
 }
 
-const Separator = () => {
+const MarketTLDR = ({
+  marketData,
+  type
+} : {
+  marketData: USDPricedFuseAsset,
+  type: "supply" | "borrow"
+}) => {
+
+  const isSupply = type === "supply"
+  const APY =  convertMantissaToAPY(
+    isSupply 
+      ? marketData.supplyRatePerBlock 
+      : marketData.borrowRatePerBlock, 365
+    )
+ 
+  const Text1 = isSupply 
+    ? `${utils.formatEther(marketData.collateralFactor.mul(100))} LTV` 
+    : `${getMillions(marketData.liquidityUSD)} Liquidity`
+
+  // const 
   return (
-    <Text
-      opacity="0.5"
-    >
-      ●
-    </Text>
+    <Flex justifyContent="flex-start !important">
+      <Text variant="secondary" alignSelf="flex-start"  mr="1.5vh">
+        {}% LTV
+      </Text>
+
+      &middot;
+
+      <Text variant="secondary" mr="1.5vh" ml="1.5vh">
+        {Text1}
+      </Text>
+
+      
+      { 
+      
+      isSupply ? (
+        <>
+        &middot;
+        <Text variant="secondary" ml="1.5vh">
+          {getMillions(marketData.totalSupplyUSD)}M Supplied
+        </Text>
+        </>
+      )
+        : null 
+      }
+    </Flex>
   )
 }
+
+
+// Port over to sdk
+export const toInt = (input: BigNumber) => {
+  if (!input) return 0
+  return parseInt(input.toString())
+}
+
+const getMillions = (bn: BigNumber) => {
+  const number  = parseFloat(bn.toString())
+
+  return (number / 1000000).toFixed(1)
+}
+
+export const convertMantissaToAPY = (mantissa: any, dayRange: number = 35) => {
+  const parsedMantissa = toInt(mantissa)
+  return (Math.pow((parsedMantissa / 1e18) * 6500 + 1, dayRange) - 1) * 100;
+};
+
+export const convertMantissaToAPR = (mantissa: any) => {
+  const parsedMantissa = toInt(mantissa)
+  return (parsedMantissa * 2372500) / 1e16;
+};
+
