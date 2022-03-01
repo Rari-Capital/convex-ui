@@ -1,4 +1,3 @@
-import { marketInteractionType } from "../types";
 /**
  * @param action - Type of action to perform. i.e borrow, withdraw, repay.
  * @param cTokenAddress - Address of market to withdraw from.
@@ -8,3 +7,5 @@ import { marketInteractionType } from "../types";
  * @param decimals - Underlying token's decimals. i.e DAI = 18.
  */
 export declare function marketInteraction(action: marketInteractionType, cTokenAddress: string, amount: string, tokenAddress: string, decimals?: number): Promise<void>;
+declare type marketInteractionType = "withdraw" | "borrow" | "repay" | "supply";
+export {};

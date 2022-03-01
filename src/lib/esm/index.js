@@ -5,7 +5,7 @@ import { Interface } from "@ethersproject/abi";
 import { getAddresses } from "./utils/getAddresses";
 import { getOracleHashes } from "./utils/getOracleHashes";
 // Fetching Data Functions
-import * as fetching from "./staticCalls";
+import * as fetching from "./fetch-data";
 // Market Interactions
 import * as market from './market-interactions';
 /**
@@ -16,7 +16,7 @@ import * as market from './market-interactions';
  */
 export const Pool = function (provider, id, poolId) {
     if (!provider || !id || !poolId) {
-        return;
+        return null;
     }
     const addresses = getAddresses(id);
     const oracleHashes = getOracleHashes(id);

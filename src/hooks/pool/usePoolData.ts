@@ -1,4 +1,3 @@
-import { useRari } from 'context/RariContext';
 import { useQuery } from 'react-query';
 import usePool from './usePool';
 
@@ -19,7 +18,7 @@ const usePoolData = (poolIndex: number) => {
     `Pool Markets PoolID ${pool?.poolId} for address ${address}`,
     async () => {
       if (pool && poolInfo) {
-        return await pool.getAllMarketsWithDynamicData(poolInfo.comptroller, address, poolInfo.oracle)
+        return await pool.getMarketsWithData(poolInfo.comptroller, {from: address})
     }},
     {
       enabled: poolInfo ? true : false,
@@ -29,24 +28,11 @@ const usePoolData = (poolIndex: number) => {
     }
   );
 
-  const { data: marketsStaticData, isLoading: staticLoading } = useQuery(
-    `Pool Static Data ${pool?.poolId}`,
-    async () => {
-      if(pool && poolInfo){
-        return await pool.getAllMarketsWithStaticData(poolInfo.comptroller, poolInfo.oracle)
-      }
-    },
-    {
-      enabled: !!poolInfo && !!marketsDynamicData,
-      refetchOnMount: false, 
-      refetchOnWindowFocus: false, 
-    }
-  )
+  console.log({marketsDynamicData})
 
   return {
     poolInfo,
     marketsDynamicData,
-    marketsStaticData
   };
 };
 
