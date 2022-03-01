@@ -51,7 +51,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
       }
       {...restProps}
     >
-      <Flex alignItems="center" id="hello" width="100%">
+      <Flex alignItems="center" width="100%">
         <TokenIcon tokenAddress={marketStaticData.underlyingToken} mr={4} />
         <Flex direction="column" width="100%">
           <Flex width="auto">

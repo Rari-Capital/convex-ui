@@ -1,9 +1,9 @@
-import { animate, useMotionValue } from "framer-motion";
-import { useEffect, useState } from "react";
-import { Card, Heading, Statistic } from "rari-components";
 import { Box, Stack } from "@chakra-ui/react";
 import { useRari } from "context/RariContext";
 import { usePoolContext } from "context/PoolContext";
+import { animate, useMotionValue } from "framer-motion";
+import { Card, Heading, Progress, Statistic, Text } from "rari-components";
+import { useEffect, useState } from "react";
 import { smallUsdFormatter } from "utils/formatters";
 
 export const PoolOverview = () => {
@@ -68,17 +68,23 @@ export const PoolOverview = () => {
     <Box paddingTop={16}>
       <Heading size="md">{heading}</Heading>
       <Stack paddingTop={8} spacing={8} direction={["column", "row"]}>
-        <Card minW={"225px"} minH="130px">
+        <Card minWidth={48}>
           <Statistic
             title={supplyStatisticTitle}
             value={smallUsdFormatter(supplyStatisticDisplayedValue)}
           />
         </Card>
-        <Card minW={"225px"}>
+        <Card minWidth={48}>
           <Statistic
             title={borrowStatisticTitle}
             value={smallUsdFormatter(borrowStatisticDisplayedValue)}
           />
+        </Card>
+        <Card justifyContent="center" flex={1}>
+          <Text variant="secondary" fontSize="sm" mb={2}>
+            Borrow Balance
+          </Text>
+          <Progress variant="light" barVariant="gradient" value={80} />
         </Card>
       </Stack>
     </Box>

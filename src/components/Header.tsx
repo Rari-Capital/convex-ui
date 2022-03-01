@@ -7,7 +7,14 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { useRari } from "context/RariContext";
-import { Button, Heading, Link, Text, TokenGroup } from "rari-components";
+import {
+  Button,
+  Heading,
+  Link,
+  Progress,
+  Text,
+  TokenGroup,
+} from "rari-components";
 import { truncate } from "utils/stringUtils";
 import ConnectModal from "./modals/ConnectModal";
 import { PoolOverview } from "./PoolOverview";
@@ -69,11 +76,7 @@ const Header: React.FC<BoxProps> = (props) => {
           <Spacer />
           <HStack align={"flex-start"}>
             {/* <WarningIcon w={2} h={2} color="red.500" /> */}
-            <Button
-              onClick={handleClick}
-              variant="neutral"
-              bg={previewMode ? "orange" : ""}
-            >
+            <Button onClick={handleClick} bg={previewMode ? "orange" : ""}>
               {!!address ? truncate(address ?? "", 8) : "Connect"}
             </Button>
           </HStack>
