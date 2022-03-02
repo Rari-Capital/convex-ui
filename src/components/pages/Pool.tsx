@@ -282,20 +282,20 @@ const MarketTLDR = ({
     )
  
   const Text1 = isSupply 
-    ? `${utils.formatEther(marketData.collateralFactor.mul(100))} LTV` 
-    : `${getMillions(marketData.liquidityUSD)} Liquidity`
+    ? `${utils.formatEther(marketData.collateralFactor.mul(100))}% LTV` 
+    : `${getMillions(marketData.liquidityUSD)}M Liquidity`
 
-  // const 
+  
   return (
     <Flex justifyContent="flex-start !important">
       <Text variant="secondary" alignSelf="flex-start"  mr="1.5vh">
-        {}% LTV
+        {Text1}
       </Text>
 
       &middot;
 
       <Text variant="secondary" mr="1.5vh" ml="1.5vh">
-        {Text1}
+        {APY}% APY
       </Text>
 
       
