@@ -5,6 +5,10 @@ import {
   Spacer,
   Spinner,
   Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
   VStack,
 } from "@chakra-ui/react";
 import MarketCard from "components/MarketCard";
@@ -19,6 +23,7 @@ import {
   ExpandableCard,
   Heading,
   StatisticTable,
+  Tabs,
   Text,
   TokenAmountInput,
   TokenIcon,
@@ -46,23 +51,52 @@ const Pool = () => {
             inAccordion
             variant="active"
             expandableChildren={
-              <VStack spacing={4} alignItems="stretch">
-                <TokenAmountInput
-                  size="lg"
-                  variant="light"
-                  tokenSymbol="UST"
-                  tokenAddress="0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
-                  onClickMax={() => {}}
-                />
-                <StatisticTable
-                  variant="active"
-                  statistics={[
-                    ["Supply Balance", "$24,456"],
-                    ["Borrow Limit", "$18,543"],
-                  ]}
-                />
-                <Button alignSelf="stretch">Approve</Button>
-              </VStack>
+              <Tabs>
+                <TabList>
+                  <Tab>Supply</Tab>
+                  <Tab>Withdraw</Tab>
+                </TabList>
+                <TabPanels>
+                  <TabPanel>
+                    <VStack spacing={4} alignItems="stretch">
+                      <TokenAmountInput
+                        size="lg"
+                        variant="light"
+                        tokenSymbol="UST"
+                        tokenAddress="0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
+                        onClickMax={() => {}}
+                      />
+                      <StatisticTable
+                        variant="active"
+                        statistics={[
+                          ["Supply Balance", "$24,456"],
+                          ["Borrow Limit", "$18,543"],
+                        ]}
+                      />
+                      <Button alignSelf="stretch">Supply</Button>
+                    </VStack>
+                  </TabPanel>
+                  <TabPanel>
+                    <VStack spacing={4} alignItems="stretch">
+                      <TokenAmountInput
+                        size="lg"
+                        variant="light"
+                        tokenSymbol="UST"
+                        tokenAddress="0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
+                        onClickMax={() => {}}
+                      />
+                      <StatisticTable
+                        variant="active"
+                        statistics={[
+                          ["Supply Balance", "$24,456"],
+                          ["Borrow Limit", "$18,543"],
+                        ]}
+                      />
+                      <Button alignSelf="stretch">Withdraw</Button>
+                    </VStack>
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
             }
           >
             <Flex alignItems="center">
@@ -87,23 +121,52 @@ const Pool = () => {
             inAccordion
             variant="active"
             expandableChildren={
-              <VStack spacing={4} alignItems="stretch">
-                <TokenAmountInput
-                  size="lg"
-                  variant="light"
-                  tokenSymbol="FEI3CRV"
-                  tokenAddress="0xD533a949740bb3306d119CC777fa900bA034cd52"
-                  onClickMax={() => {}}
-                />
-                <StatisticTable
-                  variant="active"
-                  statistics={[
-                    ["Supply Balance", "$24,456"],
-                    ["Borrow Limit", "$18,543"],
-                  ]}
-                />
-                <Button alignSelf="stretch">Approve</Button>
-              </VStack>
+              <Tabs>
+                <TabList>
+                  <Tab>Supply</Tab>
+                  <Tab>Withdraw</Tab>
+                </TabList>
+                <TabPanels>
+                  <TabPanel>
+                    <VStack spacing={4} alignItems="stretch">
+                      <TokenAmountInput
+                        size="lg"
+                        variant="light"
+                        tokenSymbol="FEI3CRV"
+                        tokenAddress="0xD533a949740bb3306d119CC777fa900bA034cd52"
+                        onClickMax={() => {}}
+                      />
+                      <StatisticTable
+                        variant="active"
+                        statistics={[
+                          ["Supply Balance", "$24,456"],
+                          ["Borrow Limit", "$18,543"],
+                        ]}
+                      />
+                      <Button alignSelf="stretch">Supply</Button>
+                    </VStack>
+                  </TabPanel>
+                  <TabPanel>
+                    <VStack spacing={4} alignItems="stretch">
+                      <TokenAmountInput
+                        size="lg"
+                        variant="light"
+                        tokenSymbol="FEI3CRV"
+                        tokenAddress="0xD533a949740bb3306d119CC777fa900bA034cd52"
+                        onClickMax={() => {}}
+                      />
+                      <StatisticTable
+                        variant="active"
+                        statistics={[
+                          ["Supply Balance", "$24,456"],
+                          ["Borrow Limit", "$18,543"],
+                        ]}
+                      />
+                      <Button alignSelf="stretch">Withdraw</Button>
+                    </VStack>
+                  </TabPanel>
+                </TabPanels>
+              </Tabs>
             }
           >
             <Flex alignItems="center">
