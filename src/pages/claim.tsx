@@ -8,7 +8,7 @@ const ClaimPage = () => {
       <Head>
         <title>Tribe Convex Pool</title>
         <meta name="description" content="Tribe Convex Pool" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.png" />
       </Head>
       <Claim />
     </Box>
