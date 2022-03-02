@@ -14,9 +14,6 @@ import {
 import MarketCard from "components/MarketCard";
 import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
-import { utils } from "ethers";
-import usePoolData from "hooks/pool/usePoolData";
-import { MarketsWithData, StaticData, USDPricedFuseAsset } from "lib/esm/types";
 import {
   Badge,
   Button,
@@ -33,7 +30,7 @@ import {
 
 const Pool = () => {
   const { address, provider } = useRari();
-  const { poolInfo, marketsDynamicData, marketsStaticData } = usePoolContext();
+  const { poolInfo, marketsDynamicData } = usePoolContext();
   // useEffect(() => {
   //     convexAPR("frax", provider).then((apr) => console.log({ apr }))
   // }, [])
@@ -192,40 +189,18 @@ const Pool = () => {
       <Heading size="md" color="black">
         Markets
       </Heading>
-      <Accordion allowToggle>
-        <Stack
-          mt={4}
-          width="100%"
-          direction={["column", "column", "column", "column", "row"]}
-          spacing={4}
-        >
-          <VStack alignItems="stretch" spacing={4} flex={1}>
-            {marketsStaticData
-              ? marketsDynamicData?.markets?.map((market, i) => (
-                  <MarketCard
-                    marketStaticData={marketsStaticData[i]}
-                    marketsDynamicData={market}
-                    key={i}
-                    type="supply"
-                    inAccordion
-                  />
-                ))
-              : null}
-          </VStack>
-          <VStack alignItems="stretch" spacing={4} flex={1}>
-            {marketsStaticData
-              ? marketsDynamicData?.markets?.map((market, i) => (
-                  <MarketCard
-                    marketStaticData={marketsStaticData[i]}
-                    marketsDynamicData={market}
-                    type="borrow"
-                    inAccordion
-                  />
-                ))
-              : null}
-          </VStack>
-        </Stack>
-      </Accordion>
+      <Stack mt={4} width="100%" direction={["column", "row"]} spacing={4}>
+        <VStack alignItems="stretch" spacing={4} flex={1}>
+          {marketsDynamicData?.assets?.map((market, i) => (
+            <MarketCard marketData={market} key={i} type="supply"/>
+          ))}
+        </VStack>
+        <VStack alignItems="stretch" spacing={4} flex={1}>
+          {marketsDynamicData?.assets?.map((market, i) => market.borrowGuardianPaused ?  null : (
+            <MarketCard marketData={market} type="borrow"/>
+          )) }
+        </VStack>
+      </Stack>
     </Box>
   );
 };
