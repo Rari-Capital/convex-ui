@@ -130,7 +130,12 @@ const Pool = () => {
         Markets
       </Heading>
       <Accordion allowToggle>
-        <Stack mt={4} width="100%" direction={["column", "row"]} spacing={4}>
+        <Stack
+          mt={4}
+          width="100%"
+          direction={["column", "column", "column", "column", "row"]}
+          spacing={4}
+        >
           <VStack alignItems="stretch" spacing={4} flex={1}>
             {marketsStaticData
               ? marketsDynamicData?.markets?.map((market, i) => (
