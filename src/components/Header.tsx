@@ -4,6 +4,7 @@ import {
   HStack,
   Image,
   Spacer,
+  StyleProps,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useRari } from "context/RariContext";
@@ -19,7 +20,15 @@ import { truncate } from "utils/stringUtils";
 import ConnectModal from "./modals/ConnectModal";
 import { PoolOverview } from "./PoolOverview";
 
-const Header: React.FC<BoxProps> = (props) => {
+type HeaderProps = BoxProps & {
+  /**
+   * Styles to be passed to the `sx` prop of the inner Box containing the
+   * Header content (not the background).
+   */
+  contentSx: StyleProps;
+};
+
+const Header: React.FC<HeaderProps> = ({ contentSx, ...restProps }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isAuthed, address, logout, previewMode } = useRari();
 
@@ -38,7 +47,7 @@ const Header: React.FC<BoxProps> = (props) => {
       paddingTop={4}
       position="relative"
       overflowX="hidden"
-      {...props}
+      {...restProps}
     >
       <Image
         src="/curve.png"
@@ -59,7 +68,7 @@ const Header: React.FC<BoxProps> = (props) => {
         zIndex={0}
         opacity={0.5}
       />
-      <Box position="relative" zIndex={1}>
+      <Box position="relative" zIndex={1} sx={contentSx}>
         <HStack alignItems="center" spacing={12} width="100%">
           <HStack spacing={4}>
             <Link href="/">
