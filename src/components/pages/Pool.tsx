@@ -164,7 +164,7 @@ const MarketCard = ({
   const { isAuthed }= useRari()
 
   const [{ data: UsersConnector }, connect] = useConnect()
-  const {data: signer} = useQuery('Users signer fuck', async () => {
+  const {data: signer} = useQuery('Users signer', async () => {
     const  wtf = await UsersConnector?.connector?.getSigner()
     const lmao = await UsersConnector?.connector?.getProvider()
     const provider = new providers.Web3Provider(lmao)
@@ -240,7 +240,7 @@ const MarketCard = ({
                 ["Supply Balance", "$24,456"],
                 ["Borrow Limit", "$18,543"],
               ]}
-            />
+            />            
             <Button onClick={handleClick} disabled={shouldBeDisabled}>Approve</Button>
           </VStack>
         }
@@ -267,6 +267,29 @@ const MarketCard = ({
           </Flex>
         </Flex>
       </ExpandableCard>
+  )
+}
+
+
+const Stats = ({
+  marketData
+}: {
+  marketData: USDPricedFuseAsset
+}) => {
+  const { borrowLimit } = usePoolContext()
+
+
+  const currentSupplyBalanceUSD = utils.commify(marketData.supplyBalanceUSD.toString())
+  const currentParsedLimit = utils.commify(borrowLimit ?? 0)
+
+  return (
+    <StatisticTable
+              variant="light"
+              statistics={[
+                ["Supply Balance", currentSupplyBalanceUSD, "$30,000"],
+                ["Borrow Limit", currentParsedLimit],
+              ]}
+            />
   )
 }
 
@@ -318,7 +341,6 @@ const MarketTLDR = ({
     </Flex>
   )
 }
-
 
 // Port over to sdk
 export const toInt = (input: BigNumber) => {
