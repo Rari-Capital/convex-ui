@@ -26,6 +26,7 @@ import {
   TokenAmountInput,
   TokenIcon,
 } from "rari-components";
+import { smallUsdFormatter } from "utils/formatters";
 // import { useEffect } from 'react'
 // import { convexAPR } from 'utils/convex/convex2'
 
@@ -44,6 +45,11 @@ const Pool = () => {
     );
   }
 
+  const activeAssets =
+    marketsDynamicData?.assets.filter(
+      (asset) => asset.borrowBalance.gt(0) || asset.supplyBalance.gt(0)
+    ) ?? [];
+
   return (
     <Box>
       <Heading size="md" color="white">
@@ -51,146 +57,99 @@ const Pool = () => {
       </Heading>
       <Accordion allowToggle>
         <VStack mt={4} mb={8} align="stretch">
-          <ExpandableCard
-            inAccordion
-            variant="active"
-            expandableChildren={
-              <Tabs>
-                <TabList>
-                  <Tab>Supply</Tab>
-                  <Tab>Withdraw</Tab>
-                </TabList>
-                <TabPanels>
-                  <TabPanel>
-                    <VStack spacing={4} alignItems="stretch">
-                      <TokenAmountInput
-                        size="lg"
-                        variant="light"
-                        tokenSymbol="UST"
-                        tokenAddress="0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
-                        onClickMax={() => {}}
-                      />
-                      <StatisticTable
-                        variant="active"
-                        statistics={[
-                          ["Supply Balance", "$24,456"],
-                          ["Borrow Limit", "$18,543"],
-                        ]}
-                      />
-                      <Button alignSelf="stretch">Supply</Button>
-                    </VStack>
-                  </TabPanel>
-                  <TabPanel>
-                    <VStack spacing={4} alignItems="stretch">
-                      <TokenAmountInput
-                        size="lg"
-                        variant="light"
-                        tokenSymbol="UST"
-                        tokenAddress="0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
-                        onClickMax={() => {}}
-                      />
-                      <StatisticTable
-                        variant="active"
-                        statistics={[
-                          ["Supply Balance", "$24,456"],
-                          ["Borrow Limit", "$18,543"],
-                        ]}
-                      />
-                      <Button alignSelf="stretch">Withdraw</Button>
-                    </VStack>
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            }
-          >
-            <Flex alignItems="center">
-              <TokenIcon
-                tokenAddress="0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
-                mr={4}
-              />
-              <Heading size="xl" mr={4}>
-                UST
-              </Heading>
-              <Badge variant="success">Supply</Badge>
-              <Spacer />
-              <Box mr={8}>
-                <Text variant="secondary" mb={1}>
-                  Supply APY
-                </Text>
-                <Heading size="lg">27.6%</Heading>
-              </Box>
-            </Flex>
-          </ExpandableCard>
-          <ExpandableCard
-            inAccordion
-            variant="active"
-            expandableChildren={
-              <Tabs>
-                <TabList>
-                  <Tab>Supply</Tab>
-                  <Tab>Withdraw</Tab>
-                </TabList>
-                <TabPanels>
-                  <TabPanel>
-                    <VStack spacing={4} alignItems="stretch">
-                      <TokenAmountInput
-                        size="lg"
-                        variant="light"
-                        tokenSymbol="FEI3CRV"
-                        tokenAddress="0xD533a949740bb3306d119CC777fa900bA034cd52"
-                        onClickMax={() => {}}
-                      />
-                      <StatisticTable
-                        variant="active"
-                        statistics={[
-                          ["Supply Balance", "$24,456"],
-                          ["Borrow Limit", "$18,543"],
-                        ]}
-                      />
-                      <Button alignSelf="stretch">Supply</Button>
-                    </VStack>
-                  </TabPanel>
-                  <TabPanel>
-                    <VStack spacing={4} alignItems="stretch">
-                      <TokenAmountInput
-                        size="lg"
-                        variant="light"
-                        tokenSymbol="FEI3CRV"
-                        tokenAddress="0xD533a949740bb3306d119CC777fa900bA034cd52"
-                        onClickMax={() => {}}
-                      />
-                      <StatisticTable
-                        variant="active"
-                        statistics={[
-                          ["Supply Balance", "$24,456"],
-                          ["Borrow Limit", "$18,543"],
-                        ]}
-                      />
-                      <Button alignSelf="stretch">Withdraw</Button>
-                    </VStack>
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            }
-          >
-            <Flex alignItems="center">
-              <TokenIcon
-                tokenAddress="0xD533a949740bb3306d119CC777fa900bA034cd52"
-                mr={4}
-              />
-              <Heading size="xl" mr={4}>
-                FEI3CRV
-              </Heading>
-              <Badge variant="warning">Borrow</Badge>
-              <Spacer />
-              <Box mr={8}>
-                <Text variant="secondary" mb={1}>
-                  Borrow APR
-                </Text>
-                <Heading size="lg">27.6%</Heading>
-              </Box>
-            </Flex>
-          </ExpandableCard>
+          {activeAssets.map((asset) => {
+            const isBorrowing = asset.borrowBalance.gt(0);
+
+            return (
+              <ExpandableCard
+                inAccordion
+                variant="active"
+                expandableChildren={
+                  <Tabs>
+                    <TabList>
+                      <Tab>{isBorrowing ? "Borrow" : "Supply"}</Tab>
+                      <Tab>Withdraw</Tab>
+                    </TabList>
+                    <TabPanels>
+                      <TabPanel>
+                        <VStack spacing={4} alignItems="stretch">
+                          <TokenAmountInput
+                            size="lg"
+                            variant="light"
+                            tokenSymbol={asset.underlyingSymbol}
+                            tokenAddress={asset.underlyingToken}
+                            onClickMax={() => {}}
+                          />
+                          <StatisticTable
+                            variant="active"
+                            statistics={[
+                              [
+                                `${isBorrowing ? "Borrow" : "Supply"} Balance`,
+                                smallUsdFormatter(
+                                  (isBorrowing
+                                    ? asset.borrowBalanceUSD
+                                    : asset.supplyBalanceUSD
+                                  ).toNumber()
+                                ),
+                              ],
+                              ["Borrow Limit", "$0"],
+                            ]}
+                          />
+                          <Button alignSelf="stretch">
+                            {isBorrowing ? "Borrow" : "Supply"}
+                          </Button>
+                        </VStack>
+                      </TabPanel>
+                      <TabPanel>
+                        <VStack spacing={4} alignItems="stretch">
+                          <TokenAmountInput
+                            size="lg"
+                            variant="light"
+                            tokenSymbol={asset.underlyingSymbol}
+                            tokenAddress={asset.underlyingToken}
+                            onClickMax={() => {}}
+                          />
+                          <StatisticTable
+                            variant="active"
+                            statistics={[
+                              [
+                                `${isBorrowing ? "Borrow" : "Supply"} Balance`,
+                                smallUsdFormatter(
+                                  (isBorrowing
+                                    ? asset.borrowBalanceUSD
+                                    : asset.supplyBalanceUSD
+                                  ).toNumber()
+                                ),
+                              ],
+                              ["Borrow Limit", "$0"],
+                            ]}
+                          />
+                          <Button alignSelf="stretch">Withdraw</Button>
+                        </VStack>
+                      </TabPanel>
+                    </TabPanels>
+                  </Tabs>
+                }
+              >
+                <Flex alignItems="center">
+                  <TokenIcon tokenAddress={asset.underlyingToken} mr={4} />
+                  <Heading size="xl" mr={4}>
+                    {asset.underlyingSymbol}
+                  </Heading>
+                  <Badge variant={isBorrowing ? "warning" : "success"}>
+                    {isBorrowing ? "Borrow" : "Supply"}
+                  </Badge>
+                  <Spacer />
+                  <Box mr={8}>
+                    <Text variant="secondary" mb={1}>
+                      Supply APY
+                    </Text>
+                    <Heading size="lg">27.6%</Heading>
+                  </Box>
+                </Flex>
+              </ExpandableCard>
+            );
+          })}
         </VStack>
       </Accordion>
       <Heading size="md" color="black">
