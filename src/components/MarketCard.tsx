@@ -11,7 +11,7 @@ import {
   TokenAmountInput,
   TokenIcon,
 } from "rari-components";
-import { getMillions, convertMantissaToAPY } from "utils/formatters";
+import { getMillions, convertMantissaToAPY, smallUsdFormatter } from "utils/formatters";
 
 type MarketCardProps = Omit<
   React.ComponentProps<typeof ExpandableCard>,
@@ -26,6 +26,8 @@ const MarketCard: React.FC<MarketCardProps> = ({
   type,
   ...restProps
 }) => {
+  const isBorrowing = type === "borrow";
+
   return (
     <ExpandableCard
       width="100%"
@@ -41,8 +43,16 @@ const MarketCard: React.FC<MarketCardProps> = ({
           <StatisticTable
             variant="light"
             statistics={[
-              ["Supply Balance", "$24,456"],
-              ["Borrow Limit", "$18,543"],
+              [
+                `${isBorrowing ? "Borrow" : "Supply"} Balance`,
+                smallUsdFormatter(
+                  (isBorrowing
+                    ? marketData.borrowBalanceUSD
+                    : marketData.supplyBalanceUSD
+                  ).toNumber()
+                ),
+              ],
+              ["Borrow Limit", "$0"],
             ]}
           />
           <Button>Approve</Button>
