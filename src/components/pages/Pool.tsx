@@ -149,7 +149,8 @@ const Pool = () => {
                   <HStack spacing={8} mr={8} textAlign="right">
                     <Box>
                       <Text variant="secondary" mb={1}>
-                        You {isBorrowing ? "Borrowed" : "Supplied"}
+                        {!!address ? "You" : "Total"}{" "}
+                        {isBorrowing ? "Borrowed" : "Supplied"}
                       </Text>
                       <Heading
                         size="md"
