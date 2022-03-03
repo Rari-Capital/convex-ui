@@ -271,27 +271,27 @@ const MarketCard = ({
 }
 
 
-const Stats = ({
-  marketData
-}: {
-  marketData: USDPricedFuseAsset
-}) => {
-  const { borrowLimit } = usePoolContext()
+// const Stats = ({
+//   marketData
+// }: {
+//   marketData: USDPricedFuseAsset
+// }) => {
+//   const { borrowLimit } = usePoolContext()
 
 
-  const currentSupplyBalanceUSD = utils.commify(marketData.supplyBalanceUSD.toString())
-  const currentParsedLimit = utils.commify(borrowLimit ?? 0)
+//   const currentSupplyBalanceUSD = utils.commify(marketData.supplyBalanceUSD.toString())
+//   const currentParsedLimit = utils.commify(borrowLimit ?? 0)
 
-  return (
-    <StatisticTable
-              variant="light"
-              statistics={[
-                ["Supply Balance", currentSupplyBalanceUSD, "$30,000"],
-                ["Borrow Limit", currentParsedLimit],
-              ]}
-            />
-  )
-}
+//   return (
+//     <StatisticTable
+//               variant="light"
+//               statistics={[
+//                 ["Supply Balance", currentSupplyBalanceUSD, "$30,000"],
+//                 ["Borrow Limit", currentParsedLimit],
+//               ]}
+//             />
+//   )
+// }
 
 const MarketTLDR = ({
   marketData,
