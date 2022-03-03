@@ -3,6 +3,7 @@ import {
   Box,
   Center,
   Flex,
+  HStack,
   Spacer,
   Spinner,
   Stack,
@@ -15,6 +16,7 @@ import {
 import MarketCard from "components/MarketCard";
 import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
+import { formatUnits } from "ethers/lib/utils";
 import {
   Badge,
   Button,
@@ -26,7 +28,11 @@ import {
   TokenAmountInput,
   TokenIcon,
 } from "rari-components";
-import { smallUsdFormatter } from "utils/formatters";
+import {
+  convertMantissaToAPR,
+  convertMantissaToAPY,
+  smallUsdFormatter,
+} from "utils/formatters";
 // import { useEffect } from 'react'
 // import { convexAPR } from 'utils/convex/convex2'
 
@@ -140,12 +146,41 @@ const Pool = () => {
                     {isBorrowing ? "Borrow" : "Supply"}
                   </Badge>
                   <Spacer />
-                  <Box mr={8}>
-                    <Text variant="secondary" mb={1}>
-                      Supply APY
-                    </Text>
-                    <Heading size="lg">27.6%</Heading>
-                  </Box>
+                  <HStack spacing={8} mr={8} textAlign="right">
+                    <Box>
+                      <Text variant="secondary" mb={1}>
+                        You {isBorrowing ? "Borrowed" : "Supplied"}
+                      </Text>
+                      <Heading
+                        size="md"
+                        variant={isBorrowing ? "warning" : "success"}
+                      >
+                        {parseFloat(
+                          formatUnits(
+                            isBorrowing
+                              ? asset.borrowBalance
+                              : asset.supplyBalance,
+                            asset.underlyingDecimals
+                          )
+                        ).toFixed(2)}{" "}
+                        {asset.underlyingSymbol}
+                      </Heading>
+                    </Box>
+                    <Box>
+                      <Text variant="secondary" mb={1}>
+                        {isBorrowing ? "Borrow" : "Supply"} APY
+                      </Text>
+                      <Heading size="md">
+                        {isBorrowing
+                          ? convertMantissaToAPR(asset.borrowRatePerBlock)
+                          : convertMantissaToAPY(
+                              asset.supplyRatePerBlock,
+                              365
+                            ).toFixed(2)}
+                        %
+                      </Heading>
+                    </Box>
+                  </HStack>
                 </Flex>
               </ExpandableCard>
             );
