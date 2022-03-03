@@ -14,9 +14,8 @@ import {
 import MarketCard from "components/MarketCard";
 import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
-import { BigNumber, utils } from "ethers";
-import usePoolData from "hooks/pool/usePoolData";
-import { FusePoolData, MarketsWithData, USDPricedFuseAsset } from "lib/esm/types";
+import { BigNumber, providers, utils, constants } from "ethers";
+import { MarketsWithData, USDPricedFuseAsset } from "lib/esm/types";
 import {
   Badge,
   Button,
@@ -28,6 +27,9 @@ import {
   TokenAmountInput,
   TokenIcon,
 } from "rari-components";
+import { useState } from "react";
+import { useQuery } from "react-query";
+import { useAccount, useConnect } from "wagmi";
 // import { useEffect } from 'react'
 // import { convexAPR } from 'utils/convex/convex2'
 
@@ -37,6 +39,7 @@ const Pool = () => {
   // useEffect(() => {
   //     convexAPR("frax", provider).then((apr) => console.log({ apr }))
   // }, [])
+  console.log({marketsDynamicData})
 
   if (!poolInfo) return <Spinner />;
 
@@ -44,163 +47,25 @@ const Pool = () => {
     <Box>
       <Heading size="md" color="white">
         Active Positions
-      </Heading>{" "}
-      <Accordion allowToggle>
-        <VStack mt={4} mb={8} align="stretch">
-          <ExpandableCard
-            inAccordion
-            variant="active"
-            expandableChildren={
-              <Tabs>
-                <TabList>
-                  <Tab>Supply</Tab>
-                  <Tab>Withdraw</Tab>
-                </TabList>
-                <TabPanels>
-                  <TabPanel>
-                    <VStack spacing={4} alignItems="stretch">
-                      <TokenAmountInput
-                        size="lg"
-                        variant="light"
-                        tokenSymbol="UST"
-                        tokenAddress="0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
-                        onClickMax={() => {}}
-                      />
-                      <StatisticTable
-                        variant="active"
-                        statistics={[
-                          ["Supply Balance", "$24,456"],
-                          ["Borrow Limit", "$18,543"],
-                        ]}
-                      />
-                      <Button alignSelf="stretch">Supply</Button>
-                    </VStack>
-                  </TabPanel>
-                  <TabPanel>
-                    <VStack spacing={4} alignItems="stretch">
-                      <TokenAmountInput
-                        size="lg"
-                        variant="light"
-                        tokenSymbol="UST"
-                        tokenAddress="0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
-                        onClickMax={() => {}}
-                      />
-                      <StatisticTable
-                        variant="active"
-                        statistics={[
-                          ["Supply Balance", "$24,456"],
-                          ["Borrow Limit", "$18,543"],
-                        ]}
-                      />
-                      <Button alignSelf="stretch">Withdraw</Button>
-                    </VStack>
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            }
-          >
-            <Flex alignItems="center">
-              <TokenIcon
-                tokenAddress="0xa47c8bf37f92aBed4A126BDA807A7b7498661acD"
-                mr={4}
-              />
-              <Heading size="xl" mr={4}>
-                UST
-              </Heading>
-              <Badge variant="success">Supply</Badge>
-              <Spacer />
-              <Box mr={8}>
-                <Text variant="secondary" mb={1}>
-                  Supply APY
-                </Text>
-                <Heading size="lg">27.6%</Heading>
-              </Box>
-            </Flex>
-          </ExpandableCard>
-          <ExpandableCard
-            inAccordion
-            variant="active"
-            expandableChildren={
-              <Tabs>
-                <TabList>
-                  <Tab>Supply</Tab>
-                  <Tab>Withdraw</Tab>
-                </TabList>
-                <TabPanels>
-                  <TabPanel>
-                    <VStack spacing={4} alignItems="stretch">
-                      <TokenAmountInput
-                        size="lg"
-                        variant="light"
-                        tokenSymbol="FEI3CRV"
-                        tokenAddress="0xD533a949740bb3306d119CC777fa900bA034cd52"
-                        onClickMax={() => {}}
-                      />
-                      <StatisticTable
-                        variant="active"
-                        statistics={[
-                          ["Supply Balance", "$24,456"],
-                          ["Borrow Limit", "$18,543"],
-                        ]}
-                      />
-                      <Button alignSelf="stretch">Supply</Button>
-                    </VStack>
-                  </TabPanel>
-                  <TabPanel>
-                    <VStack spacing={4} alignItems="stretch">
-                      <TokenAmountInput
-                        size="lg"
-                        variant="light"
-                        tokenSymbol="FEI3CRV"
-                        tokenAddress="0xD533a949740bb3306d119CC777fa900bA034cd52"
-                        onClickMax={() => {}}
-                      />
-                      <StatisticTable
-                        variant="active"
-                        statistics={[
-                          ["Supply Balance", "$24,456"],
-                          ["Borrow Limit", "$18,543"],
-                        ]}
-                      />
-                      <Button alignSelf="stretch">Withdraw</Button>
-                    </VStack>
-                  </TabPanel>
-                </TabPanels>
-              </Tabs>
-            }
-          >
-            <Flex alignItems="center">
-              <TokenIcon
-                tokenAddress="0xD533a949740bb3306d119CC777fa900bA034cd52"
-                mr={4}
-              />
-              <Heading size="xl" mr={4}>
-                FEI3CRV
-              </Heading>
-              <Badge variant="warning">Borrow</Badge>
-              <Spacer />
-              <Box mr={8}>
-                <Text variant="secondary" mb={1}>
-                  Borrow APR
-                </Text>
-                <Heading size="lg">27.6%</Heading>
-              </Box>
-            </Flex>
-          </ExpandableCard>
-        </VStack>
-      </Accordion>
+      </Heading>
+      { marketsDynamicData?.totalSupplyBalanceUSD.gt(constants.Zero) ?
+          <VStack mt={4} mb={8} align="stretch" spacing={4}>
+            <Positions marketsDynamicData={marketsDynamicData} />
+          </VStack>
+        : null
+      }
       <Heading size="md" color="black">
         Markets
       </Heading>
       <Stack mt={4} width="100%" direction={["column", "row"]} spacing={4}>
         <VStack alignItems="stretch" spacing={4} flex={1}>
-          {marketsDynamicData?.assets?.map((market, i) => (
+          {marketsDynamicData?.assets?.map((market, i) => ( market.supplyBalanceUSD.gt(constants.Zero) ? null :
             <MarketCard marketData={market} key={i} type="supply"/>
           ))}
         </VStack>
         <VStack alignItems="stretch" spacing={4} flex={1}>
           {marketsDynamicData?.assets?.map((market, i) => market.borrowGuardianPaused ?  null : (
-            <MarketCard marketData={market} type="borrow"/>
+            <MarketCard marketData={market} key={i} type="borrow"/>
           )) }
         </VStack>
       </Stack>
@@ -210,6 +75,66 @@ const Pool = () => {
 
 export default Pool;
 
+const Positions = ({marketsDynamicData}: {marketsDynamicData: MarketsWithData}) => {
+  return (
+    <>  {
+      marketsDynamicData.assets.map((market, i) => {
+        if (market.supplyBalanceUSD.gt(constants.Zero)) {
+        return (
+            <PositionCard market={market} key={i}/>
+          )}
+        })
+      }
+    </>
+
+  )
+}
+
+const PositionCard = ({market}: {market: USDPricedFuseAsset}) => {
+  return (
+    <ExpandableCard
+          variant="active"
+          expandableChildren={
+            <VStack spacing={4} alignItems="stretch">
+              <TokenAmountInput
+                size="lg"
+                variant="light"
+                tokenSymbol={market.underlyingSymbol}
+                tokenAddress={market.underlyingToken}
+                onClickMax={() => {}}
+              />
+              <StatisticTable
+                variant="light"
+                statistics={[
+                  ["Supply Balance", "$24,456"],
+                  ["Borrow Limit", "$18,543"],
+                ]}
+              />
+              <Button alignSelf="stretch">Approve</Button>
+            </VStack>
+          }
+        >
+          <Flex alignItems="center">
+            <TokenIcon
+              tokenAddress={market.underlyingToken}
+              mr={4}
+            />
+            <Heading size="xl" mr={4}>
+              {market.underlyingSymbol}
+            </Heading>
+            <Badge variant="success">Supply</Badge>
+            <Spacer />
+            <Box mr={8}>
+              <Text variant="secondary" mb={1}>
+                Supply APY
+              </Text>
+              <Heading size="lg">27.6%</Heading>
+            </Box>
+          </Flex>
+        </ExpandableCard>
+  )
+}
+
 const MarketCard = ({
   marketData,
   type
@@ -217,7 +142,65 @@ const MarketCard = ({
   marketData: USDPricedFuseAsset
   type: "supply" | "borrow"
 }) => {
+  const [amount, setAmount] = useState<string>("")
+  const { pool } = usePoolContext()
+  const { isAuthed }= useRari()
 
+  const [{ data: UsersConnector }, connect] = useConnect()
+  const {data: signer} = useQuery('Users signer fuck', async () => {
+    const  wtf = await UsersConnector?.connector?.getSigner()
+    const lmao = await UsersConnector?.connector?.getProvider()
+    const provider = new providers.Web3Provider(lmao)
+    return wtf
+  })
+
+  const handleClick = async () => {
+    if (amount === "") return
+
+    if (!isAuthed) { 
+      // This should open connect modal
+      return console.log('hello')
+    }
+
+    const address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+
+    switch (type) {
+      case "supply":
+          await pool?.checkAllowanceAndApprove(
+            address,
+            marketData.cToken,
+            marketData.underlyingToken,
+            parseInt(marketData.underlyingDecimals.toString()),
+            amount,
+            signer
+          )
+
+          
+          await pool?.marketInteraction(
+            'supply',
+            marketData.cToken,
+            amount,
+            marketData.underlyingToken,
+            signer,
+            parseInt(marketData.underlyingDecimals.toString()),
+          )
+        break;
+
+      case "borrow":
+        await pool?.marketInteraction(
+          'borrow',
+          marketData.cToken,
+          amount,
+          marketData.underlyingToken,
+          signer,
+          parseInt(marketData.underlyingDecimals.toString()),
+        )
+        break;
+    
+      default:
+        break;
+    }
+  }
   return (
     <ExpandableCard
         width="100%"
@@ -228,6 +211,7 @@ const MarketCard = ({
               variant="light"
               tokenSymbol={ marketData.underlyingSymbol}
               tokenAddress={marketData.underlyingToken}
+              onChange={(e: any) => setAmount(e.target.value)}
               onClickMax={() => {}}
             />
             <StatisticTable
@@ -237,7 +221,7 @@ const MarketCard = ({
                 ["Borrow Limit", "$18,543"],
               ]}
             />
-            <Button>Approve</Button>
+            <Button onClick={handleClick}>Approve</Button>
           </VStack>
         }
       >

@@ -82,6 +82,8 @@ export interface RewardsDistributorData {
     isRewardsDistributor: boolean;
     isFlywheel: boolean;
 }
+export declare type marketInteractionType = "withdraw" | "borrow" | "repay" | "supply";
+export declare type actionType = "enter" | "exit";
 export declare type PoolInstance = {
     poolId: number;
     contracts: {
@@ -97,6 +99,7 @@ export declare type PoolInstance = {
     fetchAvailableRdsWithContext(comptrollerAddress: string): Promise<RewardsDistributorData[]>;
     fetchFusePoolData(): Promise<FusePoolData | undefined>;
     getPool(): Promise<PoolInformation>;
+    getPriceFromOracle(tokenAddress: string, oracleAddress: string): Promise<BigNumber>;
     fetchAllMarkets(comptrollerAddress: string): Promise<string[]>;
     fetchRewardedMarketsInRd(rdAddress: string): Promise<string[]>;
     fetchRewardSpeedInMarket(rdAddress: string, marketAddress: string, type: 'supply' | 'borrow'): Promise<BigNumber>;
@@ -105,4 +108,7 @@ export declare type PoolInstance = {
         supplyAPR: number;
         supplyAPY: number;
     }>;
+    marketInteraction(action: marketInteractionType, cTokenAddress: string, amount: string, tokenAddress: string, signer: any, decimals?: number | undefined): Promise<void>;
+    collateral(comptrollerAddress: string, marketAddress: string[], action: actionType, provider: Web3Provider | JsonRpcProvider): Promise<void>;
+    checkAllowanceAndApprove(userAddress: string, marketAddress: string, underlyingAddress: string, decimals: number, amount: string, signer: any): Promise<void>;
 };

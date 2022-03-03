@@ -16,7 +16,7 @@ import * as market from './market-interactions';
  */
 export const Pool = function (provider, id, poolId) {
     if (!provider || !id || !poolId) {
-        return null;
+        return undefined;
     }
     const addresses = getAddresses(id);
     const oracleHashes = getOracleHashes(id);

@@ -4,12 +4,13 @@ import { createContext, useContext, ReactNode, useMemo, useCallback } from "reac
 import { useRouter } from "next/router";
 
 // Wagmi
-import { useAccount, useProvider } from "wagmi";
+import { useAccount, useConnect, useProvider, useSigner } from "wagmi";
 import { useNetwork } from "wagmi";
 
 // Utils
 import { alchemyURL } from "utils/connectors";
 import { providers } from "ethers";
+import { useQuery } from "react-query";
 
 export const RariContext = createContext<undefined | any>(
   undefined
@@ -25,8 +26,20 @@ export const RariProvider = ({
     fetchEns: true,
   })
 
-  const chainId = useMemo(() => data.chain?.id ?? 1, [data])
-  const provider = useMemo(() => new providers.JsonRpcProvider(alchemyURL), [])
+  const [{ data: UsersConnector }, connect] = useConnect()
+  const {data: signer} = useQuery('Users signer', async () => {
+    if(!UsersConnector.connector) return
+    const  wtf = await UsersConnector?.connector?.getSigner()
+    const lmao = await UsersConnector?.connector?.getProvider()
+    const provider = new providers.Web3Provider(lmao)
+    return provider
+  })
+
+  const chainId = useMemo(() => 31337, [data])
+  const provider = useMemo(() => {
+    return signer ? signer :
+    new providers.JsonRpcProvider(alchemyURL)
+  }, [UsersConnector])
 
   // Whether you have forced an address
   const router = useRouter()

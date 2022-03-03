@@ -1,5 +1,5 @@
 import { InfoIcon } from "@chakra-ui/icons";
-import { Box, Flex, VStack } from "@chakra-ui/react";
+import { Box, VStack } from "@chakra-ui/react";
 import {
   Card,
   ExpandableCard,

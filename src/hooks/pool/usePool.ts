@@ -10,7 +10,7 @@ const usePool = (poolIndex: number) => {
       const pool = Pool(provider, chainId, poolIndex);
       return pool;
     }
-  }, [provider._network?.name, chainId]);
+  }, [provider, chainId]);
 };
 
 export default usePool;
