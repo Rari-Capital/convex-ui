@@ -1,20 +1,8 @@
-import {
-  Accordion,
-  Box,
-  Flex,
-  Spacer,
-  Spinner,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  VStack,
-} from "@chakra-ui/react";
-import MarketCard from "components/MarketCard";
+import { Box, Flex, Spacer, Spinner, Stack, VStack } from "@chakra-ui/react";
 import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
 import { BigNumber, providers, utils, constants } from "ethers";
+// import { useBorrowLimit } from "hooks/useBorrowLimit";
 import { MarketsWithData, USDPricedFuseAsset } from "lib/esm/types";
 import {
   Badge,
@@ -22,7 +10,6 @@ import {
   ExpandableCard,
   Heading,
   StatisticTable,
-  Tabs,
   Text,
   TokenAmountInput,
   TokenIcon,
@@ -36,10 +23,8 @@ import { useAccount, useConnect } from "wagmi";
 const Pool = () => {
   const { address, provider } = useRari();
   const { poolInfo, marketsDynamicData } = usePoolContext();
-  // useEffect(() => {
-  //     convexAPR("frax", provider).then((apr) => console.log({ apr }))
-  // }, [])
-  console.log({marketsDynamicData})
+  
+  const hasSupplied = marketsDynamicData?.totalSupplyBalanceUSD.gt(constants.Zero)
 
   if (!poolInfo) return <Spinner />;
 
@@ -59,13 +44,13 @@ const Pool = () => {
       </Heading>
       <Stack mt={4} width="100%" direction={["column", "row"]} spacing={4}>
         <VStack alignItems="stretch" spacing={4} flex={1}>
-          {marketsDynamicData?.assets?.map((market, i) => ( market.supplyBalanceUSD.gt(constants.Zero) ? null :
+          {marketsDynamicData?.assets?.map((market, i) => (
             <MarketCard marketData={market} key={i} type="supply"/>
           ))}
         </VStack>
         <VStack alignItems="stretch" spacing={4} flex={1}>
           {marketsDynamicData?.assets?.map((market, i) => market.borrowGuardianPaused ?  null : (
-            <MarketCard marketData={market} key={i} type="borrow"/>
+            <MarketCard marketData={market} key={i} type="borrow" hasSupplied={hasSupplied}/>
           )) }
         </VStack>
       </Stack>
@@ -76,10 +61,12 @@ const Pool = () => {
 export default Pool;
 
 const Positions = ({marketsDynamicData}: {marketsDynamicData: MarketsWithData}) => {
+
+
   return (
     <>  {
       marketsDynamicData.assets.map((market, i) => {
-        if (market.supplyBalanceUSD.gt(constants.Zero)) {
+        if (market.supplyBalanceUSD.gt(constants.Zero) || market.borrowBalance.gt(constants.Zero)) {
         return (
             <PositionCard market={market} key={i}/>
           )}
@@ -91,6 +78,9 @@ const Positions = ({marketsDynamicData}: {marketsDynamicData: MarketsWithData}) 
 }
 
 const PositionCard = ({market}: {market: USDPricedFuseAsset}) => {
+  const isSupplying = market.supplyBalanceUSD.gt(constants.Zero)
+  const isBorrowing = market.borrowBalanceUSD.gt(constants.Zero)
+
   return (
     <ExpandableCard
           variant="active"
@@ -114,7 +104,7 @@ const PositionCard = ({market}: {market: USDPricedFuseAsset}) => {
             </VStack>
           }
         >
-          <Flex alignItems="center">
+          <Flex alignItems="center" height="100%">
             <TokenIcon
               tokenAddress={market.underlyingToken}
               mr={4}
@@ -122,14 +112,39 @@ const PositionCard = ({market}: {market: USDPricedFuseAsset}) => {
             <Heading size="xl" mr={4}>
               {market.underlyingSymbol}
             </Heading>
-            <Badge variant="success">Supply</Badge>
+            <Flex direction="column">
+              {
+                isSupplying ? <Badge variant="success">Supplying</Badge> : null
+              } 
+
+              {
+                isBorrowing ? <Badge variant="warning">Borrowing</Badge> : null
+              } 
+            </Flex>
+
             <Spacer />
-            <Box mr={8}>
-              <Text variant="secondary" mb={1}>
-                Supply APY
-              </Text>
-              <Heading size="lg">27.6%</Heading>
-            </Box>
+
+            { isSupplying ?
+              <Box mr={8}>
+                <Text variant="secondary" mb={1}>
+                  Total Supplied
+                </Text>
+                <Heading size="lg">
+                  ${utils.commify(market.supplyBalanceUSD.toString())}
+                </Heading>
+              </Box> : null
+            }
+
+            { isBorrowing ?
+              <Box mr={8}>
+                <Text variant="secondary" mb={1}>
+                  Total Borrowed
+                </Text>
+                <Heading size="lg">
+                  ${utils.commify(market.borrowBalanceUSD.toString())}
+                </Heading>
+              </Box> : null
+            }
           </Flex>
         </ExpandableCard>
   )
@@ -137,10 +152,12 @@ const PositionCard = ({market}: {market: USDPricedFuseAsset}) => {
 
 const MarketCard = ({
   marketData,
-  type
+  type,
+  hasSupplied
 } : {
   marketData: USDPricedFuseAsset
   type: "supply" | "borrow"
+  hasSupplied?: boolean
 }) => {
   const [amount, setAmount] = useState<string>("")
   const { pool } = usePoolContext()
@@ -153,6 +170,9 @@ const MarketCard = ({
     const provider = new providers.Web3Provider(lmao)
     return wtf
   })
+
+  const shouldBeDisabled = type === 'borrow' && !hasSupplied
+
 
   const handleClick = async () => {
     if (amount === "") return
@@ -221,7 +241,7 @@ const MarketCard = ({
                 ["Borrow Limit", "$18,543"],
               ]}
             />
-            <Button onClick={handleClick}>Approve</Button>
+            <Button onClick={handleClick} disabled={shouldBeDisabled}>Approve</Button>
           </VStack>
         }
       >
@@ -279,7 +299,7 @@ const MarketTLDR = ({
       &middot;
 
       <Text variant="secondary" mr="1.5vh" ml="1.5vh">
-        {APY}% APY
+        {APY.toFixed(2)}% APY
       </Text>
 
       
