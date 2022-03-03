@@ -44,12 +44,12 @@ const Pool = () => {
       </Heading>
       <Stack mt={4} width="100%" direction={["column", "row"]} spacing={4}>
         <VStack alignItems="stretch" spacing={4} flex={1}>
-          {marketsDynamicData?.assets?.map((market, i) => (
+          {marketsDynamicData?.assets?.map((market, i) => ( market.supplyBalanceUSD.gt(0) ? null :
             <MarketCard marketData={market} key={i} type="supply"/>
           ))}
         </VStack>
         <VStack alignItems="stretch" spacing={4} flex={1}>
-          {marketsDynamicData?.assets?.map((market, i) => market.borrowGuardianPaused ?  null : (
+          {marketsDynamicData?.assets?.map((market, i) => market.borrowGuardianPaused || market.borrowBalanceUSD.gt(constants.Zero) ?  null : (
             <MarketCard marketData={market} key={i} type="borrow" hasSupplied={hasSupplied}/>
           )) }
         </VStack>
@@ -61,7 +61,6 @@ const Pool = () => {
 export default Pool;
 
 const Positions = ({marketsDynamicData}: {marketsDynamicData: MarketsWithData}) => {
-
 
   return (
     <>  {
@@ -164,15 +163,16 @@ const MarketCard = ({
   const { isAuthed }= useRari()
 
   const [{ data: UsersConnector }, connect] = useConnect()
-  const {data: signer} = useQuery('Users signer', async () => {
-    const  wtf = await UsersConnector?.connector?.getSigner()
-    const lmao = await UsersConnector?.connector?.getProvider()
-    const provider = new providers.Web3Provider(lmao)
-    return wtf
+  const {data: signer} = useQuery('Users signer 1s', async () => {
+    const  signer = await UsersConnector?.connector?.getSigner()
+    const provider = await UsersConnector?.connector?.getProvider()
+    const initiatedProvider = new providers.Web3Provider(provider)
+    return signer
   })
 
-  const shouldBeDisabled = type === 'borrow' && !hasSupplied
+  console.log({signer})
 
+  const shouldBeDisabled = type === 'borrow' && !hasSupplied
 
   const handleClick = async () => {
     if (amount === "") return
@@ -221,6 +221,7 @@ const MarketCard = ({
         break;
     }
   }
+
   return (
     <ExpandableCard
         width="100%"
@@ -234,13 +235,7 @@ const MarketCard = ({
               onChange={(e: any) => setAmount(e.target.value)}
               onClickMax={() => {}}
             />
-            <StatisticTable
-              variant="light"
-              statistics={[
-                ["Supply Balance", "$24,456"],
-                ["Borrow Limit", "$18,543"],
-              ]}
-            />            
+            <Stats marketData={marketData} />          
             <Button onClick={handleClick} disabled={shouldBeDisabled}>Approve</Button>
           </VStack>
         }
@@ -271,27 +266,28 @@ const MarketCard = ({
 }
 
 
-// const Stats = ({
-//   marketData
-// }: {
-//   marketData: USDPricedFuseAsset
-// }) => {
-//   const { borrowLimit } = usePoolContext()
+const Stats = ({
+  marketData
+}: {
+  marketData: USDPricedFuseAsset
+}) => {
+  const { borrowLimit } = usePoolContext()
 
 
-//   const currentSupplyBalanceUSD = utils.commify(marketData.supplyBalanceUSD.toString())
-//   const currentParsedLimit = utils.commify(borrowLimit ?? 0)
+  const currentSupplyBalanceUSD = utils.commify(marketData.supplyBalanceUSD.toString())
+  const currentParsedLimit = utils.commify(borrowLimit ?? 0)
+  const newSupplyBalanceUSD = currentSupplyBalanceUSD + 5
 
-//   return (
-//     <StatisticTable
-//               variant="light"
-//               statistics={[
-//                 ["Supply Balance", currentSupplyBalanceUSD, "$30,000"],
-//                 ["Borrow Limit", currentParsedLimit],
-//               ]}
-//             />
-//   )
-// }
+  return (
+    <StatisticTable
+              variant="light"
+              statistics={[
+                ["Supply Balance", currentSupplyBalanceUSD],
+                ["Borrow Limit", currentParsedLimit],
+              ]}
+            />
+  )
+}
 
 const MarketTLDR = ({
   marketData,
