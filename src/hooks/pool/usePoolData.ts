@@ -19,7 +19,7 @@ const usePoolData = (poolIndex: number) => {
     `Pool Markets PoolID ${pool?.poolId} for address ${address}`,
     async () => {
       if (pool && poolInfo) {
-        return await pool.getMarketsWithData(poolInfo.comptroller)
+        return await pool.getMarketsWithData(poolInfo.comptroller, {from: address})
     }},
     {
       enabled: poolInfo ? true : false,
