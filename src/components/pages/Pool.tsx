@@ -48,7 +48,7 @@ const Pool = () => {
     <Box>
       <Heading size="md" color="white">
         Active Positions
-      </Heading>{" "}
+      </Heading>
       <Accordion allowToggle>
         <VStack mt={4} mb={8} align="stretch">
           <ExpandableCard
