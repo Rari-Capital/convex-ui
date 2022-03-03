@@ -1,6 +1,7 @@
 import {
   Accordion,
   Box,
+  Center,
   Flex,
   Spacer,
   Spinner,
@@ -35,7 +36,13 @@ const Pool = () => {
   //     convexAPR("frax", provider).then((apr) => console.log({ apr }))
   // }, [])
 
-  if (!poolInfo) return <Spinner />;
+  if (!poolInfo) {
+    return (
+      <Center p={8}>
+        <Spinner />
+      </Center>
+    );
+  }
 
   return (
     <Box>
@@ -192,13 +199,15 @@ const Pool = () => {
       <Stack mt={4} width="100%" direction={["column", "row"]} spacing={4}>
         <VStack alignItems="stretch" spacing={4} flex={1}>
           {marketsDynamicData?.assets?.map((market, i) => (
-            <MarketCard marketData={market} key={i} type="supply"/>
+            <MarketCard marketData={market} key={i} type="supply" />
           ))}
         </VStack>
         <VStack alignItems="stretch" spacing={4} flex={1}>
-          {marketsDynamicData?.assets?.map((market, i) => market.borrowGuardianPaused ?  null : (
-            <MarketCard marketData={market} type="borrow"/>
-          )) }
+          {marketsDynamicData?.assets?.map((market, i) =>
+            market.borrowGuardianPaused ? null : (
+              <MarketCard marketData={market} type="borrow" />
+            )
+          )}
         </VStack>
       </Stack>
     </Box>
