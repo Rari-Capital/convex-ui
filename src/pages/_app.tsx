@@ -18,7 +18,7 @@ function MyApp({ Component, pageProps }: any) {
         <QueryClientProvider client={queryClient}>
           <ReactQueryDevtools initialIsOpen={false} />
           <RariProvider>
-            <PoolProvider poolIndex={1}>
+            <PoolProvider poolIndex={156}>
               <Layout>
                 <Component {...pageProps} />
               </Layout>

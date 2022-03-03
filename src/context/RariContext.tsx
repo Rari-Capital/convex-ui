@@ -35,7 +35,7 @@ export const RariProvider = ({
     return provider
   })
 
-  const chainId = useMemo(() => 31337, [data])
+  const chainId = useMemo(() => 1, [data])
   const provider = useMemo(() => {
     return signer ? signer :
     new providers.JsonRpcProvider(alchemyURL)
