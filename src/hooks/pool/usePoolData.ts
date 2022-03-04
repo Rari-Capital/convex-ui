@@ -4,6 +4,7 @@ import usePool from './usePool';
 const usePoolData = (poolIndex: number) => {
   // const { address } = useRari();
   const pool = usePool(poolIndex);
+  console.log(pool)
   const address = '0xb290f2f3fad4e540d0550985951cdad2711ac34a'
 
   const { data: poolInfo } = useQuery(
@@ -28,11 +29,10 @@ const usePoolData = (poolIndex: number) => {
     }
   );
 
-  console.log({marketsDynamicData})
-
   return {
     poolInfo,
     marketsDynamicData,
+    pool
   };
 };
 

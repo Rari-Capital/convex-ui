@@ -8,7 +8,8 @@ import { smallUsdFormatter } from "utils/formatters";
 
 export const PoolOverview = () => {
   const { address } = useRari();
-  const { marketsDynamicData } = usePoolContext();
+  const { marketsDynamicData, borrowLimit, userHealth } = usePoolContext();
+
 
   // Show total market statistics if user's wallet is not connected.
   const heading = !!address ? "Portfolio Overview" : "Pool Overview";
@@ -84,7 +85,7 @@ export const PoolOverview = () => {
           <Text variant="secondary" fontSize="sm" mb={2}>
             Borrow Balance
           </Text>
-          <Progress variant="light" barVariant="gradient" value={80} />
+          <Progress variant="light" barVariant="gradient" value={userHealth} />
         </Card>
       </Stack>
     </Box>

@@ -1,8 +1,10 @@
 import { Modal, ModalOverlay, ModalHeader, ModalCloseButton, ModalBody, ModalContent, ModalFooter, Button, Text, VStack } from '@chakra-ui/react'
+import { useRari } from 'context/RariContext'
 import { useConnect } from 'wagmi'
 
-const ConnectModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => any }) => {
+const ConnectModal = () => {
     const [{ data, error }, connect] = useConnect()
+    const { onClose, isModalOpen } = useRari()
 
     const handleConnect = (connector: any) => {
         connect(connector)
@@ -10,7 +12,7 @@ const ConnectModal = ({ isOpen, onClose }: { isOpen: boolean, onClose: () => any
     }
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isModalOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Modal Title</ModalHeader>

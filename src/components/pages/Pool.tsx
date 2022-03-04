@@ -1,208 +1,50 @@
-import {
-  Accordion,
-  Box,
-  Center,
-  Flex,
-  HStack,
-  Spacer,
-  Spinner,
-  Stack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  VStack,
-} from "@chakra-ui/react";
-import MarketCard from "components/MarketCard";
+import { Accordion, Box,  Spinner, Stack, VStack } from "@chakra-ui/react";
 import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
-import { formatUnits } from "ethers/lib/utils";
-import {
-  Badge,
-  Button,
-  ExpandableCard,
-  Heading,
-  StatisticTable,
-  Tabs,
-  Text,
-  TokenAmountInput,
-  TokenIcon,
-} from "rari-components";
-import {
-  convertMantissaToAPR,
-  convertMantissaToAPY,
-  smallUsdFormatter,
-} from "utils/formatters";
+import { BigNumber, constants } from "ethers";
+// import { useBorrowLimit } from "hooks/useBorrowLimit";
+import { Heading } from "rari-components";
+import MarketCard from "components/MarketCard";
+import Positions from "components/Positions";
 // import { useEffect } from 'react'
 // import { convexAPR } from 'utils/convex/convex2'
 
 const Pool = () => {
   const { address, provider } = useRari();
   const { poolInfo, marketsDynamicData } = usePoolContext();
-  // useEffect(() => {
-  //     convexAPR("frax", provider).then((apr) => console.log({ apr }))
-  // }, [])
+  
+  const hasSupplied = marketsDynamicData?.totalSupplyBalanceUSD.gt(constants.Zero)
 
-  if (!poolInfo) {
-    return (
-      <Center p={8}>
-        <Spinner />
-      </Center>
-    );
-  }
-
-  const activeAssets =
-    marketsDynamicData?.assets.filter(
-      (asset) => asset.borrowBalance.gt(0) || asset.supplyBalance.gt(0)
-    ) ?? [];
+  if (!poolInfo) return <Spinner />;
 
   return (
     <Box>
       <Heading size="md" color="white">
         Active Positions
       </Heading>
-      <Accordion allowToggle>
-        <VStack mt={4} mb={8} align="stretch">
-          {activeAssets.map((asset) => {
-            const isBorrowing = asset.borrowBalance.gt(0);
-
-            return (
-              <ExpandableCard
-                inAccordion
-                variant="active"
-                expandableChildren={
-                  <Tabs>
-                    <TabList>
-                      <Tab>{isBorrowing ? "Borrow" : "Supply"}</Tab>
-                      <Tab>Withdraw</Tab>
-                    </TabList>
-                    <TabPanels>
-                      <TabPanel>
-                        <VStack spacing={4} alignItems="stretch">
-                          <TokenAmountInput
-                            size="lg"
-                            variant="light"
-                            tokenSymbol={asset.underlyingSymbol}
-                            tokenAddress={asset.underlyingToken}
-                            onClickMax={() => {}}
-                          />
-                          <StatisticTable
-                            variant="active"
-                            statistics={[
-                              [
-                                `${isBorrowing ? "Borrow" : "Supply"} Balance`,
-                                smallUsdFormatter(
-                                  (isBorrowing
-                                    ? asset.borrowBalanceUSD
-                                    : asset.supplyBalanceUSD
-                                  ).toNumber()
-                                ),
-                              ],
-                              ["Borrow Limit", "$0"],
-                            ]}
-                          />
-                          <Button alignSelf="stretch">
-                            {isBorrowing ? "Borrow" : "Supply"}
-                          </Button>
-                        </VStack>
-                      </TabPanel>
-                      <TabPanel>
-                        <VStack spacing={4} alignItems="stretch">
-                          <TokenAmountInput
-                            size="lg"
-                            variant="light"
-                            tokenSymbol={asset.underlyingSymbol}
-                            tokenAddress={asset.underlyingToken}
-                            onClickMax={() => {}}
-                          />
-                          <StatisticTable
-                            variant="active"
-                            statistics={[
-                              [
-                                `${isBorrowing ? "Borrow" : "Supply"} Balance`,
-                                smallUsdFormatter(
-                                  (isBorrowing
-                                    ? asset.borrowBalanceUSD
-                                    : asset.supplyBalanceUSD
-                                  ).toNumber()
-                                ),
-                              ],
-                              ["Borrow Limit", "$0"],
-                            ]}
-                          />
-                          <Button alignSelf="stretch">Withdraw</Button>
-                        </VStack>
-                      </TabPanel>
-                    </TabPanels>
-                  </Tabs>
-                }
-              >
-                <Flex alignItems="center">
-                  <TokenIcon tokenAddress={asset.underlyingToken} mr={4} />
-                  <Heading size="xl" mr={4}>
-                    {asset.underlyingSymbol}
-                  </Heading>
-                  <Badge variant={isBorrowing ? "warning" : "success"}>
-                    {isBorrowing ? "Borrow" : "Supply"}
-                  </Badge>
-                  <Spacer />
-                  <HStack spacing={8} mr={8} textAlign="right">
-                    <Box>
-                      <Text variant="secondary" mb={1}>
-                        {!!address ? "You" : "Total"}{" "}
-                        {isBorrowing ? "Borrowed" : "Supplied"}
-                      </Text>
-                      <Heading
-                        size="md"
-                        variant={isBorrowing ? "warning" : "success"}
-                      >
-                        {parseFloat(
-                          formatUnits(
-                            isBorrowing
-                              ? asset.borrowBalance
-                              : asset.supplyBalance,
-                            asset.underlyingDecimals
-                          )
-                        ).toFixed(2)}{" "}
-                        {asset.underlyingSymbol}
-                      </Heading>
-                    </Box>
-                    <Box>
-                      <Text variant="secondary" mb={1}>
-                        {isBorrowing ? "Borrow" : "Supply"} APY
-                      </Text>
-                      <Heading size="md">
-                        {isBorrowing
-                          ? convertMantissaToAPR(asset.borrowRatePerBlock)
-                          : convertMantissaToAPY(
-                              asset.supplyRatePerBlock,
-                              365
-                            ).toFixed(2)}
-                        %
-                      </Heading>
-                    </Box>
-                  </HStack>
-                </Flex>
-              </ExpandableCard>
-            );
-          })}
-        </VStack>
-      </Accordion>
+      { marketsDynamicData?.totalSupplyBalanceUSD.gt(constants.Zero) ?
+          <VStack mt={4} mb={8} align="stretch" spacing={4}>
+            <Positions marketsDynamicData={marketsDynamicData} />
+          </VStack>
+        : null
+      }
       <Heading size="md" color="black">
         Markets
       </Heading>
       <Stack mt={4} width="100%" direction={["column", "row"]} spacing={4}>
         <VStack alignItems="stretch" spacing={4} flex={1}>
-          {marketsDynamicData?.assets?.map((market, i) => (
-            <MarketCard marketData={market} key={i} type="supply" />
+          <Accordion allowToggle>
+          {marketsDynamicData?.assets?.map((market, i) => ( market.supplyBalanceUSD.gt(0) ? null :
+            <MarketCard markets={marketsDynamicData?.assets} marketData={market} index={i} key={i} type="supply"/>
           ))}
+          </Accordion>
         </VStack>
         <VStack alignItems="stretch" spacing={4} flex={1}>
-          {marketsDynamicData?.assets?.map((market, i) =>
-            market.borrowGuardianPaused ? null : (
-              <MarketCard marketData={market} type="borrow" />
-            )
-          )}
+          <Accordion allowToggle>
+          {marketsDynamicData?.assets?.map((market, i) => market.borrowGuardianPaused || market.borrowBalanceUSD.gt(constants.Zero) ?  null : (
+            <MarketCard markets={marketsDynamicData?.assets} index={i} marketData={market} key={i} type="borrow"/>
+          )) }
+          </Accordion>
         </VStack>
       </Stack>
     </Box>
@@ -210,3 +52,27 @@ const Pool = () => {
 };
 
 export default Pool;
+
+
+// Port over to sdk
+export const toInt = (input: BigNumber) => {
+  if (!input) return 0
+  return parseInt(input.toString())
+}
+
+const getMillions = (bn: BigNumber) => {
+  const number  = parseFloat(bn.toString())
+
+  return (number / 1000000).toFixed(1)
+}
+
+export const convertMantissaToAPY = (mantissa: any, dayRange: number = 35) => {
+  const parsedMantissa = toInt(mantissa)
+  return (Math.pow((parsedMantissa / 1e18) * 6500 + 1, dayRange) - 1) * 100;
+};
+
+export const convertMantissaToAPR = (mantissa: any) => {
+  const parsedMantissa = toInt(mantissa)
+  return (parsedMantissa * 2372500) / 1e16;
+};
+

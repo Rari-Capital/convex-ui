@@ -38,7 +38,6 @@ export function fetchAvailableRdsWithContext(comptrollerAddress) {
                 // If not flywheel, check for RD
                 try {
                     isRewardsDistributor = yield rdContract.callStatic.isRewardsDistributor();
-                    console.log({ isRewardsDistributor });
                 }
                 catch (_b) {
                     return;

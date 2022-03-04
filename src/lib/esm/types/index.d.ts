@@ -93,10 +93,11 @@ export declare type PoolInstance = {
     getPriceFromOracle(tokenAddress: string, oracleAddress: string): Promise<BigNumber>;
     getMarketsWithData(comptrollerAddress: string, options?: Options | undefined): Promise<MarketsWithData>;
     getEthUsdPriceBN: () => Promise<BigNumber>;
-    getDecimals(tokenAddress: string, provider: Web3Provider | JsonRpcProvider): Promise<number>;
+    getDecimals(tokenAddress: string, provider: Web3Provider | JsonRpcProvider): Promise<BigNumber>;
     fetchAvailableRdsWithContext(comptrollerAddress: string): Promise<RewardsDistributorData[]>;
     fetchFusePoolData(): Promise<FusePoolData | undefined>;
     getPool(): Promise<PoolInformation>;
+    getPriceFromOracle(tokenAddress: string, oracleAddress: string): Promise<BigNumber>;
     fetchAllMarkets(comptrollerAddress: string): Promise<string[]>;
     fetchRewardedMarketsInRd(rdAddress: string): Promise<string[]>;
     fetchRewardSpeedInMarket(rdAddress: string, marketAddress: string, type: 'supply' | 'borrow'): Promise<BigNumber>;
@@ -105,4 +106,10 @@ export declare type PoolInstance = {
         supplyAPR: number;
         supplyAPY: number;
     }>;
+    getInterestRateModel: (assetAddress: string) => Promise<any | undefined>;
+    marketInteraction(action: marketInteractionType, cTokenAddress: string, amount: string, tokenAddress: string, decimals?: BigNumber): Promise<void>;
+    collateral(comptrollerAddress: string, marketAddress: string[], action: actionType, provider: Web3Provider | JsonRpcProvider): Promise<void>;
+    checkAllowanceAndApprove(userAddress: string, marketAddress: string, underlyingAddress: string, amount: string, decimals: BigNumber): Promise<void>;
 };
+export declare type marketInteractionType = "withdraw" | "borrow" | "repay" | "supply";
+export declare type actionType = "enter" | "exit";

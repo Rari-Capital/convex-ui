@@ -34,14 +34,14 @@ export function marketInteraction(action, cTokenAddress, amount, tokenAddress, d
             'function mint(uint mintAmount) returns (uint)'
         ]);
         const cTokenContract = new Contract(cTokenAddress, cTokenInterface, this._provider.getSigner());
-        const isEth = tokenAddress === "0";
+        const isEth = tokenAddress === "0x0000000000000000000000000000000000000000";
         // 2. Parse given amount to the underlying asset's notation.
         // Fetch decimals if not given.
         if (!decimals && !isEth) {
             decimals = yield getDecimals(tokenAddress, this._provider);
         }
         // 3. Parse given amount.
-        const parsedAmount = decimals === 18 || isEth
+        const parsedAmount = decimals.eq(18) || isEth
             ? parseEther(amount)
             : parseUnits(amount, decimals);
         // 4. Perform action.

@@ -29,14 +29,14 @@ type HeaderProps = BoxProps & {
 };
 
 const Header: React.FC<HeaderProps> = ({ contentSx, ...restProps }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isAuthed, address, logout, previewMode } = useRari();
+  
+  const { isAuthed, address, logout, login, previewMode, isOpen, onClose} = useRari();
 
   const handleClick = () => {
     if (isAuthed) {
       logout();
     } else {
-      onOpen();
+      login();
     }
   };
 
@@ -89,7 +89,7 @@ const Header: React.FC<HeaderProps> = ({ contentSx, ...restProps }) => {
               {!!address ? truncate(address ?? "", 8) : "Connect"}
             </Button>
           </HStack>
-          <ConnectModal isOpen={isOpen} onClose={onClose} />
+          <ConnectModal/>
         </HStack>
         <Box pt={12}>
           <Heading>Tribe Convex Pool</Heading>
