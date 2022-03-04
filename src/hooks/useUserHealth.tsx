@@ -9,7 +9,7 @@ import { getBorrowLimit } from "./getBorrowLimit"
 const useUserHealth = (
     marketsDynamicData: MarketsWithData | undefined
 ) => {
-    const { data: borrowLimit } = useQuery("User's borrow limit", () => {
+    const { data: borrowLimit } = useQuery("User's borrow limit and health", () => {
         if (!marketsDynamicData) return
 
         const borrowLimitBN = getBorrowLimit(marketsDynamicData.assets)
