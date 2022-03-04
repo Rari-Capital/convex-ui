@@ -15,18 +15,6 @@ const Pool = () => {
   
   const hasSupplied = marketsDynamicData?.totalSupplyBalanceUSD.gt(constants.Zero)
 
-  if (!poolInfo) {
-    return (
-      <Center p={8}>
-        <Spinner />
-      </Center>
-    );
-  }
-
-  const activeAssets =
-    marketsDynamicData?.assets.filter(
-      (asset) => asset.borrowBalance.gt(0) || asset.supplyBalance.gt(0)
-    ) ?? [];
   if (!poolInfo) return <Spinner />;
 
   return (
