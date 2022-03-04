@@ -30,6 +30,7 @@ const Pool = () => {
         Markets
       </Heading>
       <Stack mt={4} width="100%" direction={["column", "row"]} spacing={4}>
+      <VStack alignItems="stretch" spacing={4} flex={1}>
           <Accordion allowToggle>
             <VStack alignItems="stretch" spacing={4} flex={1}>
               {marketsDynamicData?.assets?.map((market, i) => ( market.supplyBalanceUSD.gt(0) ? null :
@@ -37,6 +38,8 @@ const Pool = () => {
               ))}
             </VStack>
           </Accordion>
+        </VStack>
+          <VStack alignItems="stretch" spacing={4} flex={1}>
           <Accordion allowToggle>
             <VStack alignItems="stretch" spacing={4} flex={1}>
             {marketsDynamicData?.assets?.map((market, i) => market.borrowGuardianPaused || market.borrowBalanceUSD.gt(constants.Zero) ?  null : (
@@ -44,6 +47,7 @@ const Pool = () => {
             )) }
             </VStack>
           </Accordion>
+          </VStack>
       </Stack>
     </Box>
   );
