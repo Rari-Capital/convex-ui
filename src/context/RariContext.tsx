@@ -27,17 +27,10 @@ export const RariProvider = ({
   })
 
   const [{ data: UsersConnector }, connect] = useConnect()
-  const {data: signer} = useQuery('Users signer', async () => {
-    if(!UsersConnector.connector) return
-    const  wtf = await UsersConnector?.connector?.getSigner()
-    const lmao = await UsersConnector?.connector?.getProvider()
-    const provider = new providers.Web3Provider(lmao)
-    return provider
-  })
 
-  const chainId = useMemo(() => 1, [data])
+  const chainId = useMemo(() => 31337, [data])
   const provider = useMemo(() => {
-    return signer ? signer :
+    return UsersConnector.connector ? new providers.Web3Provider(UsersConnector?.connector?.getProvider()) :
     new providers.JsonRpcProvider(alchemyURL)
   }, [UsersConnector])
 
