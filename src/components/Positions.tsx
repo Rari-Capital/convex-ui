@@ -28,7 +28,7 @@ import { convertMantissaToAPR, convertMantissaToAPY, smallUsdFormatter } from "u
 import { formatUnits } from "ethers/lib/utils"
 import { useRari } from "context/RariContext"
 import { usePoolContext } from "context/PoolContext"
-import { Stats } from "./MarketCard"
+import { Stats } from "./Stats"
 import { marketInteraction } from "utils/marketInteraction"
 import { useAuthedCallback } from "hooks/useAuthedCallback"
 
