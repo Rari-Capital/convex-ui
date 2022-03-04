@@ -44,7 +44,7 @@ export const useUpdatedUserAssets = ({
               supplyBalance,
               supplyBalanceUSD: supplyBalance
                 .mul(assetToBeUpdated.underlyingPrice)
-                .mul(utils.parseEther(ethPrice.toString()))
+                .mul(ethPrice.div(constants.WeiPerEther))
                 .div(constants.WeiPerEther),
   
               totalSupply,
