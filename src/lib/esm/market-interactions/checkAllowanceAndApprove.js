@@ -22,12 +22,14 @@ import { Interface } from '@ethersproject/abi';
  */
 export function checkAllowanceAndApprove(userAddress, marketAddress, underlyingAddress, amount, decimals) {
     return __awaiter(this, void 0, void 0, function* () {
+        const isEth = underlyingAddress === "0x0000000000000000000000000000000000000000";
+        if (isEth)
+            return;
         const erc20Interface = new Interface([
             'function allowance(address owner, address spender) public view returns (uint256 remaining)',
             'function approve(address spender, uint256 value) public returns (bool success)',
         ]);
         const erc20Contract = new Contract(underlyingAddress, erc20Interface, this._provider.getSigner(userAddress));
-        const isEth = underlyingAddress === "0x0000000000000000000000000000000000000000";
         // 3. Parse given amount.
         const parsedAmount = decimals.eq(18) || isEth
             ? parseEther(amount)
