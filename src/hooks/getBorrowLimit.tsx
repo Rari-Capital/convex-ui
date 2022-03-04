@@ -25,5 +25,5 @@ export const getBorrowLimit = (
         }
     }
   
-    return _maxBorrow.div(constants.WeiPerEther);
+    return _maxBorrow.eq(0) ? _maxBorrow : _maxBorrow.div(constants.WeiPerEther);
   };
