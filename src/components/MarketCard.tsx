@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { usePoolContext } from "context/PoolContext";
+import { useRari } from "context/RariContext";
 import { Box, Flex, VStack } from "@chakra-ui/react";
 import { utils } from "ethers";
 import { USDPricedFuseAsset } from "lib/esm/types";
@@ -11,7 +14,7 @@ import {
   TokenAmountInput,
   TokenIcon,
 } from "rari-components";
-import { getMillions, convertMantissaToAPY } from "utils/formatters";
+import { getMillions, convertMantissaToAPY, smallUsdFormatter } from "utils/formatters";
 
 type MarketCardProps = Omit<
   React.ComponentProps<typeof ExpandableCard>,
@@ -26,26 +29,91 @@ const MarketCard: React.FC<MarketCardProps> = ({
   type,
   ...restProps
 }) => {
+  const { pool } = usePoolContext()
+  const { isAuthed }= useRari()
+
+  const [amount, setAmount] = useState<string>("")
+  const isBorrowing = type === "borrow";
+
+  const handleClick = async () => {
+    if (amount === "") return
+
+    if (!isAuthed) { 
+      // This should open connect modal
+      return console.log('hello')
+    }
+
+    const address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+
+    switch (type) {
+      case "supply":
+          await pool?.checkAllowanceAndApprove(
+            address,
+            marketData.cToken,
+            marketData.underlyingToken,
+            amount,
+            marketData.underlyingDecimals,
+          )
+
+          
+          await pool?.marketInteraction(
+            'supply',
+            marketData.cToken,
+            amount,
+            marketData.underlyingToken,
+            marketData.underlyingDecimals,
+          )
+        break;
+
+      case "borrow":
+        await pool?.marketInteraction(
+          'borrow',
+          marketData.cToken,
+          amount,
+          marketData.underlyingToken,
+          marketData.underlyingDecimals,
+        )
+        break;
+    
+      default:
+        break;
+    }
+  }
+
   return (
     <ExpandableCard
       width="100%"
       variant="light"
+      inAccordion={true}
       expandableChildren={
         <VStack spacing={4} alignItems="stretch">
           <TokenAmountInput
             variant="light"
             tokenSymbol={marketData.underlyingSymbol}
             tokenAddress={marketData.underlyingToken}
+            onChange={(e: any) => setAmount(e.target.value)}
             onClickMax={() => { }}
           />
           <StatisticTable
             variant="light"
             statistics={[
-              ["Supply Balance", "$24,456"],
-              ["Borrow Limit", "$18,543"],
+              [
+                `${isBorrowing ? "Borrow" : "Supply"} Balance`,
+                smallUsdFormatter(
+                  (isBorrowing
+                    ? marketData.borrowBalanceUSD
+                    : marketData.supplyBalanceUSD
+                  ).toNumber()
+                ),
+              ],
+              ["Borrow Limit", "$0"],
             ]}
           />
-          <Button>Approve</Button>
+          <Button
+            onClick={() => handleClick()}
+          >
+            Approve
+          </Button>
         </VStack>
       }
       {...restProps}
@@ -63,68 +131,6 @@ const MarketCard: React.FC<MarketCardProps> = ({
               </Badge>
             </Box>
           </Flex>
-          <Text variant="secondary" textAlign="left">
-            {parseFloat(utils.formatEther(marketData.collateralFactor)) *
-              100}
-            % LTV &middot;
-            {utils.formatEther(
-              marketData.supplyRatePerBlock.mul(100)
-            )}{" "}
-            Supply APY &middot;
-            {marketData.totalSupplyUSD.toString()}M Supplied
-          </Text>
-        </Flex>
-      </Flex>
-    </ExpandableCard>
-  );
-};
-
-const _MarketCard = ({
-  marketData,
-  type
-}: {
-  marketData: USDPricedFuseAsset
-  type: "supply" | "borrow"
-}) => {
-
-  return (
-    <ExpandableCard
-      width="100%"
-      variant="light"
-      expandableChildren={
-        <VStack spacing={4} alignItems="stretch">
-          <TokenAmountInput
-            variant="light"
-            tokenSymbol={marketData.underlyingSymbol}
-            tokenAddress={marketData.underlyingToken}
-            onClickMax={() => { }}
-          />
-          <StatisticTable
-            variant="light"
-            statistics={[
-              ["Supply Balance", "$24,456"],
-              ["Borrow Limit", "$18,543"],
-            ]}
-          />
-          <Button>Approve</Button>
-        </VStack>
-      }
-    >
-      <Flex alignItems="flex-start" id="hello" width="100%">
-        <TokenIcon tokenAddress={marketData.underlyingToken} mr={4} />
-        <Flex direction="column" width="100%">
-          <Flex direction="column" width="100%">
-            <Flex width="auto">
-              <Heading size="lg" mr={4}>
-                {marketData.underlyingSymbol}
-              </Heading>
-              <Box alignSelf="center">
-                <Badge variant={type === "supply" ? "success" : "warning"}>
-                  {type}
-                </Badge>
-              </Box>
-            </Flex>
-          </Flex>
           <MarketTLDR
             marketData={marketData}
             type={type}
@@ -132,52 +138,53 @@ const _MarketCard = ({
         </Flex>
       </Flex>
     </ExpandableCard>
-  )
-}
+  );
+};
 
 const MarketTLDR = ({
   marketData,
   type
-}: {
+} : {
   marketData: USDPricedFuseAsset,
   type: "supply" | "borrow"
 }) => {
 
   const isSupply = type === "supply"
-  const APY = convertMantissaToAPY(
-    isSupply
-      ? marketData.supplyRatePerBlock
+  const APY =  convertMantissaToAPY(
+    isSupply 
+      ? marketData.supplyRatePerBlock 
       : marketData.borrowRatePerBlock, 365
-  )
+    )
+ 
+  const Text1 = isSupply 
+    ? `${utils.formatEther(marketData.collateralFactor.mul(100))}% LTV` 
+    : `${getMillions(marketData.liquidityUSD)}M Liquidity`
 
-  const Text1 = isSupply
-    ? `${utils.formatEther(marketData.collateralFactor.mul(100))} LTV`
-    : `${getMillions(marketData.liquidityUSD)} Liquidity`
-
-  // const 
+  
   return (
     <Flex justifyContent="flex-start !important">
-      <Text variant="secondary" alignSelf="flex-start" mr="1.5vh">
-        { }% LTV
+      <Text variant="secondary" alignSelf="flex-start"  mr="1.5vh">
+        {Text1}
       </Text>
 
       &middot;
 
       <Text variant="secondary" mr="1.5vh" ml="1.5vh">
-        {Text1}
+        {APY.toFixed(2)}% APY
       </Text>
 
-      {
-
-        isSupply ? (
-          <>
-            &middot;
-            <Text variant="secondary" ml="1.5vh">
-              {getMillions(marketData.totalSupplyUSD)}M Supplied
-            </Text>
-          </>
-        )
-          : null
+      
+      { 
+      
+      isSupply ? (
+        <>
+        &middot;
+        <Text variant="secondary" ml="1.5vh">
+          {getMillions(marketData.totalSupplyUSD)}M Supplied
+        </Text>
+        </>
+      )
+        : null 
       }
     </Flex>
   )
