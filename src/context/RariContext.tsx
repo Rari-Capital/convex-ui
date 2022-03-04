@@ -11,6 +11,7 @@ import { useNetwork } from "wagmi";
 import { alchemyURL } from "utils/connectors";
 import { providers } from "ethers";
 import { useQuery } from "react-query";
+import { useDisclosure } from "@chakra-ui/react";
 
 export const RariContext = createContext<undefined | any>(
   undefined
@@ -34,6 +35,8 @@ export const RariProvider = ({
     new providers.JsonRpcProvider(alchemyURL)
   }, [UsersConnector])
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   // Whether you have forced an address
   const router = useRouter()
   const address = useMemo(() => router?.query.address ?? accountData?.address, [router, accountData])
@@ -43,6 +46,10 @@ export const RariProvider = ({
   // logs out
   const logout = useCallback(() => disconnect(), [])
 
+  const login =useCallback(() => {
+    onOpen()
+  },[onOpen])
+
   const value = {
     provider,
     chainId,
@@ -50,10 +57,17 @@ export const RariProvider = ({
     accountData,
     isAuthed,
     previewMode,
-    logout
+    logout,
+    login,
+    isModalOpen: isOpen,
+    onClose
   }
 
-  return <RariContext.Provider value={value}>{children}</RariContext.Provider>;
+  return <RariContext.Provider value={value}>
+    
+    {children}
+  
+  </RariContext.Provider>;
 };
 
 // Hook
