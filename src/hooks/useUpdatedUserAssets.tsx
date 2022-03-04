@@ -83,7 +83,7 @@ export const useUpdatedUserAssets = ({
   
             const totalBorrow = assetToBeUpdated.totalBorrow.add(amount);
   
-            let newUtilRate = totalBorrow
+            let newUtilRate = assetToBeUpdated.totalSupply.eq(0) ? constants.Zero : totalBorrow
               .mul(constants.WeiPerEther)
               .div(assetToBeUpdated.totalSupply);
   
