@@ -5,12 +5,11 @@ import { animate, useMotionValue } from "framer-motion";
 import { Card, Heading, Progress, Statistic, Text } from "rari-components";
 import { useEffect, useState } from "react";
 import { smallUsdFormatter } from "utils/formatters";
-// import { useBorrowLimit } from "hooks/useBorrowLimit";
-import { MarketsWithData } from "lib/esm/types";
 
 export const PoolOverview = () => {
   const { address } = useRari();
-  const { marketsDynamicData } = usePoolContext();
+  const { marketsDynamicData, borrowLimit, userHealth } = usePoolContext();
+
 
   // Show total market statistics if user's wallet is not connected.
   const heading = !!address ? "Portfolio Overview" : "Pool Overview";
@@ -86,7 +85,7 @@ export const PoolOverview = () => {
           <Text variant="secondary" fontSize="sm" mb={2}>
             Borrow Balance
           </Text>
-          <UserHealth/>
+          <Progress variant="light" barVariant="gradient" value={userHealth} />
         </Card>
       </Stack>
     </Box>
@@ -94,13 +93,3 @@ export const PoolOverview = () => {
 };
 
 export default PoolOverview;
-
-const UserHealth = () => {
-  const {userHealth, borrowLimit} = usePoolContext()
-
-  console.log(userHealth, borrowLimit)
-  return (
-    <h1>ruffle</h1>
-    /* <Progress variant="light" barVariant="gradient" value={80} /> */
-  )
-}
