@@ -33,7 +33,7 @@ export const PoolProvider = ({
       borrowLimit,
       userHealth
     }),
-    [poolInfo, marketsDynamicData, pool, borrowLimit]
+    [poolInfo, marketsDynamicData, pool, borrowLimit, userHealth]
   );
 
   return <PoolContext.Provider value={value}>{children}</PoolContext.Provider>;
