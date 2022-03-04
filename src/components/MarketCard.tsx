@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
 import { Box, Flex, VStack } from "@chakra-ui/react";
-import { utils } from "ethers";
+import { constants, utils } from "ethers";
 import { USDPricedFuseAsset } from "lib/esm/types";
 import {
   Badge,
@@ -14,71 +14,51 @@ import {
   TokenAmountInput,
   TokenIcon,
 } from "rari-components";
-import { getMillions, convertMantissaToAPY, smallUsdFormatter } from "utils/formatters";
+import { getMillions, convertMantissaToAPY, smallUsdFormatter, smallStringUsdFormatter, convertMantissaToAPR } from "utils/formatters";
+import { useUpdatedUserAssets } from "hooks/useUpdatedUserAssets";
+import { getBorrowLimit } from "hooks/getBorrowLimit";
+import { useAuthedCallback } from "hooks/useAuthedCallback";
+import { marketInteraction } from "utils/marketInteraction";
 
 type MarketCardProps = Omit<
   React.ComponentProps<typeof ExpandableCard>,
   "expandableChildren"
 > & {
-  marketData: USDPricedFuseAsset;
   type: "supply" | "borrow";
+  marketData: USDPricedFuseAsset
+  markets: USDPricedFuseAsset[],
+  index: number
 };
 
 const MarketCard: React.FC<MarketCardProps> = ({
+  markets,
   marketData,
+  index,
   type,
   ...restProps
 }) => {
   const { pool } = usePoolContext()
-  const { isAuthed }= useRari()
+  const { isAuthed,  }= useRari()
 
   const [amount, setAmount] = useState<string>("")
   const isBorrowing = type === "borrow";
 
-  const handleClick = async () => {
-    if (amount === "") return
+  const isSupply = type === "supply"
+  const APY =  convertMantissaToAPY(
+    isSupply 
+      ? marketData.supplyRatePerBlock 
+      : marketData.borrowRatePerBlock, 365
+    )
 
-    if (!isAuthed) { 
-      // This should open connect modal
-      return console.log('hello')
-    }
-
-    const address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
-
-    switch (type) {
-      case "supply":
-          await pool?.checkAllowanceAndApprove(
-            address,
-            marketData.cToken,
-            marketData.underlyingToken,
-            amount,
-            marketData.underlyingDecimals,
-          )
-
-          
-          await pool?.marketInteraction(
-            'supply',
-            marketData.cToken,
-            amount,
-            marketData.underlyingToken,
-            marketData.underlyingDecimals,
-          )
-        break;
-
-      case "borrow":
-        await pool?.marketInteraction(
-          'borrow',
-          marketData.cToken,
-          amount,
-          marketData.underlyingToken,
-          marketData.underlyingDecimals,
-        )
-        break;
-    
-      default:
-        break;
-    }
-  }
+  const authedHandleClick = useAuthedCallback(
+    marketInteraction,
+    [
+      amount,
+      pool,
+      marketData,
+      type
+    ]
+  )
 
   return (
     <ExpandableCard
@@ -89,28 +69,23 @@ const MarketCard: React.FC<MarketCardProps> = ({
         <VStack spacing={4} alignItems="stretch">
           <TokenAmountInput
             variant="light"
-            tokenSymbol={marketData.underlyingSymbol}
-            tokenAddress={marketData.underlyingToken}
+            tokenSymbol={markets[index].underlyingSymbol}
+            tokenAddress={markets[index].underlyingToken}
             onChange={(e: any) => setAmount(e.target.value)}
             onClickMax={() => { }}
           />
-          <StatisticTable
-            variant="light"
-            statistics={[
-              [
-                `${isBorrowing ? "Borrow" : "Supply"} Balance`,
-                smallUsdFormatter(
-                  (isBorrowing
-                    ? marketData.borrowBalanceUSD
-                    : marketData.supplyBalanceUSD
-                  ).toNumber()
-                ),
-              ],
-              ["Borrow Limit", "$0"],
-            ]}
+          { amount === "" ? null :
+          <Stats 
+            marketData={marketData} 
+            amount={amount} 
+            type={type} 
+            isBorrowing={isBorrowing} 
+            markets={markets} 
+            index={index} 
           />
+          }
           <Button
-            onClick={() => handleClick()}
+            onClick={authedHandleClick}
           >
             Approve
           </Button>
@@ -119,11 +94,11 @@ const MarketCard: React.FC<MarketCardProps> = ({
       {...restProps}
     >
       <Flex alignItems="center" width="100%">
-        <TokenIcon tokenAddress={marketData.underlyingToken} mr={4} />
+        <TokenIcon tokenAddress={markets[index].underlyingToken} mr={4} />
         <Flex direction="column" width="100%">
           <Flex width="auto">
             <Heading size="lg" mr={4}>
-              {marketData.underlyingSymbol}
+              {markets[index].underlyingSymbol}
             </Heading>
             <Box alignSelf="center">
               <Badge variant={type === "supply" ? "success" : "warning"}>
@@ -132,8 +107,9 @@ const MarketCard: React.FC<MarketCardProps> = ({
             </Box>
           </Flex>
           <MarketTLDR
-            marketData={marketData}
-            type={type}
+            marketData={markets[index]}
+            APY={APY}
+            isSupply={isSupply}
           />
         </Flex>
       </Flex>
@@ -143,18 +119,14 @@ const MarketCard: React.FC<MarketCardProps> = ({
 
 const MarketTLDR = ({
   marketData,
-  type
+  isSupply,
+  APY
 } : {
   marketData: USDPricedFuseAsset,
-  type: "supply" | "borrow"
+  isSupply: boolean,
+  APY: number
 }) => {
 
-  const isSupply = type === "supply"
-  const APY =  convertMantissaToAPY(
-    isSupply 
-      ? marketData.supplyRatePerBlock 
-      : marketData.borrowRatePerBlock, 365
-    )
  
   const Text1 = isSupply 
     ? `${utils.formatEther(marketData.collateralFactor.mul(100))}% LTV` 
@@ -190,5 +162,78 @@ const MarketTLDR = ({
   )
 }
 
-
 export default MarketCard;
+
+export const Stats = ({ 
+  isBorrowing,
+  marketData,
+  type,
+  amount,
+  markets,
+  index
+} : { 
+  isBorrowing: boolean, 
+  marketData: USDPricedFuseAsset,
+  type: "supply" | "borrow" | "withdraw" | "repay",
+  amount: string,
+  markets: USDPricedFuseAsset[],
+  index: number
+}) => {
+  const parsedAmount = marketData.underlyingDecimals.eq(18) ? utils.parseEther(amount) : utils.parseUnits(amount, marketData.underlyingDecimals)
+  const { borrowLimit, marketsDynamicData } = usePoolContext()
+  
+  const updatedAssets = useUpdatedUserAssets({
+    mode: type,
+    assets: markets,
+    index,
+    amount: parsedAmount
+  })
+
+  const updatedMarket = updatedAssets ? updatedAssets[index] : null;
+  const updatedBorrowLimit = getBorrowLimit(updatedAssets ?? [],{
+    ignoreIsEnabledCheckFor: marketData.cToken,
+  })
+
+  const borrowAPR = convertMantissaToAPR(marketData.borrowRatePerBlock).toFixed(2)
+  const supplyAPY = convertMantissaToAPY(
+    marketData.supplyRatePerBlock,
+    365
+  ).toFixed(2)
+
+  const updatedBorrowAPR = convertMantissaToAPR(updatedMarket?.borrowRatePerBlock ?? 0).toFixed(2)
+  const updatedSupplyAPY = convertMantissaToAPY(marketData.supplyRatePerBlock,
+    365).toFixed(2)
+
+  
+  const textTwo = isBorrowing && updatedMarket ?
+    `${smallStringUsdFormatter( marketsDynamicData?.totalBorrowBalanceUSD.toString() ?? 0)} -> ${smallStringUsdFormatter( marketsDynamicData?.totalBorrowBalanceUSD.add(updatedMarket?.borrowBalanceUSD ?? 0).div(constants.WeiPerEther).toString() ?? 0)}`
+    : isBorrowing ? `${smallStringUsdFormatter( marketsDynamicData?.totalBorrowBalanceUSD.toString() ?? 0)}` : "null"
+
+  
+  const textFour = isBorrowing && updatedMarket ?
+    `${borrowAPR}% -> ${updatedBorrowAPR}%` : borrowAPR
+
+
+  const stats: [title: string, value: string][] = useMemo(() => {
+    const _stats: [title: string, value: string][] = [
+    ["Borrow Balance",textTwo],
+    ["Borrow Limit", smallUsdFormatter(borrowLimit ?? 0)],
+    ["Borrow APY", textFour]
+  ]
+
+  if (!isBorrowing) _stats.unshift([
+    `Supply Balance`,
+    `${smallUsdFormatter( markets[index].supplyBalanceUSD.toNumber())}`
+  ]) 
+
+  return _stats
+
+}, [isBorrowing, markets, index, textFour, borrowLimit])
+
+  return (
+    <StatisticTable
+      variant="light"
+      statistics={stats}
+  />
+  )
+}
