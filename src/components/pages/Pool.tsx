@@ -23,29 +23,27 @@ const Pool = () => {
         Active Positions
       </Heading>
       { marketsDynamicData?.totalSupplyBalanceUSD.gt(constants.Zero) ?
-          <VStack mt={4} mb={8} align="stretch" spacing={4}>
             <Positions marketsDynamicData={marketsDynamicData} />
-          </VStack>
         : null
       }
       <Heading size="md" color="black">
         Markets
       </Heading>
       <Stack mt={4} width="100%" direction={["column", "row"]} spacing={4}>
-        <VStack alignItems="stretch" spacing={4} flex={1}>
           <Accordion allowToggle>
-          {marketsDynamicData?.assets?.map((market, i) => ( market.supplyBalanceUSD.gt(0) ? null :
-            <MarketCard markets={marketsDynamicData?.assets} marketData={market} index={i} key={i} type="supply"/>
-          ))}
+            <VStack alignItems="stretch" spacing={4} flex={1}>
+              {marketsDynamicData?.assets?.map((market, i) => ( market.supplyBalanceUSD.gt(0) ? null :
+                <MarketCard markets={marketsDynamicData?.assets} marketData={market} index={i} key={i} type="supply"/>
+              ))}
+            </VStack>
           </Accordion>
-        </VStack>
-        <VStack alignItems="stretch" spacing={4} flex={1}>
           <Accordion allowToggle>
-          {marketsDynamicData?.assets?.map((market, i) => market.borrowGuardianPaused || market.borrowBalanceUSD.gt(constants.Zero) ?  null : (
-            <MarketCard markets={marketsDynamicData?.assets} index={i} marketData={market} key={i} type="borrow"/>
-          )) }
+            <VStack alignItems="stretch" spacing={4} flex={1}>
+            {marketsDynamicData?.assets?.map((market, i) => market.borrowGuardianPaused || market.borrowBalanceUSD.gt(constants.Zero) ?  null : (
+              <MarketCard markets={marketsDynamicData?.assets} index={i} marketData={market} key={i} type="borrow"/>
+            )) }
+            </VStack>
           </Accordion>
-        </VStack>
       </Stack>
     </Box>
   );

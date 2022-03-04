@@ -36,7 +36,9 @@ import { useAuthedCallback } from "hooks/useAuthedCallback"
 const Positions = ({marketsDynamicData}: {marketsDynamicData: MarketsWithData}) => {
     const { address } = useRari()
     return (
-      <Accordion allowToggle>  {
+      <Accordion allowToggle>  
+        <VStack mt={4} mb={8} align="stretch" spacing={4}>
+      {
         marketsDynamicData.assets.map((market, i) => {
           if (market.supplyBalanceUSD.gt(constants.Zero)) {
           return (
@@ -54,6 +56,7 @@ const Positions = ({marketsDynamicData}: {marketsDynamicData: MarketsWithData}) 
           }
         )
         }
+        </VStack>
       </Accordion>
   
     )
