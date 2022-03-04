@@ -1,23 +1,11 @@
-import { Accordion, Box, Flex, Spacer, Spinner, Stack, VStack } from "@chakra-ui/react";
+import { Accordion, Box,  Spinner, Stack, VStack } from "@chakra-ui/react";
 import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
-import { BigNumber, providers, utils, constants } from "ethers";
+import { BigNumber, constants } from "ethers";
 // import { useBorrowLimit } from "hooks/useBorrowLimit";
-import { MarketsWithData, USDPricedFuseAsset } from "lib/esm/types";
-import {
-  Badge,
-  Button,
-  ExpandableCard,
-  Heading,
-  StatisticTable,
-  Text,
-  TokenAmountInput,
-  TokenIcon,
-} from "rari-components";
-import { useState } from "react";
-import { useQuery } from "react-query";
-import { useAccount, useConnect } from "wagmi";
+import { Heading } from "rari-components";
 import MarketCard from "components/MarketCard";
+import Positions from "components/Positions";
 // import { useEffect } from 'react'
 // import { convexAPR } from 'utils/convex/convex2'
 
@@ -64,95 +52,6 @@ const Pool = () => {
 };
 
 export default Pool;
-
-const Positions = ({marketsDynamicData}: {marketsDynamicData: MarketsWithData}) => {
-
-  return (
-    <>  {
-      marketsDynamicData.assets.map((market, i) => {
-        if (market.supplyBalanceUSD.gt(constants.Zero) || market.borrowBalance.gt(constants.Zero)) {
-        return (
-            <PositionCard market={market} key={i}/>
-          )}
-        })
-      }
-    </>
-
-  )
-}
-
-const PositionCard = ({market}: {market: USDPricedFuseAsset}) => {
-  const isSupplying = market.supplyBalanceUSD.gt(constants.Zero)
-  const isBorrowing = market.borrowBalanceUSD.gt(constants.Zero)
-
-  return (
-    <ExpandableCard
-          variant="active"
-          expandableChildren={
-            <VStack spacing={4} alignItems="stretch">
-              {/* <TokenAmountInput
-                size="lg"
-                variant="light"
-                tokenSymbol={market.underlyingSymbol}
-                tokenAddress={market.underlyingToken}
-                onClickMax={() => {}}
-              /> */}
-              <StatisticTable
-                variant="light"
-                statistics={[
-                  ["Supply Balance", "$24,456"],
-                  ["Borrow Limit", "$18,543"],
-                ]}
-              />
-              <Button alignSelf="stretch">Approve</Button>
-            </VStack>
-          }
-        >
-          <Flex alignItems="center" height="100%">
-            <TokenIcon
-              tokenAddress={market.underlyingToken}
-              mr={4}
-            />
-            <Heading size="xl" mr={4}>
-              {market.underlyingSymbol}
-            </Heading>
-            <Flex direction="column">
-              {
-                isSupplying ? <Badge variant="success">Supplying</Badge> : null
-              } 
-
-              {
-                isBorrowing ? <Badge variant="warning">Borrowing</Badge> : null
-              } 
-            </Flex>
-
-            <Spacer />
-
-            { isSupplying ?
-              <Box mr={8}>
-                <Text variant="secondary" mb={1}>
-                  Total Supplied
-                </Text>
-                <Heading size="lg">
-                  ${utils.commify(market.supplyBalanceUSD.toString())}
-                </Heading>
-              </Box> : null
-            }
-
-            { isBorrowing ?
-              <Box mr={8}>
-                <Text variant="secondary" mb={1}>
-                  Total Borrowed
-                </Text>
-                <Heading size="lg">
-                  ${utils.commify(market.borrowBalanceUSD.toString())}
-                </Heading>
-              </Box> : null
-            }
-          </Flex>
-        </ExpandableCard>
-  )
-}
 
 
 // Port over to sdk
