@@ -1,3 +1,4 @@
+"use strict";
 // // Ethers
 // import { Web3Provider, JsonRpcProvider } from "@ethersproject/providers";
 // import { Contract } from "@ethersproject/contracts";

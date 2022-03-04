@@ -22,7 +22,7 @@ import { getDecimals } from "../fetch-data/misc/getDecimals";
  * @param tokenAddress - Address of the market's underlying asset.
  * @param decimals - Underlying token's decimals. i.e DAI = 18.
  */
-export function marketInteraction(action, cTokenAddress, amount, tokenAddress, signer, decimals) {
+export function marketInteraction(action, cTokenAddress, amount, tokenAddress, decimals) {
     return __awaiter(this, void 0, void 0, function* () {
         // 1. Initiate market/ctoken contract.
         const cTokenInterface = new Interface([
@@ -33,7 +33,7 @@ export function marketInteraction(action, cTokenAddress, amount, tokenAddress, s
             'function mint() payable',
             'function mint(uint mintAmount) returns (uint)'
         ]);
-        const cTokenContract = new Contract(cTokenAddress, cTokenInterface, signer);
+        const cTokenContract = new Contract(cTokenAddress, cTokenInterface, this._provider.getSigner());
         const isEth = tokenAddress === "0";
         // 2. Parse given amount to the underlying asset's notation.
         // Fetch decimals if not given.
@@ -41,7 +41,7 @@ export function marketInteraction(action, cTokenAddress, amount, tokenAddress, s
             decimals = yield getDecimals(tokenAddress, this._provider);
         }
         // 3. Parse given amount.
-        const parsedAmount = decimals === 18 || isEth
+        const parsedAmount = decimals.eq(18) || isEth
             ? parseEther(amount)
             : parseUnits(amount, decimals);
         // 4. Perform action.
