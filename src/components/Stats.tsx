@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { USDPricedFuseAsset } from "lib/esm/types"
+import { MarketsWithData, USDPricedFuseAsset } from "lib/esm/types"
 import { utils, constants } from "ethers"
 import { usePoolContext } from "context/PoolContext"
 import { useUpdatedUserAssets } from "hooks/useUpdatedUserAssets"
@@ -48,10 +48,11 @@ export const Stats = ({
       365).toFixed(2)
   
     
-    const textTwo = isBorrowing && updatedMarket ?
-      `${smallStringUsdFormatter( marketsDynamicData?.totalBorrowBalanceUSD.toString() ?? 0)} -> ${smallStringUsdFormatter( marketsDynamicData?.totalBorrowBalanceUSD.add(updatedMarket?.borrowBalanceUSD ?? 0).div(constants.WeiPerEther).toString() ?? 0)}`
-      : isBorrowing ? `${smallStringUsdFormatter( marketsDynamicData?.totalBorrowBalanceUSD.toString() ?? 0)}` : "null"
-  
+    const textTwo = getStats(
+      isBorrowing,
+      updatedMarket,
+      marketsDynamicData
+    )
     
     const textFour = isBorrowing && updatedMarket ?
       `${borrowAPR}% -> ${updatedBorrowAPR}%` : borrowAPR
@@ -79,4 +80,23 @@ export const Stats = ({
         statistics={stats}
     />
     )
+  }
+
+
+  const getStats = (
+    isBorrowing: boolean,
+    updatedMarket: USDPricedFuseAsset | null,
+    marketsDynamicData: MarketsWithData | undefined,
+    ) => {
+      if (!marketsDynamicData || !updatedMarket) return ''
+
+
+    const simulatedAmount = marketsDynamicData.totalBorrowBalanceUSD.add(updatedMarket.borrowBalanceUSD.div(constants.WeiPerEther))
+
+    const textTwo = isBorrowing && updatedMarket ?
+    `${smallStringUsdFormatter(marketsDynamicData.totalBorrowBalanceUSD.toString())} 
+      -> ${smallStringUsdFormatter( simulatedAmount.toString()) }`
+    : isBorrowing ? `${smallStringUsdFormatter( marketsDynamicData?.totalBorrowBalanceUSD.toString() ?? 0)}` : "null"
+
+    return textTwo
   }
