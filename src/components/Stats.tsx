@@ -48,31 +48,24 @@ export const Stats = ({
       365).toFixed(2)
   
     
-    const textTwo = getStats(
-      isBorrowing,
+    const textOne = getTextOne(
+      type,
       updatedMarket,
       marketsDynamicData
     )
     
-    const textFour = isBorrowing && updatedMarket ?
-      `${borrowAPR}% -> ${updatedBorrowAPR}%` : borrowAPR
   
   
-    const stats: [title: string, value: string][] = useMemo(() => {
-      const _stats: [title: string, value: string][] = [
-      ["Borrow Balance",textTwo],
-      ["Borrow Limit", smallUsdFormatter(borrowLimit ?? 0)],
-      ["Borrow APY", textFour]
-    ]
   
-    if (!isBorrowing) _stats.unshift([
-      `Supply Balance`,
-      `${smallUsdFormatter( markets[index].supplyBalanceUSD.toNumber())}`
-    ]) 
-  
-    return _stats
-  
-  }, [isBorrowing, markets, index, textFour, borrowLimit])
+    const stats: [title: string, value: string][] = getStats(
+      type,
+      updatedMarket,
+      marketsDynamicData,
+      borrowLimit,
+      isBorrowing,
+      borrowAPR,
+      updatedBorrowAPR
+    )
   
     return (
       <StatisticTable
@@ -82,21 +75,70 @@ export const Stats = ({
     )
   }
 
-
   const getStats = (
-    isBorrowing: boolean,
+    type: "supply" | "borrow" | "withdraw" | "repay",
     updatedMarket: USDPricedFuseAsset | null,
     marketsDynamicData: MarketsWithData | undefined,
-    ) => {
+    borrowLimit: number | undefined,
+    isBorrowing: boolean,
+    borrowAPR: string,
+    updatedBorrowAPR: string
+  ) => {
+      if(!updatedMarket || !marketsDynamicData || typeof borrowLimit === "undefined") return []
+
+      let _stats: [title: string, value: string][] = []
+
+
+      const textOne = getTextOne(
+        type,
+        updatedMarket,
+        marketsDynamicData
+      )
+
+      const textFour = isBorrowing && updatedMarket ?
+      `${borrowAPR}% -> ${updatedBorrowAPR}%` : `${borrowAPR}`
+      
+      if (type === "borrow") {
+          _stats = [
+          ["Borrow Balance",textOne],
+          ["Borrow Limit", smallUsdFormatter(borrowLimit ?? 0)],
+          ["Borrow APY", textFour]
+        ]
+      }
+    
+      if (type === "supply") {
+        _stats = [
+          [ `Supply Balance`, textOne ]
+        ]
+      }
+    
+      return _stats
+  }
+
+
+  const getTextOne = (
+    type: "supply" | "borrow" | "withdraw" | "repay",
+    updatedMarket: USDPricedFuseAsset | null,
+    marketsDynamicData: MarketsWithData | undefined,
+    ): string => {
       if (!marketsDynamicData || !updatedMarket) return ''
+      
+      
+      switch (type) {
+        case "borrow":
+            const simulatedBorrow = marketsDynamicData.totalBorrowBalanceUSD.add(updatedMarket.borrowBalanceUSD.div(constants.WeiPerEther))
+           
+            return `${smallStringUsdFormatter(marketsDynamicData.totalBorrowBalanceUSD.toString())} 
+                  -> ${smallStringUsdFormatter( simulatedBorrow.toString()) }`
+        case "supply":
 
+          const simulatedSupply = marketsDynamicData.totalSupplyBalanceUSD.add(updatedMarket.supplyBalanceUSD.div(constants.WeiPerEther))
+          
+          return `${smallUsdFormatter(marketsDynamicData.totalSupplyBalanceUSD.toString())}
+                  => ${smallStringUsdFormatter(simulatedSupply.toString())}`
 
-    const simulatedAmount = marketsDynamicData.totalBorrowBalanceUSD.add(updatedMarket.borrowBalanceUSD.div(constants.WeiPerEther))
+        default:
+          return 'break';
+      }
 
-    const textTwo = isBorrowing && updatedMarket ?
-    `${smallStringUsdFormatter(marketsDynamicData.totalBorrowBalanceUSD.toString())} 
-      -> ${smallStringUsdFormatter( simulatedAmount.toString()) }`
-    : isBorrowing ? `${smallStringUsdFormatter( marketsDynamicData?.totalBorrowBalanceUSD.toString() ?? 0)}` : "null"
-
-    return textTwo
   }
