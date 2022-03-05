@@ -4,13 +4,12 @@ import { createContext, useContext, ReactNode, useMemo, useCallback } from "reac
 import { useRouter } from "next/router";
 
 // Wagmi
-import { useAccount, useConnect, useProvider, useSigner } from "wagmi";
+import { useAccount, useConnect } from "wagmi";
 import { useNetwork } from "wagmi";
 
 // Utils
 import { alchemyURL } from "utils/connectors";
 import { providers } from "ethers";
-import { useQuery } from "react-query";
 import { useDisclosure } from "@chakra-ui/react";
 
 export const RariContext = createContext<undefined | any>(

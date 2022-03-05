@@ -26,7 +26,8 @@ type MarketCardProps = Omit<
   type: "supply" | "borrow";
   marketData: USDPricedFuseAsset
   markets: USDPricedFuseAsset[],
-  index: number
+  index: number,
+  tokenData: TokenData
 };
 
 const MarketCard: React.FC<MarketCardProps> = ({
@@ -34,20 +35,20 @@ const MarketCard: React.FC<MarketCardProps> = ({
   marketData,
   index,
   type,
+  tokenData,
   ...restProps
 }) => {
   const { pool } = usePoolContext()
-  const { isAuthed,  }= useRari()
 
   const [amount, setAmount] = useState<string>("")
   const isBorrowing = type === "borrow";
 
   const isSupply = type === "supply"
-  const APY =  convertMantissaToAPY(
-    isSupply 
-      ? marketData.supplyRatePerBlock 
+  const APY = convertMantissaToAPY(
+    isSupply
+      ? marketData.supplyRatePerBlock
       : marketData.borrowRatePerBlock, 365
-    )
+  )
 
   const authedHandleClick = useAuthedCallback(
     marketInteraction,
@@ -73,15 +74,15 @@ const MarketCard: React.FC<MarketCardProps> = ({
             onChange={(e: any) => setAmount(e.target.value)}
             onClickMax={() => { }}
           />
-          { amount === "" ? null :
-          <Stats
-            marketData={marketData} 
-            amount={amount} 
-            type={type} 
-            isBorrowing={isBorrowing} 
-            markets={markets} 
-            index={index} 
-          />
+          {amount === "" ? null :
+            <Stats
+              marketData={marketData}
+              amount={amount}
+              type={type}
+              isBorrowing={isBorrowing}
+              markets={markets}
+              index={index}
+            />
           }
           <Button
             onClick={authedHandleClick}
@@ -120,21 +121,21 @@ const MarketTLDR = ({
   marketData,
   isSupply,
   APY
-} : {
+}: {
   marketData: USDPricedFuseAsset,
   isSupply: boolean,
   APY: number
 }) => {
 
- 
-  const Text1 = isSupply 
-    ? `${utils.formatEther(marketData.collateralFactor.mul(100))}% LTV` 
+
+  const Text1 = isSupply
+    ? `${utils.formatEther(marketData.collateralFactor.mul(100))}% LTV`
     : `${getMillions(marketData.liquidityUSD)}M Liquidity`
 
-  
+
   return (
     <Flex justifyContent="flex-start !important">
-      <Text variant="secondary" alignSelf="flex-start"  mr="1.5vh">
+      <Text variant="secondary" alignSelf="flex-start" mr="1.5vh">
         {Text1}
       </Text>
 
@@ -144,18 +145,18 @@ const MarketTLDR = ({
         {APY.toFixed(2)}% APY
       </Text>
 
-      
-      { 
-      
-      isSupply ? (
-        <>
-        &middot;
-        <Text variant="secondary" ml="1.5vh">
-          {getMillions(marketData.totalSupplyUSD)}M Supplied
-        </Text>
-        </>
-      )
-        : null 
+
+      {
+
+        isSupply ? (
+          <>
+            &middot;
+            <Text variant="secondary" ml="1.5vh">
+              {getMillions(marketData.totalSupplyUSD)}M Supplied
+            </Text>
+          </>
+        )
+          : null
       }
     </Flex>
   )

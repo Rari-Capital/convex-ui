@@ -18,6 +18,7 @@ import {
 } from "rari-components";
 import { truncate } from "utils/stringUtils";
 import ConnectModal from "./modals/ConnectModal";
+import ClaimModal from "./modals/ClaimModal";
 import { PoolOverview } from "./PoolOverview";
 
 type HeaderProps = BoxProps & {
@@ -29,8 +30,8 @@ type HeaderProps = BoxProps & {
 };
 
 const Header: React.FC<HeaderProps> = ({ contentSx, ...restProps }) => {
-  
-  const { isAuthed, address, logout, login, previewMode, isOpen, onClose} = useRari();
+  const { isOpen: isClaimModalOpen, onOpen: openClaimModal, onClose: closeClaimModal } = useDisclosure();
+  const { isAuthed, address, logout, login, previewMode } = useRari();
 
   const handleClick = () => {
     if (isAuthed) {
@@ -81,15 +82,19 @@ const Header: React.FC<HeaderProps> = ({ contentSx, ...restProps }) => {
               />
             </Link>
           </HStack>
-          <Link href="/claim">Rewards</Link>
+          {/* <Link href="/claim">Rewards</Link> */}
           <Spacer />
           <HStack align={"flex-start"}>
+            <Button onClick={openClaimModal} bg={"#00DB8A"}>
+              Claim rewards
+            </Button>
             {/* <WarningIcon w={2} h={2} color="red.500" /> */}
             <Button onClick={handleClick} bg={previewMode ? "orange" : ""}>
               {!!address ? truncate(address ?? "", 8) : "Connect"}
             </Button>
           </HStack>
-          <ConnectModal/>
+          <ConnectModal />
+          <ClaimModal isOpen={isClaimModalOpen} onClose={closeClaimModal} />
         </HStack>
         <Box pt={12}>
           <Heading>Tribe Convex Pool</Heading>

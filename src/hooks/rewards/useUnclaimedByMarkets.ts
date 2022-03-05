@@ -18,7 +18,7 @@ type FlywheelData = {
   };
 };
 
-const flywheels: FlywheelData = {
+export const flywheels: FlywheelData = {
   "0x65DFbde18D7f12a680480aBf6e17F345d8637829": {
     rewardToken: "0xD533a949740bb3306d119CC777fa900bA034cd52",
     rewardTokenSymbol: "CRV",
@@ -36,6 +36,7 @@ const flywheels: FlywheelData = {
   },
 };
 
+// Mapping of flywheel -> Undelrying Claimable
 type FlywheelRewardsTotal = {
   [flywheel: string]: BigNumber;
 };
@@ -50,7 +51,6 @@ export type FlywheelRewardsByMarket = {
 
 export const useMaxUnclaimedByMarkets = (cTokens: string[]) => {
   const { provider, address } = useRari();
-  if (!address) return;
 
   const lens = new Contract(
     FLYWHEEL_LENS_ROUTER,
@@ -58,18 +58,15 @@ export const useMaxUnclaimedByMarkets = (cTokens: string[]) => {
     provider
   );
 
-  const [flywheelAddresses, accrueForAll, claimRewards] = useMemo(() => {
-    //   TODO - remove hardcode
-    const flywheelAddresses = Object.keys(flywheels);
-    const accrueForAll = new Array(flywheelAddresses.length).fill(true);
-    const claimRewards = new Array(cTokens.length).fill(true);
-    return [flywheelAddresses, accrueForAll, claimRewards];
-  }, [cTokens]);
+  // TODO - remove hardcode
+  const flywheelAddresses = Object.keys(flywheels);
+  const accrueForAll = new Array(flywheelAddresses.length).fill(true);
+  const claimRewards = new Array(cTokens.length).fill(true);
 
   const { data, error } = useQuery(
     `Unclaimed by ${address} for markets ${cTokens?.join(" + ")}`,
     async () => {
-      if (!cTokens || !cTokens.length) return undefined;
+      if (!cTokens || !cTokens.length || !address) return undefined;
       let flywheelRewardsTotals: FlywheelRewardsTotal = {};
 
       try {
@@ -103,6 +100,8 @@ export const useMaxUnclaimedByMarkets = (cTokens: string[]) => {
           claimRewards
         );
 
+        console.log({ obj, result, flywheelRewardsTotals });
+
         return { flywheelRewardsTotals, estimatedGas };
       } catch (err) {
         console.error(
@@ -121,7 +120,8 @@ export const useMaxUnclaimedByMarkets = (cTokens: string[]) => {
         cTokens,
         flywheelAddresses,
         accrueForAll,
-        claimRewards
+        claimRewards,
+        { from: address }
       )
       .then((unsignedTx) => {
         const signer = (provider as Web3Provider).getSigner(address);
@@ -145,30 +145,39 @@ export const useFlywheelsTotalUSD = (
       poolInfo?.id
     }`,
     async () => {
-      if (!poolInfo || !pool) return;
+      if (!poolInfo || !pool || !flywheelRewards) return;
       let flywheelRewardsTotalsUSD: FlywheelRewardsTotalUSD = {};
       let sumUSD = 0;
 
       const ethUSD = await pool.getEthUsdPriceBN();
 
-      flywheelsAddresses.forEach(async (flywheelAddress) => {
-        const ethPrice = await pool.getPriceFromOracle(
-          flywheels[flywheelAddress].rewardToken,
-          poolInfo!.oracle
-        );
+      await Promise.all(
+        flywheelsAddresses.map(async (flywheelAddress) => {
+          const ethPrice = await pool.getPriceFromOracle(
+            flywheels[flywheelAddress].rewardToken,
+            poolInfo!.oracle
+          );
 
-        const amountUSD = parseFloat(
-          formatEther(ethPrice.mul(ethUSD).div(constants.WeiPerEther))
-        );
+          // amountUSD = claimable by user * ethPrice * ethUSD
+          const amountUSD = parseFloat(
+            formatEther(
+              flywheelRewards[flywheelAddress]
+                .mul(ethPrice)
+                .mul(ethUSD)
+                .div(constants.WeiPerEther)
+                .div(constants.WeiPerEther)
+            )
+          );
 
-        flywheelRewardsTotalsUSD[flywheelAddress] = amountUSD;
-        sumUSD += amountUSD;
-        console.log({ sumUSD, amountUSD });
-      });
+          flywheelRewardsTotalsUSD[flywheelAddress] = amountUSD;
+          sumUSD += amountUSD;
+        })
+      );
 
       return { flywheelRewardsTotalsUSD, sumUSD };
     }
   );
+
   const { flywheelRewardsTotalsUSD, sumUSD } = data ?? {
     flywheelRewardsTotalsUSD: {},
     sumUSD: 0,
