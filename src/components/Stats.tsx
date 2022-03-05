@@ -34,25 +34,12 @@ export const Stats = ({
   
     const updatedMarket = updatedAssets ? updatedAssets[index] : null;
   
-    const borrowAPR = convertMantissaToAPR(marketData.borrowRatePerBlock).toFixed(2)
-    const supplyAPY = convertMantissaToAPY(
-      marketData.supplyRatePerBlock,
-      365
-    ).toFixed(2)
-  
-    const updatedBorrowAPR = convertMantissaToAPR(updatedMarket?.borrowRatePerBlock ?? 0).toFixed(2)
-    const updatedSupplyAPY = convertMantissaToAPY(marketData.supplyRatePerBlock,
-      365).toFixed(2)
-  
     const stats: [title: string, value: string][] = getStats(
       type,
       updatedMarket,
+      marketData,
       marketsDynamicData,
       borrowLimit,
-      borrowAPR,
-      supplyAPY,
-      updatedSupplyAPY,
-      updatedBorrowAPR
     )
   
     return (
@@ -66,13 +53,11 @@ export const Stats = ({
   const getStats = (
     type: "supply" | "borrow" | "withdraw" | "repay",
     updatedMarket: USDPricedFuseAsset | null,
+    marketData: USDPricedFuseAsset,
     marketsDynamicData: MarketsWithData | undefined,
     borrowLimit: number | undefined,
-    borrowAPR: string,
-    supplyAPY: string,
-    updatedSupplyAPY: string,
-    updatedBorrowAPR: string
   ) => {
+      console.log({updatedMarket, marketsDynamicData, borrowLimit})
       if(!updatedMarket || !marketsDynamicData || typeof borrowLimit === "undefined") return []
 
       let _stats: [title: string, value: string][] = []
@@ -89,6 +74,14 @@ export const Stats = ({
   
         const textTwo = `${smallUsdFormatter(borrowLimit ?? 0)} -> ${smallUsdFormatter(newBorrow.div(constants.WeiPerEther).toString())}`
 
+        const supplyAPY = convertMantissaToAPY(
+          marketData.supplyRatePerBlock,
+          365
+        ).toFixed(2)
+
+        const updatedSupplyAPY = convertMantissaToAPY(marketData.supplyRatePerBlock,
+          365).toFixed(2)
+
         const textThree =  `${supplyAPY}% -> ${updatedSupplyAPY}%`
         
         _stats = [
@@ -98,14 +91,17 @@ export const Stats = ({
         ]
       }
 
-      
-      
       if (type === "borrow") {
            const simulatedBorrow = marketsDynamicData.totalBorrowBalanceUSD.add(updatedMarket.borrowBalanceUSD.div(constants.WeiPerEther))
            
            const textOne = `${smallStringUsdFormatter(marketsDynamicData.totalBorrowBalanceUSD.toString())} 
                 -> ${smallStringUsdFormatter( simulatedBorrow.toString()) }`
 
+            const borrowAPR = convertMantissaToAPR(marketData.borrowRatePerBlock).toFixed(2)
+
+
+            const updatedBorrowAPR = convertMantissaToAPR(updatedMarket?.borrowRatePerBlock ?? 0).toFixed(2)
+            
             const textThree = `${borrowAPR}% -> ${updatedBorrowAPR}%`
 
           _stats = [
