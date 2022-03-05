@@ -25,12 +25,14 @@ export const useUpdatedUserAssets = ({
           if (!assets || !assets.length || !pool) return [];
   
           const ethPrice: BigNumber = await pool.getEthUsdPriceBN();
+          console.log(ethPrice)
   
           const assetToBeUpdated = assets[index];
   
           const interestRateModel = await pool.getInterestRateModel(
             assetToBeUpdated.cToken
           );
+          console.log(interestRateModel)
   
           let updatedAsset: USDPricedFuseAsset;
           if (mode === "supply") {
@@ -131,6 +133,7 @@ export const useUpdatedUserAssets = ({
             };
           }
   
+          console.log("DONE")
           const ret = assets.map((value, _index) => {
             if (_index === index) {
               return updatedAsset;
