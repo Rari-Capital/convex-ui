@@ -17,6 +17,7 @@ import { getMillions, convertMantissaToAPY } from "utils/formatters";
 import { useAuthedCallback } from "hooks/useAuthedCallback";
 import { marketInteraction } from "utils/marketInteraction";
 import { Stats } from "./Stats";
+import useDebounce from "hooks/useDebounce";
 
 type MarketCardProps = Omit<
   React.ComponentProps<typeof ExpandableCard>,
@@ -39,6 +40,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
   const { isAuthed,  }= useRari()
 
   const [amount, setAmount] = useState<string>("")
+  const debouncedValue = useDebounce(amount, 3000)
   const isBorrowing = type === "borrow";
 
   const isSupply = type === "supply"
@@ -51,7 +53,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
   const authedHandleClick = useAuthedCallback(
     marketInteraction,
     [
-      amount,
+      debouncedValue,
       pool,
       marketData,
       type

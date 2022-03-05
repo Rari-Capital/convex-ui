@@ -33,9 +33,6 @@ export const Stats = ({
     })
   
     const updatedMarket = updatedAssets ? updatedAssets[index] : null;
-    const updatedBorrowLimit = getBorrowLimit(updatedAssets ?? [],{
-      ignoreIsEnabledCheckFor: marketData.cToken,
-    })
   
     const borrowAPR = convertMantissaToAPR(marketData.borrowRatePerBlock).toFixed(2)
     const supplyAPY = convertMantissaToAPY(
@@ -46,13 +43,6 @@ export const Stats = ({
     const updatedBorrowAPR = convertMantissaToAPR(updatedMarket?.borrowRatePerBlock ?? 0).toFixed(2)
     const updatedSupplyAPY = convertMantissaToAPY(marketData.supplyRatePerBlock,
       365).toFixed(2)
-  
-    
-    const textOne = getTextOne(
-      type,
-      updatedMarket,
-      marketsDynamicData
-    )
   
     const stats: [title: string, value: string][] = getStats(
       type,
