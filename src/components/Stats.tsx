@@ -53,17 +53,15 @@ export const Stats = ({
       updatedMarket,
       marketsDynamicData
     )
-    
-  
-  
   
     const stats: [title: string, value: string][] = getStats(
       type,
       updatedMarket,
       marketsDynamicData,
       borrowLimit,
-      isBorrowing,
       borrowAPR,
+      supplyAPY,
+      updatedSupplyAPY,
       updatedBorrowAPR
     )
   
@@ -80,8 +78,9 @@ export const Stats = ({
     updatedMarket: USDPricedFuseAsset | null,
     marketsDynamicData: MarketsWithData | undefined,
     borrowLimit: number | undefined,
-    isBorrowing: boolean,
     borrowAPR: string,
+    supplyAPY: string,
+    updatedSupplyAPY: string,
     updatedBorrowAPR: string
   ) => {
       if(!updatedMarket || !marketsDynamicData || typeof borrowLimit === "undefined") return []
@@ -95,20 +94,35 @@ export const Stats = ({
         marketsDynamicData
       )
 
-      const textFour = isBorrowing && updatedMarket ?
-      `${borrowAPR}% -> ${updatedBorrowAPR}%` : `${borrowAPR}`
+      const textTwo = getTextTwo(
+        type,
+        borrowLimit,
+        updatedMarket
+      )
+
+      const textThree = getTextThree(
+        type,
+        updatedBorrowAPR,
+        borrowAPR,
+        supplyAPY,
+        updatedSupplyAPY
+      )
+
+      
       
       if (type === "borrow") {
           _stats = [
           ["Borrow Balance",textOne],
           ["Borrow Limit", smallUsdFormatter(borrowLimit ?? 0)],
-          ["Borrow APY", textFour]
+          ["Borrow APY", textThree]
         ]
       }
     
       if (type === "supply") {
         _stats = [
-          [ `Supply Balance`, textOne ]
+          [ "Supply Balance", textOne ],
+          [ "Borrow Limit", textTwo],
+          [ "Supply APY", textThree]
         ]
       }
     
@@ -141,4 +155,42 @@ export const Stats = ({
           return 'break';
       }
 
+  }
+
+  const getTextTwo = (
+    type: "supply" | "borrow" | "withdraw" | "repay",
+    borrowLimit: number,
+    updatedMarket: USDPricedFuseAsset
+  ): string => {
+    if(type === "borrow") return ''
+
+    if (type === "supply") {
+      const newBorrow = (
+        updatedMarket.supplyBalanceUSD
+        .mul(updatedMarket.collateralFactor)
+      ).div(constants.WeiPerEther)
+
+      return `${smallUsdFormatter(borrowLimit ?? 0)} -> ${smallUsdFormatter(newBorrow.div(constants.WeiPerEther).toString())}`
+    }
+    return ''
+  }
+
+  const getTextThree = (
+    type: "supply" | "borrow" | "withdraw" | "repay",
+    updatedBorrowAPR: string,
+    borrowAPR: string,
+    supplyAPY: string,
+    updatedSuppplyAPY: string
+  ) => {
+
+    if (type === "borrow") {
+      return `${borrowAPR}% -> ${updatedBorrowAPR}%`
+    }
+
+    if(type === 'supply') {
+      return `${supplyAPY}% -> ${updatedSuppplyAPY}%`
+    }
+
+    return ''
+      
   }
