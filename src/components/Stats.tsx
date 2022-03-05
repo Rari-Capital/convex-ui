@@ -76,111 +76,44 @@ export const Stats = ({
       if(!updatedMarket || !marketsDynamicData || typeof borrowLimit === "undefined") return []
 
       let _stats: [title: string, value: string][] = []
+      if(type === "supply") {
+        const simulatedSupply = marketsDynamicData.totalSupplyBalanceUSD.add(updatedMarket.supplyBalanceUSD.div(constants.WeiPerEther))
+          
+        const textOne = `${smallUsdFormatter(marketsDynamicData.totalSupplyBalanceUSD.toString())}
+                => ${smallStringUsdFormatter(simulatedSupply.toString())}`
 
+        const newBorrow = (
+          updatedMarket.supplyBalanceUSD
+          .mul(updatedMarket.collateralFactor)
+        ).div(constants.WeiPerEther)
+  
+        const textTwo = `${smallUsdFormatter(borrowLimit ?? 0)} -> ${smallUsdFormatter(newBorrow.div(constants.WeiPerEther).toString())}`
 
-      const textOne = getTextOne(
-        type,
-        updatedMarket,
-        marketsDynamicData
-      )
-
-      const textTwo = getTextTwo(
-        type,
-        borrowLimit,
-        updatedMarket
-      )
-
-      const textThree = getTextThree(
-        type,
-        updatedBorrowAPR,
-        borrowAPR,
-        supplyAPY,
-        updatedSupplyAPY
-      )
-
-      
-      
-      if (type === "borrow") {
-          _stats = [
-          ["Borrow Balance",textOne],
-          ["Borrow Limit", smallUsdFormatter(borrowLimit ?? 0)],
-          ["Borrow APY", textThree]
-        ]
-      }
-    
-      if (type === "supply") {
+        const textThree =  `${supplyAPY}% -> ${updatedSupplyAPY}%`
+        
         _stats = [
           [ "Supply Balance", textOne ],
           [ "Borrow Limit", textTwo],
           [ "Supply APY", textThree]
         ]
       }
-    
-      return _stats
-  }
 
-
-  const getTextOne = (
-    type: "supply" | "borrow" | "withdraw" | "repay",
-    updatedMarket: USDPricedFuseAsset | null,
-    marketsDynamicData: MarketsWithData | undefined,
-    ): string => {
-      if (!marketsDynamicData || !updatedMarket) return ''
       
       
-      switch (type) {
-        case "borrow":
-            const simulatedBorrow = marketsDynamicData.totalBorrowBalanceUSD.add(updatedMarket.borrowBalanceUSD.div(constants.WeiPerEther))
+      if (type === "borrow") {
+           const simulatedBorrow = marketsDynamicData.totalBorrowBalanceUSD.add(updatedMarket.borrowBalanceUSD.div(constants.WeiPerEther))
            
-            return `${smallStringUsdFormatter(marketsDynamicData.totalBorrowBalanceUSD.toString())} 
-                  -> ${smallStringUsdFormatter( simulatedBorrow.toString()) }`
-        case "supply":
+           const textOne = `${smallStringUsdFormatter(marketsDynamicData.totalBorrowBalanceUSD.toString())} 
+                -> ${smallStringUsdFormatter( simulatedBorrow.toString()) }`
 
-          const simulatedSupply = marketsDynamicData.totalSupplyBalanceUSD.add(updatedMarket.supplyBalanceUSD.div(constants.WeiPerEther))
-          
-          return `${smallUsdFormatter(marketsDynamicData.totalSupplyBalanceUSD.toString())}
-                  => ${smallStringUsdFormatter(simulatedSupply.toString())}`
+            const textThree = `${borrowAPR}% -> ${updatedBorrowAPR}%`
 
-        default:
-          return 'break';
+          _stats = [
+          ["Borrow Balance",textOne],
+          ["Borrow Limit", smallUsdFormatter(borrowLimit ?? 0)],
+          ["Borrow APY", textThree]
+        ]
       }
 
-  }
-
-  const getTextTwo = (
-    type: "supply" | "borrow" | "withdraw" | "repay",
-    borrowLimit: number,
-    updatedMarket: USDPricedFuseAsset
-  ): string => {
-    if(type === "borrow") return ''
-
-    if (type === "supply") {
-      const newBorrow = (
-        updatedMarket.supplyBalanceUSD
-        .mul(updatedMarket.collateralFactor)
-      ).div(constants.WeiPerEther)
-
-      return `${smallUsdFormatter(borrowLimit ?? 0)} -> ${smallUsdFormatter(newBorrow.div(constants.WeiPerEther).toString())}`
-    }
-    return ''
-  }
-
-  const getTextThree = (
-    type: "supply" | "borrow" | "withdraw" | "repay",
-    updatedBorrowAPR: string,
-    borrowAPR: string,
-    supplyAPY: string,
-    updatedSuppplyAPY: string
-  ) => {
-
-    if (type === "borrow") {
-      return `${borrowAPR}% -> ${updatedBorrowAPR}%`
-    }
-
-    if(type === 'supply') {
-      return `${supplyAPY}% -> ${updatedSuppplyAPY}%`
-    }
-
-    return ''
-      
+      return _stats
   }
