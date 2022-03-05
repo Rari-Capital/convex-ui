@@ -19,14 +19,14 @@ const useUserHealth = (
         const userHealth = parseFloat(healthBN.toString())
         const borrowLimit = parseFloat(borrowLimitBN.toString())
 
-        return { userHealth, borrowLimit }
+        return { userHealth, borrowLimit, borrowLimitBN }
     }, {
         refetchOnMount: false,
         refetchOnWindowFocus: false,
         enabled: marketsDynamicData ? true : false
     })
 
-    return {userHealth: borrowLimit?.userHealth, borrowLimit: borrowLimit?.borrowLimit}
+    return {userHealth: borrowLimit?.userHealth, borrowLimit: borrowLimit?.borrowLimit, borrowLimitBN: borrowLimit?.borrowLimitBN}
 }
 
 export default useUserHealth

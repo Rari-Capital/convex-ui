@@ -43,9 +43,9 @@ export const useUpdatedUserAssets = ({
   
               supplyBalance,
               supplyBalanceUSD: supplyBalance
-                .mul(assetToBeUpdated.underlyingPrice)
-                .mul(ethPrice.div(constants.WeiPerEther))
-                .div(constants.WeiPerEther),
+              .mul(assetToBeUpdated.underlyingPrice)
+              .mul(ethPrice)
+              .div(constants.WeiPerEther.pow(3)),
   
               totalSupply,
               supplyRatePerBlock: interestRateModel.getSupplyRate(
@@ -92,9 +92,9 @@ export const useUpdatedUserAssets = ({
   
               borrowBalance,
               borrowBalanceUSD: borrowBalance
-                .mul(assetToBeUpdated.underlyingPrice)
-                .mul(ethPrice.div(constants.WeiPerEther))
-                .div(constants.WeiPerEther),
+              .mul(assetToBeUpdated.underlyingPrice)
+              .mul(ethPrice)
+              .div(constants.WeiPerEther.pow(3)),
   
               totalBorrow,
               borrowRatePerBlock: interestRateModel.getBorrowRate(
@@ -130,7 +130,6 @@ export const useUpdatedUserAssets = ({
               borrowRatePerBlock,
             };
           }
-  
           const ret = assets.map((value, _index) => {
             if (_index === index) {
               return updatedAsset;

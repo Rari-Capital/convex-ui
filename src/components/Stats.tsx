@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 import { MarketsWithData, USDPricedFuseAsset } from "lib/esm/types"
-import { utils, constants } from "ethers"
+import { utils, constants, BigNumber } from "ethers"
 import { usePoolContext } from "context/PoolContext"
 import { useUpdatedUserAssets } from "hooks/useUpdatedUserAssets"
 import { convertMantissaToAPR, convertMantissaToAPY, smallUsdFormatter, smallStringUsdFormatter } from "utils/formatters"
@@ -22,24 +22,26 @@ export const Stats = ({
     markets: USDPricedFuseAsset[],
     index: number
   }) => {
-    const parsedAmount = marketData.underlyingDecimals.eq(18) ? utils.parseEther(amount) : utils.parseUnits(amount, marketData.underlyingDecimals)
-    const { borrowLimit, marketsDynamicData } = usePoolContext()
+    const parsedAmount = utils.parseUnits(amount, marketData.underlyingDecimals)
+    const { borrowLimit, marketsDynamicData, borrowLimitBN } = usePoolContext()
     
-    const updatedAssets = useUpdatedUserAssets({
+    const updatedMarkets = useUpdatedUserAssets({
       mode: type,
       assets: markets,
       index,
       amount: parsedAmount
     })
-  
-    const updatedMarket = updatedAssets ? updatedAssets[index] : null;
+
+    const updatedMarket = updatedMarkets ? updatedMarkets[index] : null;
   
     const stats: [title: string, value: string][] = getStats(
       type,
       updatedMarket,
       marketData,
       marketsDynamicData,
+      updatedMarkets,
       borrowLimit,
+      borrowLimitBN
     )
   
     return (
@@ -55,31 +57,27 @@ export const Stats = ({
     updatedMarket: USDPricedFuseAsset | null,
     marketData: USDPricedFuseAsset,
     marketsDynamicData: MarketsWithData | undefined,
+    updatedMarkets: USDPricedFuseAsset[] | undefined,
     borrowLimit: number | undefined,
+    borrowLimitBN: BigNumber | undefined
   ) => {
-      console.log({updatedMarket, marketsDynamicData, borrowLimit})
-      if(!updatedMarket || !marketsDynamicData || typeof borrowLimit === "undefined") return []
+      if(!updatedMarket || !marketsDynamicData || typeof borrowLimit === "undefined" || !borrowLimitBN || !updatedMarkets) return []
 
       let _stats: [title: string, value: string][] = []
       if(type === "supply") {
-        const simulatedSupply = marketsDynamicData.totalSupplyBalanceUSD.add(updatedMarket.supplyBalanceUSD.div(constants.WeiPerEther))
-          
-        const textOne = `${smallUsdFormatter(marketsDynamicData.totalSupplyBalanceUSD.toString())}
-                => ${smallStringUsdFormatter(simulatedSupply.toString())}`
+        const textOne = `${smallUsdFormatter(marketData.supplyBalanceUSD.toString())}
+                => ${smallStringUsdFormatter(updatedMarket.supplyBalanceUSD.toString())}`
 
-        const newBorrow = (
-          updatedMarket.supplyBalanceUSD
-          .mul(updatedMarket.collateralFactor)
-        ).div(constants.WeiPerEther)
+        const newBorrow = getBorrowLimit(updatedMarkets)
   
-        const textTwo = `${smallUsdFormatter(borrowLimit ?? 0)} -> ${smallUsdFormatter(newBorrow.div(constants.WeiPerEther).toString())}`
+        const textTwo = `${smallUsdFormatter(borrowLimit ?? 0)} -> ${smallUsdFormatter((newBorrow).toString())}`
 
         const supplyAPY = convertMantissaToAPY(
           marketData.supplyRatePerBlock,
           365
         ).toFixed(2)
 
-        const updatedSupplyAPY = convertMantissaToAPY(marketData.supplyRatePerBlock,
+        const updatedSupplyAPY = convertMantissaToAPY(updatedMarket.supplyRatePerBlock,
           365).toFixed(2)
 
         const textThree =  `${supplyAPY}% -> ${updatedSupplyAPY}%`
@@ -92,10 +90,8 @@ export const Stats = ({
       }
 
       if (type === "borrow") {
-           const simulatedBorrow = marketsDynamicData.totalBorrowBalanceUSD.add(updatedMarket.borrowBalanceUSD.div(constants.WeiPerEther))
-           
-           const textOne = `${smallStringUsdFormatter(marketsDynamicData.totalBorrowBalanceUSD.toString())} 
-                -> ${smallStringUsdFormatter( simulatedBorrow.toString()) }`
+           const textOne = `${smallStringUsdFormatter(marketData.borrowBalanceUSD.toString())} 
+                -> ${smallStringUsdFormatter(updatedMarket.borrowBalanceUSD.toString()) }`
 
             const borrowAPR = convertMantissaToAPR(marketData.borrowRatePerBlock).toFixed(2)
 

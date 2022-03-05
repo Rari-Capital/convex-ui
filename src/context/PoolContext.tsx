@@ -1,3 +1,4 @@
+import { BigNumber } from "ethers";
 import usePoolData from "hooks/pool/usePoolData";
 import useUserHealth from "hooks/useUserHealth";
 import { FusePoolData, MarketsWithData, PoolInstance } from "lib/esm/types";
@@ -13,6 +14,7 @@ type PoolContextData = {
   pool: PoolInstance | undefined
   borrowLimit: number | undefined;
   userHealth: number | undefined;
+  borrowLimitBN: BigNumber | undefined;
 };
 
 export const PoolProvider = ({
@@ -23,7 +25,7 @@ export const PoolProvider = ({
   children: ReactChildren;
 }) => {
   const { poolInfo, marketsDynamicData, pool } = usePoolData(poolIndex);
-  const {borrowLimit, userHealth} = useUserHealth(marketsDynamicData)
+  const {borrowLimit, userHealth, borrowLimitBN} = useUserHealth(marketsDynamicData)
 
   const value = useMemo(
     () => ({
@@ -31,9 +33,10 @@ export const PoolProvider = ({
       marketsDynamicData,
       pool,
       borrowLimit,
-      userHealth
+      userHealth,
+      borrowLimitBN
     }),
-    [poolInfo, marketsDynamicData, pool, borrowLimit, userHealth]
+    [poolInfo, marketsDynamicData, pool, borrowLimit, userHealth, borrowLimitBN]
   );
 
   return <PoolContext.Provider value={value}>{children}</PoolContext.Provider>;
