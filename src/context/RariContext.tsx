@@ -28,7 +28,7 @@ export const RariProvider = ({
 
   const [{ data: UsersConnector }, connect] = useConnect()
 
-  const chainId = useMemo(() => 1, [data])
+  const chainId = useMemo(() => 31337, [data])
   const provider = useMemo(() => {
     return UsersConnector.connector ? new providers.Web3Provider(UsersConnector?.connector?.getProvider()) :
     new providers.JsonRpcProvider(alchemyURL)

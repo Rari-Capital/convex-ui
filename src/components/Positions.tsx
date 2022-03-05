@@ -6,8 +6,7 @@ import {
   Button,
   ExpandableCard,
   Heading,
-  StatisticTable,
-  Tabs,
+  Tabs, 
   Text,
   TokenAmountInput,
   TokenIcon,
@@ -72,7 +71,7 @@ const PositionCard = ({
 } : {
   market: USDPricedFuseAsset, 
   address:  string, 
-  type: "supply" | "borrow" | "withdraw" | "repay"
+  type: "supply" | "borrow"
   index: number
 }) => {
     const isSupplying = type === "supply"
@@ -147,10 +146,11 @@ const Internal = ({
   isBorrowing: boolean,
   market: USDPricedFuseAsset,
   index: number,
-  type: "supply" | "borrow" | "withdraw" | "repay"
+  type: "supply" | "borrow"
 }) => {
   const { marketsDynamicData, pool } = usePoolContext()
   const [action, setAction] = useState('')
+  console.log({action})
 
   const [amount, setAmount] = useState<string>("")
 
@@ -170,8 +170,7 @@ const Internal = ({
           <Tab onClick={() => setAction(isBorrowing ? 'repay' : 'withdraw')}>{isBorrowing ? "Repay" : "Withdraw"}</Tab>
         </TabList>
         <TabPanels>
-          <TabPanel>
-            <VStack spacing={4} alignItems="stretch">
+        <VStack mt={4} spacing={4} alignItems="stretch">
               <TokenAmountInput
                 size="lg"
                 variant="light"
@@ -194,7 +193,6 @@ const Internal = ({
                 {isBorrowing ? "Borrow" : "Supply"}
               </Button>
             </VStack>
-          </TabPanel>
         </TabPanels>
       </Tabs>
   )
