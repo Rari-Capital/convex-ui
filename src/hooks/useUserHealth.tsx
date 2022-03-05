@@ -1,3 +1,4 @@
+import { constants } from "ethers"
 import { MarketsWithData } from "lib/esm/types"
 import { useQuery } from "react-query"
 import { getBorrowLimit } from "./getBorrowLimit"
@@ -11,10 +12,10 @@ const useUserHealth = (
 ) => {
     const { data: borrowLimit } = useQuery("User's borrow limit and health", () => {
         if (!marketsDynamicData) return
-
+        
         const borrowLimitBN = getBorrowLimit(marketsDynamicData.assets)
-        const healthBN = marketsDynamicData.totalBorrowBalanceUSD.mul(100).div(borrowLimitBN)
-
+        const healthBN = borrowLimitBN.eq(0) ? constants.Zero :  marketsDynamicData.totalBorrowBalanceUSD.mul(100).div(borrowLimitBN)
+        
         const userHealth = parseFloat(healthBN.toString())
         const borrowLimit = parseFloat(borrowLimitBN.toString())
 
