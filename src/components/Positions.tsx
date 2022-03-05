@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { MarketsWithData, USDPricedFuseAsset } from "lib/esm/types"
-import { constants } from "ethers"
+import { constants, utils } from "ethers"
 import { 
   Badge,
   Button,
@@ -110,15 +110,12 @@ const PositionCard = ({
                         size="md"
                         variant={isBorrowing ? "warning" : "success"}
                       >
-                        {parseFloat(
-                          formatUnits(
+                        {utils.commify(
                             isBorrowing
-                              ? market.borrowBalance
-                              : market.supplyBalance,
-                            market.underlyingDecimals
-                          )
-                        ).toFixed(2)}{" "}
-                        {market.underlyingSymbol}
+                              ? market.borrowBalanceUSD.toString()
+                              : market.supplyBalanceUSD.toString(),
+                        )}{" "}
+                        USD
                       </Heading>
                     </Box>
                     <Box>
@@ -153,6 +150,7 @@ const Internal = ({
   type: "supply" | "borrow" | "withdraw" | "repay"
 }) => {
   const { marketsDynamicData, pool } = usePoolContext()
+  const [action, setAction] = useState('')
 
   const [amount, setAmount] = useState<string>("")
 
@@ -162,14 +160,14 @@ const Internal = ({
       amount,
       pool,
       market,
-      type
+      action
     ]
   )
   return (
       <Tabs>
         <TabList>
-          <Tab>{isBorrowing ? "Borrow" : "Supply"}</Tab>
-          <Tab>{isBorrowing ? "Repay" : "Withdraw"}</Tab>
+          <Tab onClick={() => setAction(isBorrowing ? 'borrow' : 'supply')}>{isBorrowing ? "Borrow" : "Supply"}</Tab>
+          <Tab onClick={() => setAction(isBorrowing ? 'repay' : 'withdraw')}>{isBorrowing ? "Repay" : "Withdraw"}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -184,13 +182,14 @@ const Internal = ({
               />
               { !marketsDynamicData || amount === ""  ? null :
                   <Stats 
-                  amount={amount}
-                  type={type}
-                  index={index}
-                  isBorrowing={isBorrowing} 
-                  markets={marketsDynamicData?.assets} 
-                  marketData={market}
-                />}
+                    amount={amount}
+                    type={type}
+                    index={index}
+                    isBorrowing={isBorrowing} 
+                    markets={marketsDynamicData?.assets} 
+                    marketData={market}
+                  />
+              }
               <Button alignSelf="stretch" onClick={authedHandleClick}>
                 {isBorrowing ? "Borrow" : "Supply"}
               </Button>

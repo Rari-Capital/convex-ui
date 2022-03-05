@@ -40,6 +40,26 @@ export const marketInteraction = async (
           market.underlyingDecimals,
         )
         break;
+
+      case "repay":
+        await pool?.marketInteraction(
+          'repay',
+          market.cToken,
+          amount,
+          market.underlyingToken,
+          market.underlyingDecimals,
+        )
+        break;
+
+      case "withdraw":
+        await pool?.marketInteraction(
+          'withdraw',
+          market.cToken,
+          amount,
+          market.underlyingToken,
+          market.underlyingDecimals,
+        )
+        break;
     
       default:
         break;
