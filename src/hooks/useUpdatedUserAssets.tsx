@@ -25,14 +25,12 @@ export const useUpdatedUserAssets = ({
           if (!assets || !assets.length || !pool) return [];
   
           const ethPrice: BigNumber = await pool.getEthUsdPriceBN();
-          console.log(ethPrice)
   
           const assetToBeUpdated = assets[index];
   
           const interestRateModel = await pool.getInterestRateModel(
             assetToBeUpdated.cToken
           );
-          console.log(interestRateModel)
   
           let updatedAsset: USDPricedFuseAsset;
           if (mode === "supply") {
@@ -45,9 +43,9 @@ export const useUpdatedUserAssets = ({
   
               supplyBalance,
               supplyBalanceUSD: supplyBalance
-                .mul(assetToBeUpdated.underlyingPrice)
-                .mul(ethPrice.div(constants.WeiPerEther))
-                .div(constants.WeiPerEther),
+              .mul(assetToBeUpdated.underlyingPrice)
+              .mul(ethPrice)
+              .div(constants.WeiPerEther.pow(3)),
   
               totalSupply,
               supplyRatePerBlock: interestRateModel.getSupplyRate(
@@ -94,9 +92,9 @@ export const useUpdatedUserAssets = ({
   
               borrowBalance,
               borrowBalanceUSD: borrowBalance
-                .mul(assetToBeUpdated.underlyingPrice)
-                .mul(ethPrice.div(constants.WeiPerEther))
-                .div(constants.WeiPerEther),
+              .mul(assetToBeUpdated.underlyingPrice)
+              .mul(ethPrice)
+              .div(constants.WeiPerEther.pow(3)),
   
               totalBorrow,
               borrowRatePerBlock: interestRateModel.getBorrowRate(
@@ -132,8 +130,6 @@ export const useUpdatedUserAssets = ({
               borrowRatePerBlock,
             };
           }
-  
-          console.log("DONE")
           const ret = assets.map((value, _index) => {
             if (_index === index) {
               return updatedAsset;

@@ -77,7 +77,7 @@ export const Stats = ({
           365
         ).toFixed(2)
 
-        const updatedSupplyAPY = convertMantissaToAPY(marketData.supplyRatePerBlock,
+        const updatedSupplyAPY = convertMantissaToAPY(updatedMarket.supplyRatePerBlock,
           365).toFixed(2)
 
         const textThree =  `${supplyAPY}% -> ${updatedSupplyAPY}%`
@@ -90,10 +90,8 @@ export const Stats = ({
       }
 
       if (type === "borrow") {
-           const simulatedBorrow = marketsDynamicData.totalBorrowBalanceUSD.add(updatedMarket.borrowBalanceUSD.div(constants.WeiPerEther))
-           
-           const textOne = `${smallStringUsdFormatter(marketsDynamicData.totalBorrowBalanceUSD.toString())} 
-                -> ${smallStringUsdFormatter( simulatedBorrow.toString()) }`
+           const textOne = `${smallStringUsdFormatter(marketData.borrowBalanceUSD.toString())} 
+                -> ${smallStringUsdFormatter(updatedMarket.borrowBalanceUSD.toString()) }`
 
             const borrowAPR = convertMantissaToAPR(marketData.borrowRatePerBlock).toFixed(2)
 
