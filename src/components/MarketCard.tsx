@@ -3,6 +3,7 @@ import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
 import { Box, Flex, VStack } from "@chakra-ui/react";
 import { utils } from "ethers";
+import { TokenData, useTokenData } from "hooks/useTokenData";
 import { USDPricedFuseAsset } from "lib/esm/types";
 import {
   Badge,
@@ -11,7 +12,7 @@ import {
   Heading,
   Text,
   TokenAmountInput,
-  TokenIcon,
+  TokenIcon
 } from "rari-components";
 import { getMillions, convertMantissaToAPY } from "utils/formatters";
 import { useAuthedCallback } from "hooks/useAuthedCallback";

@@ -1,11 +1,11 @@
+import { useRari } from 'context/RariContext';
 import { useQuery } from 'react-query';
 import usePool from './usePool';
 
 const usePoolData = (poolIndex: number) => {
-  // const { address } = useRari();
+  const { address } = useRari();
   const pool = usePool(poolIndex);
   console.log(pool)
-  const address = '0xb290f2f3fad4e540d0550985951cdad2711ac34a'
 
   const { data: poolInfo } = useQuery(
     `Pool data PoolID ${pool?.poolId}`,
@@ -15,7 +15,7 @@ const usePoolData = (poolIndex: number) => {
     { refetchOnMount: false, refetchOnWindowFocus: false, enabled: !!pool }
   );
 
-  const { data: marketsDynamicData , isLoading } = useQuery(
+  const { data: marketsDynamicData } = useQuery(
     `Pool Markets PoolID ${pool?.poolId} for address ${address}`,
     async () => {
       if (pool && poolInfo) {

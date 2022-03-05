@@ -1,78 +1,177 @@
 import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
-import { BigNumber, Contract } from "ethers";
+import { BigNumber, constants, Contract } from "ethers";
 
 import FlywheelLensABI from "contracts/abi/FlywheelRouter.json";
 import { useQuery } from "react-query";
+import { formatEther, parseEther } from "ethers/lib/utils";
+import { useCallback, useMemo } from "react";
+import { Web3Provider } from "@ethersproject/providers";
 
-const LENS_ADDRESS = "0x8301bfd36b10e02464ebc64c3362caf18a44203e";
+const FLYWHEEL_LENS_ROUTER = "0x8301bfd36b10e02464ebc64c3362caf18a44203e";
 
-const flywheels = {
-  CRV: "0x65DFbde18D7f12a680480aBf6e17F345d8637829",
-  CVX: "0x18B9aE8499e560bF94Ef581420c38EC4CfF8559C",
-  LDO: "0x18B9aE8499e560bF94Ef581420c38EC4CfF8559C",
+type FlywheelData = {
+  [flywheel: string]: {
+    rewardToken: string;
+    rewardTokenSymbol: string;
+    rewardTokenDecimals: number;
+  };
 };
 
-export type FlywheelRewardsByMarket = {
-  [cToken: string]: FlywheelRewardsForMarket;
+const flywheels: FlywheelData = {
+  "0x65DFbde18D7f12a680480aBf6e17F345d8637829": {
+    rewardToken: "0xD533a949740bb3306d119CC777fa900bA034cd52",
+    rewardTokenSymbol: "CRV",
+    rewardTokenDecimals: 18,
+  },
+  "0x18B9aE8499e560bF94Ef581420c38EC4CfF8559C": {
+    rewardToken: "0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b",
+    rewardTokenSymbol: "CVX",
+    rewardTokenDecimals: 18,
+  },
+  "0x506ce4145833e55000cbd4c89ac9ba180647eb5e": {
+    rewardToken: "0x5a98fcbea516cf06857215779fd812ca3bef1b32",
+    rewardTokenSymbol: "LDO",
+    rewardTokenDecimals: 18,
+  },
 };
 
-type FlywheelRewardsForMarket = {
+type FlywheelRewardsTotal = {
   [flywheel: string]: BigNumber;
 };
 
-const useUnclaimedByMarkets = () => {
-  const { provider, address } = useRari();
-  const { marketsDynamicData } = usePoolContext();
+type FlywheelRewardsTotalUSD = {
+  [flywheel: string]: number;
+};
 
-  const lens = new Contract(LENS_ADDRESS, JSON.stringify(FlywheelLensABI), provider);
-  const cTokens = marketsDynamicData?.assets.map((market) => market.cToken);
+export type FlywheelRewardsByMarket = {
+  [cToken: string]: FlywheelRewardsTotal;
+};
+
+export const useMaxUnclaimedByMarkets = (cTokens: string[]) => {
+  const { provider, address } = useRari();
+  if (!address) return;
+
+  const lens = new Contract(
+    FLYWHEEL_LENS_ROUTER,
+    JSON.stringify(FlywheelLensABI),
+    provider
+  );
+
+  const [flywheelAddresses, accrueForAll, claimRewards] = useMemo(() => {
+    //   TODO - remove hardcode
+    const flywheelAddresses = Object.keys(flywheels);
+    const accrueForAll = new Array(flywheelAddresses.length).fill(true);
+    const claimRewards = new Array(cTokens.length).fill(true);
+    return [flywheelAddresses, accrueForAll, claimRewards];
+  }, [cTokens]);
 
   const { data, error } = useQuery(
     `Unclaimed by ${address} for markets ${cTokens?.join(" + ")}`,
     async () => {
       if (!cTokens || !cTokens.length) return undefined;
+      let flywheelRewardsTotals: FlywheelRewardsTotal = {};
 
-      const accrue = new Array(Object.keys(flywheels).length).fill(true);
-      const claimRewards = new Array(cTokens.length).fill(true);
+      try {
+        const obj = {
+          address,
+          cTokens,
+          flywheelAddresses,
+          accrueForAll,
+          claimRewards,
+        };
 
-      let flywheelRewards: FlywheelRewardsByMarket = {};
-
-      cTokens.forEach(async (cToken) => {
-        try {
-          const obj = {
+        let result: BigNumber[] =
+          await lens.callStatic.getUnclaimedRewardsByMarkets(
             address,
-            cToken, 
-            flywheels,
-            accrue,
-            true: true,
-          };
-          console.log({ obj });
+            cTokens,
+            flywheelAddresses,
+            accrueForAll,
+            claimRewards
+          );
 
-        //   let result = await lens.callStatic.getUnclaimedRewardsForMarket(
-        //     address,
-        //     cToken,
-        //     flywheels,
-        //     accrue,
-        //     true
-        //   );
+        result.forEach(
+          (claimable, i) =>
+            (flywheelRewardsTotals[flywheelAddresses[i]] = claimable)
+        );
 
-        //   console.log({ result });
+        let estimatedGas = await lens.estimateGas.getUnclaimedRewardsByMarkets(
+          address,
+          cTokens,
+          flywheelAddresses,
+          accrueForAll,
+          claimRewards
+        );
 
-        //   flywheelRewards[cToken] = Object.fromEntries(
-        //     Object.keys(flywheels).map((k, i) => [k, result[i]])
-        //   ); 
-        } catch {
-          console.error("error fetching CToken Rewards for " + cToken);
-        }
-      });
-
-      return flywheelRewards;
+        return { flywheelRewardsTotals, estimatedGas };
+      } catch (err) {
+        console.error(
+          "error fetching CToken Rewards for " + cTokens.join(", ")
+        );
+      }
     }
   );
 
-  //   console.log({ marketsStaticData, lens, data });
-  return data;
+  const call = useCallback(() => {
+    if (!address || !cTokens || !cTokens.length) return undefined;
+
+    return lens.populateTransaction
+      .getUnclaimedRewardsByMarkets(
+        address,
+        cTokens,
+        flywheelAddresses,
+        accrueForAll,
+        claimRewards
+      )
+      .then((unsignedTx) => {
+        const signer = (provider as Web3Provider).getSigner(address);
+        return signer.sendTransaction(unsignedTx);
+      });
+  }, [address, cTokens, provider]);
+
+  return { ...data, call };
 };
 
-export default useUnclaimedByMarkets;
+export const useFlywheelsTotalUSD = (
+  flywheelRewards?: FlywheelRewardsTotal
+) => {
+  const { poolInfo, pool } = usePoolContext();
+
+  //   TODO: remove hardcoded flywheel
+  const flywheelsAddresses = Object.keys(flywheelRewards ?? {});
+
+  const { data, error } = useQuery(
+    `USD Value Of flywheels ${flywheelsAddresses.join(", ")} for pool ${
+      poolInfo?.id
+    }`,
+    async () => {
+      if (!poolInfo || !pool) return;
+      let flywheelRewardsTotalsUSD: FlywheelRewardsTotalUSD = {};
+      let sumUSD = 0;
+
+      const ethUSD = await pool.getEthUsdPriceBN();
+
+      flywheelsAddresses.forEach(async (flywheelAddress) => {
+        const ethPrice = await pool.getPriceFromOracle(
+          flywheels[flywheelAddress].rewardToken,
+          poolInfo!.oracle
+        );
+
+        const amountUSD = parseFloat(
+          formatEther(ethPrice.mul(ethUSD).div(constants.WeiPerEther))
+        );
+
+        flywheelRewardsTotalsUSD[flywheelAddress] = amountUSD;
+        sumUSD += amountUSD;
+        console.log({ sumUSD, amountUSD });
+      });
+
+      return { flywheelRewardsTotalsUSD, sumUSD };
+    }
+  );
+  const { flywheelRewardsTotalsUSD, sumUSD } = data ?? {
+    flywheelRewardsTotalsUSD: {},
+    sumUSD: 0,
+  };
+  return { flywheelRewardsTotalsUSD, sumUSD };
+};
