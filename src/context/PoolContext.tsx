@@ -10,7 +10,7 @@ export const PoolContext = createContext<undefined | PoolContextData>(
 type PoolContextData = {
   poolInfo?: FusePoolData;
   marketsDynamicData?: MarketsWithData;
-  pool: PoolInstance | undefined | null;
+  pool: PoolInstance | undefined
   borrowLimit: number | undefined;
   userHealth: number | undefined;
 };
