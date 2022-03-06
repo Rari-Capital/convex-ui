@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
-import { Box, Flex, VStack } from "@chakra-ui/react";
+import { Avatar, Box, Flex, VStack } from "@chakra-ui/react";
 import { utils } from "ethers";
 import { TokenData, useTokenData } from "hooks/useTokenData";
 import { USDPricedFuseAsset } from "lib/esm/types";
@@ -45,6 +45,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
     365
   );
 
+    console.log({tokenData})
   return (
     <ExpandableCard
       width="100%"
@@ -60,7 +61,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
       {...restProps}
     >
       <Flex alignItems="center" width="100%">
-        <TokenIcon tokenAddress={markets[index].underlyingToken} mr={4} />
+        <Avatar src={tokenData.logoURL} mr={4}/>
         <Flex direction="column" width="100%">
           <Flex width="auto">
             <Heading size="lg" mr={4}>
