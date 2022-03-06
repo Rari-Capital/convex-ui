@@ -134,7 +134,7 @@ const PositionCard = ({
             </Text>
             <Heading size="md">
               {isBorrowing
-                ? convertMantissaToAPR(market.borrowRatePerBlock)
+                ? convertMantissaToAPR(market.borrowRatePerBlock).toFixed(2)
                 : convertMantissaToAPY(market.supplyRatePerBlock, 365).toFixed(
                     2
                   )}
