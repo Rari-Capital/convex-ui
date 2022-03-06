@@ -1,65 +1,67 @@
-import { PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
+import { PoolInstance, USDPricedFuseAsset } from "lib/esm/types"
 
 export const marketInteraction = async (
-  amount: string,
-  pool: PoolInstance,
-  market: USDPricedFuseAsset,
-  type: "supply" | "borrow" | "withdraw" | "repay"
+    amount: string,
+    pool: PoolInstance,
+    market: USDPricedFuseAsset,
+    type: "supply" | "borrow" | "withdraw" | "repay"
 ) => {
-  if (amount === "") return;
+    if (amount === "") return
 
-  const address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+    const address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
 
-  switch (type) {
-    case "supply":
-      await pool?.checkAllowanceAndApprove(
-        address,
-        market.cToken,
-        market.underlyingToken,
-        amount,
-        market.underlyingDecimals
-      );
+    switch (type) {
+      case "supply":
 
-      await pool?.marketInteraction(
-        "supply",
-        market.cToken,
-        amount,
-        market.underlyingToken,
-        market.underlyingDecimals
-      );
-      break;
+          await pool?.checkAllowanceAndApprove(
+            address,
+            market.cToken,
+            market.underlyingToken,
+            amount,
+            market.underlyingDecimals,
+          )
 
-    case "borrow":
-      await pool?.marketInteraction(
-        "borrow",
-        market.cToken,
-        amount,
-        market.underlyingToken,
-        market.underlyingDecimals
-      );
-      break;
+          
+          await pool?.marketInteraction(
+            'supply',
+            market.cToken,
+            amount,
+            market.underlyingToken,
+            market.underlyingDecimals,
+          )
+        break;
 
-    case "repay":
-      await pool?.marketInteraction(
-        "repay",
-        market.cToken,
-        amount,
-        market.underlyingToken,
-        market.underlyingDecimals
-      );
-      break;
+      case "borrow":
+        await pool?.marketInteraction(
+          'borrow',
+          market.cToken,
+          amount,
+          market.underlyingToken,
+          market.underlyingDecimals,
+        )
+        break;
 
-    case "withdraw":
-      await pool?.marketInteraction(
-        "withdraw",
-        market.cToken,
-        amount,
-        market.underlyingToken,
-        market.underlyingDecimals
-      );
-      break;
+      case "repay":
+        await pool?.marketInteraction(
+          'repay',
+          market.cToken,
+          amount,
+          market.underlyingToken,
+          market.underlyingDecimals,
+        )
+        break;
 
-    default:
-      break;
+      case "withdraw":
+        await pool?.marketInteraction(
+          'withdraw',
+          market.cToken,
+          amount,
+          market.underlyingToken,
+          market.underlyingDecimals,
+        )
+        break;
+    
+      default:
+        break;
+    }
   }
-};

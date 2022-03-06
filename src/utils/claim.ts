@@ -1,4 +1,4 @@
-export default true;
+export default true
 
 // import { BigNumber, Contract } from "ethers";
 // import LensRouter from "../../contracts/abi/FlywheelLensRouter.json";

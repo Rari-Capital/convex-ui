@@ -11,7 +11,7 @@ export const PoolContext = createContext<undefined | PoolContextData>(
 type PoolContextData = {
   poolInfo?: FusePoolData;
   marketsDynamicData?: MarketsWithData;
-  pool: PoolInstance | undefined;
+  pool: PoolInstance | undefined
   borrowLimit: number | undefined;
   userHealth: number | undefined;
   borrowLimitBN: BigNumber | undefined;
@@ -25,8 +25,7 @@ export const PoolProvider = ({
   children: ReactChildren;
 }) => {
   const { poolInfo, marketsDynamicData, pool } = usePoolData(poolIndex);
-  const { borrowLimit, userHealth, borrowLimitBN } =
-    useUserHealth(marketsDynamicData);
+  const {borrowLimit, userHealth, borrowLimitBN} = useUserHealth(marketsDynamicData)
 
   const value = useMemo(
     () => ({
@@ -35,7 +34,7 @@ export const PoolProvider = ({
       pool,
       borrowLimit,
       userHealth,
-      borrowLimitBN,
+      borrowLimitBN
     }),
     [poolInfo, marketsDynamicData, pool, borrowLimit, userHealth, borrowLimitBN]
   );

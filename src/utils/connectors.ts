@@ -15,7 +15,7 @@ const chains = defaultChains;
 
 // Set up connectors
 export const connectors = ({ chainId }: { chainId: number }) => {
-  const rpcUrl = alchemyURL;
+  const rpcUrl = alchemyURL
   return [
     new InjectedConnector({
       chains,
@@ -30,7 +30,7 @@ export const connectors = ({ chainId }: { chainId: number }) => {
     new WalletLinkConnector({
       options: {
         appName: "Rari Convex UI",
-        jsonRpcUrl: rpcUrl,
+        jsonRpcUrl: rpcUrl
       },
     }),
   ];
