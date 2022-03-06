@@ -77,7 +77,6 @@ const MarketCard: React.FC<MarketCardProps> = ({
               marketData={marketData}
               amount={amount}
               type={type}
-              isBorrowing={isBorrowing}
               markets={markets}
               index={index}
             />

@@ -13,14 +13,12 @@ import { getBorrowLimit } from "hooks/getBorrowLimit";
 import { StatisticTable } from "rari-components";
 
 export const Stats = ({
-  isBorrowing,
   marketData,
   type,
   amount,
   markets,
   index,
 }: {
-  isBorrowing: boolean;
   marketData: USDPricedFuseAsset;
   type: "supply" | "borrow" | "withdraw" | "repay"; 
   amount: string;
@@ -71,7 +69,7 @@ const getStats = (
     return [];
 
   let _stats: [title: string, value: string][] = [];
-  if (type === "supply") {
+  if (type === "supply" || type === "withdraw") {
     const textOne = `${smallUsdFormatter(
       marketData.supplyBalanceUSD.toString()
     )}
@@ -104,7 +102,7 @@ const getStats = (
     ];
   }
 
-  if (type === "borrow") {
+  if (type === "borrow" || type === "repay") {
     const textOne = `${smallStringUsdFormatter(
       marketData.borrowBalanceUSD.toString()
     )} 
@@ -121,32 +119,6 @@ const getStats = (
     ).toFixed(2);
 
     const textThree = `${borrowAPR}% -> ${updatedBorrowAPR}%`;
-
-    _stats = [
-      ["Borrow Balance", textOne],
-      ["Borrow Limit", smallUsdFormatter(borrowLimit ?? 0)],
-      ["Borrow APY", textThree],
-    ];
-  }
-
-  if (type === "repay") {
-    const textOne = `${smallUsdFormatter(
-      marketData.borrowBalanceUSD.toString()
-    )}
-                => ${smallStringUsdFormatter(
-                  updatedMarket.borrowBalanceUSD.toString()
-                )}`
-
-    const borrowAPR = convertMantissaToAPR(
-      marketData.borrowRatePerBlock
-    ).toFixed(2);
-
-    const updatedBorrowAPR = convertMantissaToAPR(
-      updatedMarket?.borrowRatePerBlock ?? 0
-    ).toFixed(2);
-
-    const textThree = `${borrowAPR}% -> ${updatedBorrowAPR}%`;
-
 
     _stats = [
       ["Borrow Balance", textOne],

@@ -195,7 +195,6 @@ const Internal = ({
               amount={amount}
               type={action}
               index={index}
-              isBorrowing={isBorrowing}
               markets={marketsDynamicData?.assets}
               marketData={market}
             />
