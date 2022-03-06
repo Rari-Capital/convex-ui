@@ -3,7 +3,8 @@ import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { WalletLinkConnector } from "wagmi/connectors/walletLink";
 
-export const alchemyURL = `http://127.0.0.1:8545/`;
+export const alchemyURL =
+  process.env.NEXT_PUBLIC_ALCHEMY_URL || `http://127.0.0.1:8545/`;
 
 // API key for Ethereum node
 // Two popular services are Infura (infura.io) and Alchemy (alchemy.com)
