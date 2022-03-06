@@ -22,7 +22,7 @@ export const Stats = ({
 }: {
   isBorrowing: boolean;
   marketData: USDPricedFuseAsset;
-  type: "supply" | "borrow" | "withdraw" | "repay";
+  type: "supply" | "borrow" | "withdraw" | "repay"; 
   amount: string;
   markets: USDPricedFuseAsset[];
   index: number;
@@ -117,10 +117,36 @@ const getStats = (
     ).toFixed(2);
 
     const updatedBorrowAPR = convertMantissaToAPR(
+      updatedMarket.borrowRatePerBlock ?? 0
+    ).toFixed(2);
+
+    const textThree = `${borrowAPR}% -> ${updatedBorrowAPR}%`;
+
+    _stats = [
+      ["Borrow Balance", textOne],
+      ["Borrow Limit", smallUsdFormatter(borrowLimit ?? 0)],
+      ["Borrow APY", textThree],
+    ];
+  }
+
+  if (type === "repay") {
+    const textOne = `${smallUsdFormatter(
+      marketData.borrowBalanceUSD.toString()
+    )}
+                => ${smallStringUsdFormatter(
+                  updatedMarket.borrowBalanceUSD.toString()
+                )}`
+
+    const borrowAPR = convertMantissaToAPR(
+      marketData.borrowRatePerBlock
+    ).toFixed(2);
+
+    const updatedBorrowAPR = convertMantissaToAPR(
       updatedMarket?.borrowRatePerBlock ?? 0
     ).toFixed(2);
 
     const textThree = `${borrowAPR}% -> ${updatedBorrowAPR}%`;
+
 
     _stats = [
       ["Borrow Balance", textOne],
