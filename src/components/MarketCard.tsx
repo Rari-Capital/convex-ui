@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { usePoolContext } from "context/PoolContext";
 import { useRari } from "context/RariContext";
-import { Avatar, Box, Flex, VStack } from "@chakra-ui/react";
+import { Avatar, Box, Flex, Spinner, VStack } from "@chakra-ui/react";
 import { utils } from "ethers";
 import { TokenData, useTokenData } from "hooks/useTokenData";
 import { USDPricedFuseAsset } from "lib/esm/types";
@@ -60,7 +60,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
       {...restProps}
     >
       <Flex alignItems="center" width="100%">
-        <Avatar src={tokenData.logoURL} mr={4}/>
+       { tokenData ? <Avatar src={tokenData.logoURL} mr={4}/> : <Spinner />}
         <Flex direction="column" width="100%">
           <Flex width="auto">
             <Heading size="lg" mr={4}>
