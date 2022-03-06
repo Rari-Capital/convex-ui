@@ -49,7 +49,7 @@ export const getInterestRateModel = function (assetAddress) {
                 break;
             }
         }
-        
+        console.log(irm);
         yield irm.init(interestRateModelAddress, assetAddress, this._provider);
         return irm;
     });

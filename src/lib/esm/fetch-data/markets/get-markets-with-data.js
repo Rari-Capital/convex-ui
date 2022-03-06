@@ -19,7 +19,7 @@ import { filterOnlyObjectProperties } from "../utils/filterOnlyObjectProperties"
  */
 export function getMarketsWithData(comptrollerAddress, options) {
     return __awaiter(this, void 0, void 0, function* () {
-        let assets = (yield this.contracts.fuseLensContract.callStatic.getPoolAssetsWithData(comptrollerAddress, options !== null && options !== void 0 ? options : {})).map(filterOnlyObjectProperties);
+        let assets = (yield this.contracts.fuseLens.callStatic.getPoolAssetsWithData(comptrollerAddress, options !== null && options !== void 0 ? options : {})).map(filterOnlyObjectProperties);
         const ethPrice = yield this.getEthUsdPriceBN();
         let totalLiquidityUSD = Zero;
         let totalSupplyBalanceUSD = Zero;
