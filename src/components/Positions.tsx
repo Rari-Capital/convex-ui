@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MarketsWithData, USDPricedFuseAsset } from "lib/esm/types";
-import { constants, utils } from "ethers";
+import { BigNumber, constants, utils } from "ethers";
 import {
   Badge,
   Button,
@@ -113,20 +113,27 @@ const PositionCard = ({
           {isBorrowing ? "Borrow" : "Supply"}
         </Badge>
         <Spacer />
-        <HStack spacing={8} mr={8} textAlign="right">
+        <HStack spacing={12} mr={12} textAlign="center">
           <Box>
             <Text variant="secondary" mb={1}>
               {!!address ? "You" : "Total"}{" "}
               {isBorrowing ? "Borrowed" : "Supplied"}
             </Text>
             <Heading size="md" variant={isBorrowing ? "warning" : "success"}>
-              {utils.commify(
-                isBorrowing
-                  ? market.borrowBalanceUSD.toString()
-                  : market.supplyBalanceUSD.toString()
-              )}{" "}
-              USD
+              {smallUsdFormatter(
+                (isBorrowing
+                  ? market.borrowBalanceUSD
+                  : market.supplyBalanceUSD
+                ).toString()
+              )}
             </Heading>
+            <Text variant="secondary" fontSize="xs">
+              {(isBorrowing ? market.borrowBalance : market.supplyBalance)
+                .div(BigNumber.from(10).pow(market.underlyingDecimals))
+                .toNumber()
+                .toFixed(2)}{" "}
+              {market.underlyingSymbol}
+            </Text>
           </Box>
           <Box>
             <Text variant="secondary" mb={1}>
@@ -140,6 +147,10 @@ const PositionCard = ({
                   )}
               %
             </Heading>
+            {/* Empty text is here to align the APR/APY with the supply number */}
+            <Text variant="secondary" fontSize="xs">
+              &nbsp;
+            </Text>
           </Box>
         </HStack>
       </Flex>
