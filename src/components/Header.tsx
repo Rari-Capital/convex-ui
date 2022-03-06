@@ -85,11 +85,11 @@ const Header: React.FC<HeaderProps> = ({ contentSx, ...restProps }) => {
           {/* <Link href="/claim">Rewards</Link> */}
           <Spacer />
           <HStack align={"flex-start"}>
-            <Button onClick={openClaimModal} bg={"#00DB8A"}>
-              Claim rewards
+            <Button onClick={openClaimModal} bg="success">
+              Claim Rewards
             </Button>
             {/* <WarningIcon w={2} h={2} color="red.500" /> */}
-            <Button onClick={handleClick} bg={previewMode ? "orange" : ""}>
+            <Button onClick={handleClick} bg={previewMode ? "warning" : ""}>
               {!!address ? truncate(address ?? "", 8) : "Connect"}
             </Button>
           </HStack>

@@ -32,3 +32,7 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# resolves dependency issue (for now, should remove later)
+package-lock.json
+yarn.lock
