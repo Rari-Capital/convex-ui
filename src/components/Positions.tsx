@@ -160,7 +160,6 @@ const Internal = ({
 }) => {
   const { marketsDynamicData, pool } = usePoolContext();
   const [action, setAction] = useState<"supply" | "borrow" | "withdraw" | "repay">(type);
-  console.log({ action });
 
   const [amount, setAmount] = useState<string>("");
 

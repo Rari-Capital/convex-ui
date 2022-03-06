@@ -45,7 +45,6 @@ const MarketCard: React.FC<MarketCardProps> = ({
     365
   );
 
-    console.log({tokenData})
   return (
     <ExpandableCard
       width="100%"

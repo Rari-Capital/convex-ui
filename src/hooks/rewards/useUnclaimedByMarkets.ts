@@ -100,7 +100,7 @@ export const useMaxUnclaimedByMarkets = (cTokens: string[]) => {
           claimRewards
         );
 
-        console.log({ obj, result, flywheelRewardsTotals });
+        // console.log({ obj, result, flywheelRewardsTotals });
 
         return { flywheelRewardsTotals, estimatedGas };
       } catch (err) {

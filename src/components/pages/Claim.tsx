@@ -21,12 +21,12 @@ const Claim = () => {
   const { flywheelRewardsTotalsUSD, sumUSD } = useFlywheelsTotalUSD(
     flywheelRewardsTotals
   );
-  console.log({
-    flywheelRewardsTotals,
-    flywheelRewardsTotalsUSD,
-    sumUSD,
-    estimatedGas,
-  });
+  // console.log({
+  //   flywheelRewardsTotals,
+  //   flywheelRewardsTotalsUSD,
+  //   sumUSD,
+  //   estimatedGas,
+  // });
 
   const flywheelAddresses = Object.keys(flywheelRewardsTotals ?? {});
 
