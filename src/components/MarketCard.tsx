@@ -39,8 +39,6 @@ const MarketCard: React.FC<MarketCardProps> = ({
   tokenData,
   ...restProps
 }) => {
-  const { pool } = usePoolContext();
-
   const isSupply = type === "supply";
   const APY = convertMantissaToAPY(
     isSupply ? marketData.supplyRatePerBlock : marketData.borrowRatePerBlock,
