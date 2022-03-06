@@ -15,10 +15,10 @@ const ConnectModal = () => {
         <Modal isOpen={isModalOpen} onClose={onClose}>
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>Modal Title</ModalHeader>
+                <ModalHeader>Choose Wallet</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <VStack>
+                    <VStack alignItems="stretch" pb={4}>
                         {data.connectors.map((connector) => (
                             <Button
                                 disabled={!connector.ready}
