@@ -17,3 +17,6 @@
 
 # sdk (should be formatted in its own repo)
 src/lib/esm
+
+# contracts (these are outputs)
+src/contracts/abi
