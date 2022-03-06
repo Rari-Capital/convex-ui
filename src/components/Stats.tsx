@@ -11,16 +11,18 @@ import {
 } from "utils/formatters";
 import { getBorrowLimit } from "hooks/getBorrowLimit";
 import { StatisticTable } from "rari-components";
+import { ActionType } from "./pages/Pool";
+
 
 export const Stats = ({
   marketData,
-  type,
+  action,
   amount,
   markets,
   index,
 }: {
   marketData: USDPricedFuseAsset;
-  type: "supply" | "borrow" | "withdraw" | "repay"; 
+  action: ActionType;
   amount: string;
   markets: USDPricedFuseAsset[];
   index: number;
@@ -29,7 +31,7 @@ export const Stats = ({
   const { borrowLimit, marketsDynamicData, borrowLimitBN } = usePoolContext();
 
   const updatedMarkets = useUpdatedUserAssets({
-    mode: type,
+    action,
     assets: markets,
     index,
     amount: parsedAmount,
@@ -38,7 +40,7 @@ export const Stats = ({
   const updatedMarket = updatedMarkets ? updatedMarkets[index] : null;
 
   const stats: [title: string, value: string][] = getStats(
-    type,
+    action,
     updatedMarket,
     marketData,
     marketsDynamicData,
@@ -51,7 +53,7 @@ export const Stats = ({
 };
 
 const getStats = (
-  type: "supply" | "borrow" | "withdraw" | "repay",
+  action: ActionType,
   updatedMarket: USDPricedFuseAsset | null,
   marketData: USDPricedFuseAsset,
   marketsDynamicData: MarketsWithData | undefined,
@@ -69,7 +71,7 @@ const getStats = (
     return [];
 
   let _stats: [title: string, value: string][] = [];
-  if (type === "supply" || type === "withdraw") {
+  if (action === ActionType.supply || action === ActionType.withdraw) {
     const textOne = `${smallUsdFormatter(
       marketData.supplyBalanceUSD.toString()
     )}
@@ -102,7 +104,7 @@ const getStats = (
     ];
   }
 
-  if (type === "borrow" || type === "repay") {
+  if (action === ActionType.borrow|| action === ActionType.repay) {
     const textOne = `${smallStringUsdFormatter(
       marketData.borrowBalanceUSD.toString()
     )} 

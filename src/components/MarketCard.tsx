@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { usePoolContext } from "context/PoolContext";
-import { useRari } from "context/RariContext";
-import { Avatar, Box, Flex, Spinner, VStack } from "@chakra-ui/react";
+import { Avatar, Box, Center, Flex, Spinner, VStack } from "@chakra-ui/react";
 import { utils } from "ethers";
-import { TokenData, useTokenData } from "hooks/useTokenData";
-import { USDPricedFuseAsset } from "lib/esm/types";
+import { TokenData } from "hooks/useTokenData";
+import { PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
 import {
   Badge,
   Button,
@@ -12,19 +11,21 @@ import {
   Heading,
   Text,
   TokenAmountInput,
-  TokenIcon,
 } from "rari-components";
 import { getMillions, convertMantissaToAPY } from "utils/formatters";
 import { useAuthedCallback } from "hooks/useAuthedCallback";
 import { marketInteraction } from "utils/marketInteraction";
 import { Stats } from "./Stats";
 import useDebounce from "hooks/useDebounce";
+import { ActionType } from "./pages/Pool";
+import { fetchMaxAmount } from "utils/fetchMaxAmount";
+import { useRari } from "context/RariContext";
 
 type MarketCardProps = Omit<
   React.ComponentProps<typeof ExpandableCard>,
   "expandableChildren"
 > & {
-  type: "supply" | "borrow";
+  action: ActionType;
   marketData: USDPricedFuseAsset;
   markets: USDPricedFuseAsset[];
   index: number;
@@ -35,16 +36,23 @@ const MarketCard: React.FC<MarketCardProps> = ({
   markets,
   marketData,
   index,
-  type,
+  action,
   tokenData,
   ...restProps
 }) => {
-  const isSupply = type === "supply";
+  const { pool } = usePoolContext()
+  const isSupply = action === ActionType.supply;
+
   const APY = convertMantissaToAPY(
     isSupply ? marketData.supplyRatePerBlock : marketData.borrowRatePerBlock,
     365
   );
 
+  if (!pool ) return (
+    <Center>
+      <Spinner/>
+    </Center>
+  )
   return (
     <ExpandableCard
       width="100%"
@@ -53,8 +61,9 @@ const MarketCard: React.FC<MarketCardProps> = ({
       expandableChildren={
         <Internal 
           market={marketData}
-          type={type}
+          action={action}
           index={index}
+          pool={pool}
         />
       }
       {...restProps}
@@ -68,7 +77,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
             </Heading>
             <Box alignSelf="center">
               <Badge variant={isSupply ? "success" : "warning"}>
-                {type}
+                {isSupply ? "Supply" : "Borrow"}
               </Badge>
             </Box>
           </Flex>
@@ -122,23 +131,32 @@ export default MarketCard;
 
 const Internal = ({
   market,
-  type,
-  index
+  action,
+  index,
+  pool
 }: {
   market: USDPricedFuseAsset;
   index: number;
-  type: "supply" | "borrow";
+  action: ActionType;
+  pool: PoolInstance;
 }) => {
-  const { marketsDynamicData, pool } = usePoolContext();
+  const { address } = useRari()
+  const { marketsDynamicData } = usePoolContext();
   const [amount, setAmount] = useState<string>("");
 
   const debouncedValue = useDebounce(amount, 3000);
+
+  const maxClickHandle = async () => {
+    const answer: number = parseFloat(await fetchMaxAmount(action, pool, address, market))
+    setAmount(answer.toString())
+  }
+  
 
   const authedHandleClick = useAuthedCallback(marketInteraction, [
     debouncedValue,
     pool,
     market,
-    type,
+    action,
   ]);
 
   return (
@@ -148,13 +166,13 @@ const Internal = ({
             tokenSymbol={market.underlyingSymbol}
             tokenAddress={market.underlyingToken}
             onChange={(e: any) => setAmount(e.target.value)}
-            onClickMax={() => {}}
+            onClickMax={maxClickHandle}
           />
           {!marketsDynamicData || amount === "" ? null : (
             <Stats
               marketData={market}
               amount={amount}
-              type={type}
+              action={action}
               markets={marketsDynamicData?.assets}
               index={index}
             />

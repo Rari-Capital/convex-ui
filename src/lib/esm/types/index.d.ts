@@ -73,6 +73,7 @@ export declare type PoolInformation = {
 export declare type Addresses = {
     FUSE_POOL_DIRECTORY_CONTRACT_ADDRESS: string;
     FUSE_POOL_LENS_CONTRACT_ADDRESS: string;
+    FUSE_POOL_LENS_SECONDARY_CONTRACT_ADDRESS: string;
 };
 export declare type OracleHashes = {
     [key: string]: string;
@@ -85,7 +86,8 @@ export interface RewardsDistributorData {
 export declare type PoolInstance = {
     poolId: number;
     contracts: {
-        fuseLensContract: Contract;
+        fuseLens: Contract;
+        secondaryFuseLens: Contract;
     };
     _provider: Web3Provider | JsonRpcProvider;
     addresses: Addresses;
@@ -110,6 +112,7 @@ export declare type PoolInstance = {
     marketInteraction(action: marketInteractionType, cTokenAddress: string, amount: string, tokenAddress: string, decimals?: BigNumber): Promise<void>;
     collateral(comptrollerAddress: string, marketAddress: string[], action: actionType, provider: Web3Provider | JsonRpcProvider): Promise<void>;
     checkAllowanceAndApprove(userAddress: string, marketAddress: string, underlyingAddress: string, amount: string, decimals: BigNumber): Promise<void>;
+    fetchTokenBalance(tokenAddress: string | undefined, address?: string): Promise<BigNumber>;
 };
 export declare type marketInteractionType = "withdraw" | "borrow" | "repay" | "supply";
 export declare type actionType = "enter" | "exit";

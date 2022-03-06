@@ -1,14 +1,17 @@
 import { Accordion, Box, Spinner, Stack, VStack } from "@chakra-ui/react";
 import { usePoolContext } from "context/PoolContext";
-import { useRari } from "context/RariContext";
 import { BigNumber, constants } from "ethers";
-// import { useBorrowLimit } from "hooks/useBorrowLimit";
 import { Heading } from "rari-components";
 import MarketCard from "components/MarketCard";
 import Positions from "components/Positions";
 import { useTokensDataAsMap } from "hooks/useTokenData";
-// import { useEffect } from 'react'
-// import { convexAPR } from 'utils/convex/convex2'
+
+export enum ActionType {
+  "supply",
+  "borrow",
+  "withdraw",
+  "repay"
+}
 
 const Pool = () => {
   const { poolInfo, marketsDynamicData } = usePoolContext();
@@ -16,6 +19,7 @@ const Pool = () => {
   const hasSupplied = marketsDynamicData?.totalSupplyBalanceUSD.gt(
     constants.Zero
   );
+
   const tokensData = useTokensDataAsMap(
     marketsDynamicData?.assets.map(({ underlyingToken }) => underlyingToken)
   );
@@ -27,7 +31,7 @@ const Pool = () => {
       <Heading size="md" color="white">
         Active Positions
       </Heading>
-      {marketsDynamicData?.totalSupplyBalanceUSD.gt(constants.Zero) ? (
+      {hasSupplied && marketsDynamicData ? (
         <Positions marketsDynamicData={marketsDynamicData} />
       ) : null}
       <Heading size="md" color="black">
@@ -44,7 +48,7 @@ const Pool = () => {
                     marketData={market}
                     index={i}
                     key={i}
-                    type="supply"
+                    action={ActionType.supply}
                     tokenData={tokensData[market.underlyingToken]}
                   />
                 )
@@ -63,7 +67,7 @@ const Pool = () => {
                     index={i}
                     marketData={market}
                     key={i}
-                    type="borrow"
+                    action={ActionType.borrow}
                     tokenData={tokensData[market.underlyingToken]}
                   />
                 )

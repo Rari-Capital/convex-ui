@@ -3,14 +3,15 @@ import { BigNumber, constants, utils } from "ethers";
 import { usePoolContext } from "context/PoolContext";
 import { useQuery, UseQueryResult } from "react-query";
 import { useMemo } from "react";
+import { ActionType } from "components/pages/Pool";
 
 export const useUpdatedUserAssets = ({
-  mode,
+  action,
   index,
   assets,
   amount,
 }: {
-  mode: "supply" | "borrow" | "withdraw" | "repay";
+  action: ActionType;
   assets: USDPricedFuseAsset[];
   index: number;
   amount: BigNumber;
@@ -19,7 +20,7 @@ export const useUpdatedUserAssets = ({
 
   const { data: updatedAssets }: UseQueryResult<USDPricedFuseAsset[]> =
     useQuery(
-      mode + " " + index + " " + JSON.stringify(assets) + " " + amount,
+      action + " " + index + " " + JSON.stringify(assets) + " " + amount,
       async () => {
         if (!assets || !assets.length || !pool) return [];
 
@@ -32,7 +33,7 @@ export const useUpdatedUserAssets = ({
         );
 
         let updatedAsset: USDPricedFuseAsset;
-        if (mode === "supply") {
+        if (action === ActionType.supply) {
           const supplyBalance = assetToBeUpdated.supplyBalance.add(amount);
 
           const totalSupply = assetToBeUpdated.totalSupply.add(amount);
@@ -55,7 +56,7 @@ export const useUpdatedUserAssets = ({
                 : constants.Zero
             ),
           };
-        } else if (mode === "withdraw") {
+        } else if (action === ActionType.withdraw) {
           const supplyBalance = assetToBeUpdated.supplyBalance.sub(amount);
           const totalSupply = assetToBeUpdated.totalSupply.sub(amount);
 
@@ -77,7 +78,7 @@ export const useUpdatedUserAssets = ({
                 : constants.Zero
             ),
           };
-        } else if (mode === "borrow") {
+        } else if (action === ActionType.borrow) {
           const borrowBalance = assetToBeUpdated.borrowBalance.add(amount);
 
           const totalBorrow = assetToBeUpdated.totalBorrow.add(amount);
@@ -104,7 +105,7 @@ export const useUpdatedUserAssets = ({
                 : constants.Zero
             ),
           };
-        } else if (mode === "repay") {
+        } else if (action === ActionType.repay) {
           const borrowBalance = assetToBeUpdated.borrowBalance.sub(amount);
 
           const totalBorrow = assetToBeUpdated.totalBorrow.sub(amount);
