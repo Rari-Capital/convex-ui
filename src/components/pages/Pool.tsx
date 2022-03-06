@@ -6,6 +6,13 @@ import MarketCard from "components/MarketCard";
 import Positions from "components/Positions";
 import { useTokensDataAsMap } from "hooks/useTokenData";
 
+export enum ActionType {
+  "supply",
+  "borrow",
+  "withdraw",
+  "repay"
+}
+
 const Pool = () => {
   const { poolInfo, marketsDynamicData } = usePoolContext();
 
@@ -41,7 +48,7 @@ const Pool = () => {
                     marketData={market}
                     index={i}
                     key={i}
-                    type="supply"
+                    action={ActionType.supply}
                     tokenData={tokensData[market.underlyingToken]}
                   />
                 )
@@ -60,7 +67,7 @@ const Pool = () => {
                     index={i}
                     marketData={market}
                     key={i}
-                    type="borrow"
+                    action={ActionType.borrow}
                     tokenData={tokensData[market.underlyingToken]}
                   />
                 )

@@ -20,7 +20,6 @@ import {
   TabPanels,
   TabList,
   Tab,
-  TabPanel,
   Accordion,
 } from "@chakra-ui/react";
 import {
@@ -28,12 +27,12 @@ import {
   convertMantissaToAPY,
   smallUsdFormatter,
 } from "utils/formatters";
-import { formatUnits } from "ethers/lib/utils";
 import { useRari } from "context/RariContext";
 import { usePoolContext } from "context/PoolContext";
 import { Stats } from "./Stats";
 import { marketInteraction } from "utils/marketInteraction";
 import { useAuthedCallback } from "hooks/useAuthedCallback";
+import { ActionType } from "./pages/Pool";
 
 const Positions = ({
   marketsDynamicData,
@@ -52,7 +51,7 @@ const Positions = ({
                 address={address}
                 index={i}
                 key={i}
-                type="supply"
+                action={ActionType.supply}
               />
             );
           }
@@ -65,7 +64,7 @@ const Positions = ({
                 address={address}
                 index={i}
                 key={i}
-                type="borrow"
+                action={ActionType.borrow}
               />
             );
           }
@@ -80,16 +79,15 @@ export default Positions;
 const PositionCard = ({
   market,
   address,
-  type,
+  action,
   index,
 }: {
   market: USDPricedFuseAsset;
   address: string;
-  type: "supply" | "borrow";
+  action: ActionType;
   index: number;
 }) => {
-  const isSupplying = type === "supply";
-  const isBorrowing = type === "borrow";
+  const isBorrowing = action === ActionType.borrow;
 
   return (
     <ExpandableCard
@@ -97,7 +95,7 @@ const PositionCard = ({
       variant="active"
       expandableChildren={
         <Internal
-          type={type}
+          type={action}
           market={market}
           isBorrowing={isBorrowing}
           index={index}
@@ -110,7 +108,7 @@ const PositionCard = ({
           {market.underlyingSymbol}
         </Heading>
         <Badge variant={isBorrowing ? "warning" : "success"}>
-          {isBorrowing ? "Borrow" : "Supply"}
+          {isBorrowing ? "Borrowed" : "Supplied"}
         </Badge>
         <Spacer />
         <HStack spacing={12} mr={12} textAlign="center">
@@ -167,10 +165,10 @@ const Internal = ({
   isBorrowing: boolean;
   market: USDPricedFuseAsset;
   index: number;
-  type: "supply" | "borrow";
+  type: ActionType;
 }) => {
   const { marketsDynamicData, pool } = usePoolContext();
-  const [action, setAction] = useState<"supply" | "borrow" | "withdraw" | "repay">(type);
+  const [action, setAction] = useState<ActionType>(type);
 
   const [amount, setAmount] = useState<string>("");
 
@@ -180,13 +178,14 @@ const Internal = ({
     market,
     action,
   ]);
+  
   return (
     <Tabs>
       <TabList>
-        <Tab onClick={() => setAction(isBorrowing ? "borrow" : "supply")}>
+        <Tab onClick={() => setAction(isBorrowing ? ActionType.borrow : ActionType.supply)}>
           {isBorrowing ? "Borrow" : "Supply"}
         </Tab>
-        <Tab onClick={() => setAction(isBorrowing ? "repay" : "withdraw")}>
+        <Tab onClick={() => setAction(isBorrowing ? ActionType.repay : ActionType.withdraw)}>
           {isBorrowing ? "Repay" : "Withdraw"}
         </Tab>
       </TabList>
@@ -203,7 +202,7 @@ const Internal = ({
           {!marketsDynamicData || amount === "" ? null : (
             <Stats
               amount={amount}
-              type={action}
+              action={action}
               index={index}
               markets={marketsDynamicData?.assets}
               marketData={market}
