@@ -30,7 +30,11 @@ type HeaderProps = BoxProps & {
 };
 
 const Header: React.FC<HeaderProps> = ({ contentSx, ...restProps }) => {
-  const { isOpen: isClaimModalOpen, onOpen: openClaimModal, onClose: closeClaimModal } = useDisclosure();
+  const {
+    isOpen: isClaimModalOpen,
+    onOpen: openClaimModal,
+    onClose: closeClaimModal,
+  } = useDisclosure();
   const { isAuthed, address, logout, login, previewMode } = useRari();
 
   const handleClick = () => {
