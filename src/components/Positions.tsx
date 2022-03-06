@@ -128,10 +128,10 @@ const PositionCard = ({
               )}
             </Heading>
             <Text variant="secondary" fontSize="xs">
-              {(isBorrowing ? market.borrowBalance : market.supplyBalance)
+              {utils.commify((isBorrowing ? market.borrowBalance : market.supplyBalance)
                 .div(BigNumber.from(10).pow(market.underlyingDecimals))
                 .toNumber()
-                .toFixed(2)}{" "}
+                .toFixed(2))}{" "}
               {market.underlyingSymbol}
             </Text>
           </Box>
