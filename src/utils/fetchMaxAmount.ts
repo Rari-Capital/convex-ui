@@ -1,7 +1,6 @@
 // Ethers
-import { BigNumber } from "@ethersproject/bignumber";
 import { ActionType } from "components/pages/Pool";
-import { constants } from "ethers";
+import { constants, utils } from "ethers";
 
 // Types
 import { PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
@@ -14,8 +13,6 @@ export async function fetchMaxAmount(
     asset: USDPricedFuseAsset,
   ) {
 
-    console.log({pool})
-  
     if (mode === ActionType.supply) {
       const balance = await pool.fetchTokenBalance(
         asset.underlyingToken,
@@ -30,10 +27,11 @@ export async function fetchMaxAmount(
         asset.underlyingToken,
         address
       );
-      const debt = BigNumber.from(asset.borrowBalance);
+
+      const borrowBalance = asset.borrowBalance.div(constants.WeiPerEther).toNumber()
   
-      if (balance.gt(debt)) {
-        return debt;
+      if (borrowBalance < balance) {
+        return asset.borrowBalance.div(constants.WeiPerEther).toString();
       } else {
         return balance;
       }
@@ -48,9 +46,7 @@ export async function fetchMaxAmount(
             asset.cToken
           );
   
-        const amount = maxBorrow.mul(3).div(4);
-  
-        return amount.div(1);
+        return maxBorrow.div(constants.WeiPerEther).toString()
       } catch (err) {
         throw new Error("Could not fetch your max borrow amount! Code: " + err);
       }
@@ -63,8 +59,9 @@ export async function fetchMaxAmount(
             address,
             asset.cToken
           );
+
   
-        return maxRedeem;
+        return maxRedeem.div(constants.WeiPerEther).toString();
       } catch (err) {
         throw new Error("Could not fetch your max borrow amount! Code: " + err);
       }
