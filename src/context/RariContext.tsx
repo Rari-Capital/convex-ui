@@ -1,6 +1,11 @@
-
 // React
-import { createContext, useContext, ReactNode, useMemo, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useMemo,
+  useCallback,
+} from "react";
 import { useRouter } from "next/router";
 
 // Wagmi
@@ -12,42 +17,43 @@ import { alchemyURL } from "utils/connectors";
 import { providers } from "ethers";
 import { useDisclosure } from "@chakra-ui/react";
 
-export const RariContext = createContext<undefined | any>(
-  undefined
-);
+export const RariContext = createContext<undefined | any>(undefined);
 
-export const RariProvider = ({
-  children
-}: {
-  children: ReactNode
-}) => {
-  const [{ data, error, loading }, switchNetwork] = useNetwork()
+export const RariProvider = ({ children }: { children: ReactNode }) => {
+  const [{ data, error, loading }, switchNetwork] = useNetwork();
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
-  })
+  });
 
-  const [{ data: UsersConnector }, connect] = useConnect()
+  const [{ data: UsersConnector }, connect] = useConnect();
 
-  const chainId = useMemo(() => 31337, [data])
+  const chainId = useMemo(() => 31337, [data]);
   const provider = useMemo(() => {
-    return UsersConnector.connector ? new providers.Web3Provider(UsersConnector?.connector?.getProvider()) :
-    new providers.JsonRpcProvider(alchemyURL)
-  }, [UsersConnector])
+    return UsersConnector.connector
+      ? new providers.Web3Provider(UsersConnector?.connector?.getProvider())
+      : new providers.JsonRpcProvider(alchemyURL);
+  }, [UsersConnector]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // Whether you have forced an address
-  const router = useRouter()
-  const address = useMemo(() => router?.query.address ?? accountData?.address, [router, accountData])
-  const previewMode = useMemo(() => !!address && address === router?.query.address, [router, address])
-  const isAuthed = useMemo(() => !!accountData, [accountData])
+  const router = useRouter();
+  const address = useMemo(
+    () => router?.query.address ?? accountData?.address,
+    [router, accountData]
+  );
+  const previewMode = useMemo(
+    () => !!address && address === router?.query.address,
+    [router, address]
+  );
+  const isAuthed = useMemo(() => !!accountData, [accountData]);
 
   // logs out
-  const logout = useCallback(() => disconnect(), [])
+  const logout = useCallback(() => disconnect(), []);
 
-  const login =useCallback(() => {
-    onOpen()
-  },[onOpen])
+  const login = useCallback(() => {
+    onOpen();
+  }, [onOpen]);
 
   const value = {
     provider,
@@ -59,14 +65,10 @@ export const RariProvider = ({
     logout,
     login,
     isModalOpen: isOpen,
-    onClose
-  }
+    onClose,
+  };
 
-  return <RariContext.Provider value={value}>
-    
-    {children}
-  
-  </RariContext.Provider>;
+  return <RariContext.Provider value={value}>{children}</RariContext.Provider>;
 };
 
 // Hook

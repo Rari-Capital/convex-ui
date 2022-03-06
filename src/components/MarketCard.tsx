@@ -12,7 +12,7 @@ import {
   Heading,
   Text,
   TokenAmountInput,
-  TokenIcon
+  TokenIcon,
 } from "rari-components";
 import { getMillions, convertMantissaToAPY } from "utils/formatters";
 import { useAuthedCallback } from "hooks/useAuthedCallback";
@@ -25,10 +25,10 @@ type MarketCardProps = Omit<
   "expandableChildren"
 > & {
   type: "supply" | "borrow";
-  marketData: USDPricedFuseAsset
-  markets: USDPricedFuseAsset[],
-  index: number,
-  tokenData: TokenData
+  marketData: USDPricedFuseAsset;
+  markets: USDPricedFuseAsset[];
+  index: number;
+  tokenData: TokenData;
 };
 
 const MarketCard: React.FC<MarketCardProps> = ({
@@ -39,28 +39,24 @@ const MarketCard: React.FC<MarketCardProps> = ({
   tokenData,
   ...restProps
 }) => {
-  const { pool } = usePoolContext()
+  const { pool } = usePoolContext();
 
-  const [amount, setAmount] = useState<string>("")
-  const debouncedValue = useDebounce(amount, 3000)
+  const [amount, setAmount] = useState<string>("");
+  const debouncedValue = useDebounce(amount, 3000);
   const isBorrowing = type === "borrow";
 
-  const isSupply = type === "supply"
+  const isSupply = type === "supply";
   const APY = convertMantissaToAPY(
-    isSupply
-      ? marketData.supplyRatePerBlock
-      : marketData.borrowRatePerBlock, 365
-  )
+    isSupply ? marketData.supplyRatePerBlock : marketData.borrowRatePerBlock,
+    365
+  );
 
-  const authedHandleClick = useAuthedCallback(
-    marketInteraction,
-    [
-      debouncedValue,
-      pool,
-      marketData,
-      type
-    ]
-  )
+  const authedHandleClick = useAuthedCallback(marketInteraction, [
+    debouncedValue,
+    pool,
+    marketData,
+    type,
+  ]);
 
   return (
     <ExpandableCard
@@ -74,9 +70,9 @@ const MarketCard: React.FC<MarketCardProps> = ({
             tokenSymbol={markets[index].underlyingSymbol}
             tokenAddress={markets[index].underlyingToken}
             onChange={(e: any) => setAmount(e.target.value)}
-            onClickMax={() => { }}
+            onClickMax={() => {}}
           />
-          {amount === "" ? null :
+          {amount === "" ? null : (
             <Stats
               marketData={marketData}
               amount={amount}
@@ -85,12 +81,8 @@ const MarketCard: React.FC<MarketCardProps> = ({
               markets={markets}
               index={index}
             />
-          }
-          <Button
-            onClick={authedHandleClick}
-          >
-            Approve
-          </Button>
+          )}
+          <Button onClick={authedHandleClick}>Approve</Button>
         </VStack>
       }
       {...restProps}
@@ -122,46 +114,35 @@ const MarketCard: React.FC<MarketCardProps> = ({
 const MarketTLDR = ({
   marketData,
   isSupply,
-  APY
+  APY,
 }: {
-  marketData: USDPricedFuseAsset,
-  isSupply: boolean,
-  APY: number
+  marketData: USDPricedFuseAsset;
+  isSupply: boolean;
+  APY: number;
 }) => {
-
-
   const Text1 = isSupply
     ? `${utils.formatEther(marketData.collateralFactor.mul(100))}% LTV`
-    : `${getMillions(marketData.liquidityUSD)}M Liquidity`
-
+    : `${getMillions(marketData.liquidityUSD)}M Liquidity`;
 
   return (
     <Flex justifyContent="flex-start !important">
       <Text variant="secondary" alignSelf="flex-start" mr="1.5vh">
         {Text1}
       </Text>
-
       &middot;
-
       <Text variant="secondary" mr="1.5vh" ml="1.5vh">
         {APY.toFixed(2)}% APY
       </Text>
-
-
-      {
-
-        isSupply ? (
-          <>
-            &middot;
-            <Text variant="secondary" ml="1.5vh">
-              {getMillions(marketData.totalSupplyUSD)}M Supplied
-            </Text>
-          </>
-        )
-          : null
-      }
+      {isSupply ? (
+        <>
+          &middot;
+          <Text variant="secondary" ml="1.5vh">
+            {getMillions(marketData.totalSupplyUSD)}M Supplied
+          </Text>
+        </>
+      ) : null}
     </Flex>
-  )
-}
+  );
+};
 
 export default MarketCard;
