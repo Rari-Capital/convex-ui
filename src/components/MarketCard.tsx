@@ -142,15 +142,15 @@ const Internal = ({
 }) => {
   const { address } = useRari()
   const { marketsDynamicData } = usePoolContext();
-  const [amount, setAmount] = useState<string>("");
+  const [amount, setAmount] = useState<string>("0");
 
   const debouncedValue = useDebounce(amount, 3000);
 
   const maxClickHandle = async () => {
-    const answer: number = parseFloat(await fetchMaxAmount(action, pool, address, market))
+    const answer: number = await fetchMaxAmount(action, pool, address, market)
     setAmount(answer.toString())
   }
-  
+  console.log({amount})
 
   const authedHandleClick = useAuthedCallback(marketInteraction, [
     debouncedValue,
@@ -165,10 +165,11 @@ const Internal = ({
             variant="light"
             tokenSymbol={market.underlyingSymbol}
             tokenAddress={market.underlyingToken}
+            value={amount}
             onChange={(e: any) => setAmount(e.target.value)}
             onClickMax={maxClickHandle}
           />
-          {!marketsDynamicData || amount === "" ? null : (
+          {!marketsDynamicData || amount === "0" || amount === "" ? null : (
             <Stats
               marketData={market}
               amount={amount}

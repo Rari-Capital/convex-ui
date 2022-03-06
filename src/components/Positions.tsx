@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MarketsWithData, USDPricedFuseAsset } from "lib/esm/types";
+import { MarketsWithData, PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
 import { BigNumber, constants, utils } from "ethers";
 import {
   Badge,
@@ -21,6 +21,8 @@ import {
   TabList,
   Tab,
   Accordion,
+  Center,
+  Spinner,
 } from "@chakra-ui/react";
 import {
   convertMantissaToAPR,
@@ -33,6 +35,7 @@ import { Stats } from "./Stats";
 import { marketInteraction } from "utils/marketInteraction";
 import { useAuthedCallback } from "hooks/useAuthedCallback";
 import { ActionType } from "./pages/Pool";
+import { fetchMaxAmount } from "utils/fetchMaxAmount";
 
 const Positions = ({
   marketsDynamicData,
@@ -87,7 +90,14 @@ const PositionCard = ({
   action: ActionType;
   index: number;
 }) => {
+  const { pool } = usePoolContext()
   const isBorrowing = action === ActionType.borrow;
+
+  if (!pool ) return (
+    <Center>
+      <Spinner/>
+    </Center>
+  )
 
   return (
     <ExpandableCard
@@ -99,6 +109,7 @@ const PositionCard = ({
           market={market}
           isBorrowing={isBorrowing}
           index={index}
+          pool={pool}
         />
       }
     >
@@ -161,16 +172,25 @@ const Internal = ({
   market,
   index,
   type,
+  pool
 }: {
   isBorrowing: boolean;
   market: USDPricedFuseAsset;
   index: number;
   type: ActionType;
+  pool: PoolInstance;
 }) => {
-  const { marketsDynamicData, pool } = usePoolContext();
+  const { address } = useRari()
+  const { marketsDynamicData } = usePoolContext();
   const [action, setAction] = useState<ActionType>(type);
 
-  const [amount, setAmount] = useState<string>("");
+  const [amount, setAmount] = useState<string>("0");
+
+  const maxClickHandle = async () => {
+    const answer: number = await fetchMaxAmount(action, pool, address, market)
+    setAmount(answer.toString())
+  }
+  console.log({amount})
 
   const authedHandleClick = useAuthedCallback(marketInteraction, [
     amount,
@@ -194,12 +214,13 @@ const Internal = ({
           <TokenAmountInput
             size="lg"
             variant="light"
+            value={amount}
             tokenSymbol={market.underlyingSymbol}
             tokenAddress={market.underlyingToken}
             onChange={(e: any) => setAmount(e.target.value)}
-            onClickMax={() => {}}
+            onClickMax={maxClickHandle}
           />
-          {!marketsDynamicData || amount === "" ? null : (
+          {!marketsDynamicData || amount === "" || amount === "0" ? null : (
             <Stats
               amount={amount}
               action={action}
