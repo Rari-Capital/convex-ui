@@ -141,7 +141,7 @@ const PositionCard = ({
             </Text>
             <Heading size="md">
               {isBorrowing
-                ? convertMantissaToAPR(market.borrowRatePerBlock)
+                ? convertMantissaToAPR(market.borrowRatePerBlock).toFixed(2)
                 : convertMantissaToAPY(market.supplyRatePerBlock, 365).toFixed(
                     2
                   )}
@@ -171,7 +171,6 @@ const Internal = ({
 }) => {
   const { marketsDynamicData, pool } = usePoolContext();
   const [action, setAction] = useState<"supply" | "borrow" | "withdraw" | "repay">(type);
-  console.log({ action });
 
   const [amount, setAmount] = useState<string>("");
 

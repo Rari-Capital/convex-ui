@@ -5,7 +5,6 @@ import usePool from "./usePool";
 const usePoolData = (poolIndex: number) => {
   const { address } = useRari();
   const pool = usePool(poolIndex);
-  console.log(pool);
 
   const { data: poolInfo } = useQuery(
     `Pool data PoolID ${pool?.poolId}`,
