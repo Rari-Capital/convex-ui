@@ -17,6 +17,11 @@ import { alchemyURL } from "utils/connectors";
 import { providers } from "ethers";
 import { useDisclosure } from "@chakra-ui/react";
 
+const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID;
+if (!CHAIN_ID) {
+  throw new Error("Must set `NEXT_PUBLIC_CHAIN_ID` environment variable!");
+}
+
 export const RariContext = createContext<undefined | any>(undefined);
 
 export const RariProvider = ({ children }: { children: ReactNode }) => {
@@ -27,7 +32,7 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
 
   const [{ data: UsersConnector }, connect] = useConnect();
 
-  const chainId = useMemo(() => 31337, [data]);
+  const chainId = useMemo(() => parseInt(CHAIN_ID), [data]);
   const provider = useMemo(() => {
     return UsersConnector.connector
       ? new providers.Web3Provider(UsersConnector?.connector?.getProvider())
