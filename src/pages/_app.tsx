@@ -1,5 +1,6 @@
 // @ts-nocheck
 import "rari-components/assets/fonts/avenir-next/avenir.css";
+import 'styles/styles.css'
 import { Provider } from "wagmi";
 import { ChakraProvider } from "@chakra-ui/react";
 import theme from "rari-components/theme";

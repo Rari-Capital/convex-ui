@@ -12,6 +12,7 @@ import {
 import { getBorrowLimit } from "hooks/getBorrowLimit";
 import { StatisticTable } from "rari-components";
 import { ActionType } from "./pages/Pool";
+import { Center, Spinner } from "@chakra-ui/react";
 
 
 export const Stats = ({
@@ -20,12 +21,14 @@ export const Stats = ({
   amount,
   markets,
   index,
+  enterMarket
 }: {
   marketData: USDPricedFuseAsset;
   action: ActionType;
   amount: string;
   markets: USDPricedFuseAsset[];
   index: number;
+  enterMarket: boolean;
 }) => {
   const parsedAmount = utils.parseUnits(amount, marketData.underlyingDecimals);
   const { borrowLimit, marketsDynamicData, borrowLimitBN } = usePoolContext();
@@ -46,10 +49,11 @@ export const Stats = ({
     marketsDynamicData,
     updatedMarkets,
     borrowLimit,
-    borrowLimitBN
+    borrowLimitBN,
+    enterMarket
   );
 
-  return <StatisticTable variant="light" statistics={stats} />;
+  return <StatisticTable variant="light" backgroundColor="white" border="none" statistics={stats} />;
 };
 
 const getStats = (
@@ -59,7 +63,8 @@ const getStats = (
   marketsDynamicData: MarketsWithData | undefined,
   updatedMarkets: USDPricedFuseAsset[] | undefined,
   borrowLimit: number | undefined,
-  borrowLimitBN: BigNumber | undefined
+  borrowLimitBN: BigNumber | undefined,
+  enterMarket: boolean
 ) => {
   if (
     !updatedMarket ||
@@ -71,6 +76,7 @@ const getStats = (
     return [];
 
   let _stats: [title: string, value: string][] = [];
+
   if (action === ActionType.supply || action === ActionType.withdraw) {
     const textOne = `${smallUsdFormatter(
       marketData.supplyBalanceUSD.toString()
@@ -79,7 +85,9 @@ const getStats = (
                   updatedMarket.supplyBalanceUSD.toString()
                 )}`;
 
-    const newBorrow = getBorrowLimit(updatedMarkets);
+    const newBorrow = getBorrowLimit(updatedMarkets,  {
+      ignoreIsEnabledCheckFor: enterMarket ? marketData.cToken : undefined,
+    });
 
     const textTwo = `${smallUsdFormatter(
       borrowLimit ?? 0

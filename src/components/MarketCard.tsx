@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { usePoolContext } from "context/PoolContext";
-import { Avatar, Box, Center, Flex, Spinner, VStack } from "@chakra-ui/react";
+import { Avatar, Box, Center, Flex, Spinner, Switch, VStack } from "@chakra-ui/react";
 import { utils } from "ethers";
 import { TokenData } from "hooks/useTokenData";
 import { PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
 import {
   Badge,
   Button,
+  Card,
   ExpandableCard,
   Heading,
   Text,
@@ -142,26 +143,28 @@ const Internal = ({
 }) => {
   const { address } = useRari()
   const { marketsDynamicData } = usePoolContext();
+
   const [amount, setAmount] = useState<string>("0");
+  const [enterMarket, setEnterMarket] = useState<boolean>(true)
 
-  const debouncedValue = useDebounce(amount, 3000);
+  const debouncedAmount = useDebounce(amount, 1000);
 
-  const maxClickHandle = async () => {
-    const answer: number = await fetchMaxAmount(action, pool, address, market)
-    setAmount(answer.toString())
-  }
-  console.log({amount})
-
-  const authedHandleClick = useAuthedCallback(marketInteraction, [
-    debouncedValue,
+  const authedHandleSubmit = useAuthedCallback(marketInteraction, [
+    debouncedAmount,
     pool,
     market,
     action,
   ]);
 
+  const maxClickHandle = async () => {
+    const answer: number = await fetchMaxAmount(action, pool, address, market)
+    setAmount(answer.toString())
+  }
+
   return (
-    <VStack spacing={4} alignItems="stretch">
+    <VStack spacing={4} alignItems="stretch" background="#F0F0F0">
           <TokenAmountInput
+            border="none"
             variant="light"
             tokenSymbol={market.underlyingSymbol}
             tokenAddress={market.underlyingToken}
@@ -169,16 +172,45 @@ const Internal = ({
             onChange={(e: any) => setAmount(e.target.value)}
             onClickMax={maxClickHandle}
           />
-          {!marketsDynamicData || amount === "0" || amount === "" ? null : (
-            <Stats
-              marketData={market}
-              amount={amount}
-              action={action}
-              markets={marketsDynamicData?.assets}
-              index={index}
-            />
+          {!marketsDynamicData || debouncedAmount === "0" || debouncedAmount === "" ? null : (
+            <>
+              <Stats
+                marketData={market}
+                amount={debouncedAmount}
+                action={action}
+                markets={marketsDynamicData?.assets}
+                index={index}
+                enterMarket={enterMarket}
+              />
+              <EnterMarket
+                setEnterMarket={setEnterMarket}
+                enterMarket={enterMarket}
+              />
+            </>
           )}
-          <Button onClick={authedHandleClick}>Approve</Button>
+          <Button onClick={authedHandleSubmit}>Approve</Button>
         </VStack>
+  )
+}
+
+const EnterMarket = ({
+  setEnterMarket,
+  enterMarket
+}: {
+  setEnterMarket: Dispatch<SetStateAction<boolean>>
+  enterMarket: boolean
+}) => {
+  return (
+    <Card backgroundColor="white" display="flex" height="1vh" justifyContent="center" alignItems="center">
+      <Flex backgroundColor="white" color="black" justifyContent="space-between" width="100%">
+        <Text>
+          Enable as collateral
+        </Text>
+        <Switch 
+          onChange={() => setEnterMarket(!enterMarket)} 
+          isChecked={enterMarket}
+        />
+      </Flex>
+    </Card>
   )
 }
