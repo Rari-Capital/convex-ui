@@ -5,6 +5,9 @@ import { Heading } from "rari-components";
 import MarketCard from "components/MarketCard";
 import Positions from "components/Positions";
 import { useTokensDataAsMap } from "hooks/useTokenData";
+import { PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
+import { useQuery } from "react-query";
+import { useRari } from "context/RariContext";
 
 export enum ActionType {
   "supply",
@@ -15,11 +18,21 @@ export enum ActionType {
 }
 
 const Pool = () => {
-  const { poolInfo, marketsDynamicData } = usePoolContext();
+  const { poolInfo, marketsDynamicData, pool } = usePoolContext();
+  const { address } = useRari();
 
   const hasSupplied = marketsDynamicData?.totalSupplyBalanceUSD.gt(
     constants.Zero
   );
+
+  const {data} = useQuery('hello', async () => {
+    if(!pool || !marketsDynamicData || !address) return
+
+    console.log({pool})
+    const answer = await getBalances(pool, marketsDynamicData?.assets, address)
+    return answer
+  })
+  console.log({data})
 
   const tokensData = useTokensDataAsMap(
     marketsDynamicData?.assets.map(({ underlyingToken }) => underlyingToken)
@@ -104,3 +117,10 @@ export const convertMantissaToAPR = (mantissa: any) => {
   const parsedMantissa = toInt(mantissa);
   return (parsedMantissa * 2372500) / 1e16;
 };
+
+
+const getBalances = async (pool: PoolInstance, markets: USDPricedFuseAsset[], userAddress: string) => {
+  console.log('hey thers')
+  const balances = await pool.fetchTokenBalancesForPool(markets, userAddress)
+  console.log({balances}, 'lol')
+}
