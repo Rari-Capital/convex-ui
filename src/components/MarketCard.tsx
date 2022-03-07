@@ -186,13 +186,6 @@ const Internal = ({
                 index={index}
                 enterMarket={enterMarket}
               />
-              { action === ActionType.supply ?
-                <CollateralSwitch
-                  setEnterMarket={setEnterMarket}
-                  enterMarket={enterMarket}
-                  collateralFactor={market.collateralFactor}
-                /> : null
-              }
             </>
           )}
           <Button 
@@ -202,42 +195,5 @@ const Internal = ({
             {isEmpty ? "Please enter a valid amount" : "Approve"}
           </Button>
         </VStack>
-  )
-}
-
-export const CollateralSwitch = ({
-  setEnterMarket,
-  enterMarket,
-  collateralFactor
-}: {
-  setEnterMarket: Dispatch<SetStateAction<boolean>>
-  enterMarket: boolean,
-  collateralFactor: BigNumber
-}) => {
-  useEffect(() => {
-    setEnterMarket(true)
-  }, [])
-
-  return (
-    <Card backgroundColor="white" display="flex" justifyContent="center" alignItems="center">
-      <Flex backgroundColor="white" color="black" align="center" justifyContent="space-between" width="100%">
-        <Flex width="100%" justifyContent="space-between" direction="column">
-          <Text>
-            {enterMarket ? "Enabled as collateral" : "Enable as collateral"}
-          </Text>
-          <Text variant="secondary" fontSize="10px">
-            { enterMarket 
-              ? `You'll be able to borrow ${utils.formatUnits(collateralFactor, 16)}% of the supplied amount` 
-              : "You won't be able to borrow against the supplied amount."
-            }
-          </Text>
-          
-        </Flex>
-        <Switch 
-            onChange={() => setEnterMarket(!enterMarket)} 
-            isChecked={enterMarket}
-          />
-      </Flex>
-    </Card>
   )
 }

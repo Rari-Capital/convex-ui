@@ -47,6 +47,7 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
     () => router?.query.address ?? accountData?.address,
     [router, accountData]
   );
+  
   const previewMode = useMemo(
     () => !!address && address === router?.query.address,
     [router, address]
