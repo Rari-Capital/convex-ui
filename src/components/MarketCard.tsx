@@ -159,6 +159,7 @@ const Internal = ({
   ]);
 
   const maxClickHandle = async () => {
+    if (!address) return
     const answer: number = await fetchMaxAmount(action, pool, address, market)
     setAmount(answer.toString())
   }
