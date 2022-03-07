@@ -1,17 +1,22 @@
-import { Box, Stack } from "@chakra-ui/react";
+import { Box, Stack, Flex, VStack, HStack, BoxProps } from "@chakra-ui/react";
 import { useRari } from "context/RariContext";
 import { usePoolContext } from "context/PoolContext";
 import { animate, useMotionValue } from "framer-motion";
 import { Card, Heading, Progress, Statistic, Text } from "rari-components";
-import { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { smallUsdFormatter } from "utils/formatters";
 
-export const PoolOverview = () => {
+export const PoolOverview: React.FC<BoxProps> = (props) => {
   const { address } = useRari();
-  const { marketsDynamicData, borrowLimit, userHealth } = usePoolContext();
+  const {
+    marketsDynamicData,
+    borrowLimit,
+    userHealth: _userHealth,
+  } = usePoolContext();
+
+  let userHealth = 80;
 
   // Show total market statistics if user's wallet is not connected.
-  const heading = !!address ? "Portfolio Overview" : "Pool Overview";
   const supplyStatisticTitle = !!address ? "You Supplied" : "Total Supplied";
   const borrowStatisticTitle = !!address ? "You Borrowed" : "Total Borrowed";
   const supplyStatisticValue =
@@ -64,30 +69,49 @@ export const PoolOverview = () => {
     };
   }, [supplyStatisticValue, borrowStatisticValue]);
 
+  let color;
+  if (userHealth < 25) {
+    color = "linear-gradient(90.12deg, #4AFA5B 5.91%, #40FFBA 96.27%)";
+  } else if (userHealth < 70) {
+    color = "linear-gradient(90.12deg, #40C6FF 5.91%, #4A5BFA 96.27%)";
+  } else { 
+    color = "linear-gradient(90.12deg, #F67B36 5.91%, #F64D36 96.27%)";
+  }
+
   return (
-    <Box paddingTop={16}>
-      <Heading size="md">{heading}</Heading>
-      <Stack paddingTop={8} spacing={8} direction={["column", "row"]}>
-        <Card minWidth={48}>
-          <Statistic
-            title={supplyStatisticTitle}
-            value={smallUsdFormatter(supplyStatisticDisplayedValue)}
-          />
-        </Card>
-        <Card minWidth={48}>
-          <Statistic
-            title={borrowStatisticTitle}
-            value={smallUsdFormatter(borrowStatisticDisplayedValue)}
-          />
-        </Card>
-        <Card justifyContent="center" flex={1}>
-          <Text variant="secondary" fontSize="sm" mb={2}>
-            Borrow Balance
-          </Text>
-          <Progress variant="light" barVariant="gradient" value={userHealth} />
-        </Card>
-      </Stack>
-    </Box>
+    <Flex justify="center" align="center" {...props}>
+      <VStack align="stretch">
+        <HStack>
+          <Card minWidth={48}>
+            <Statistic
+              title={supplyStatisticTitle}
+              value={smallUsdFormatter(supplyStatisticDisplayedValue)}
+            />
+          </Card>
+          <Card minWidth={48}>
+            <Statistic
+              title={borrowStatisticTitle}
+              value={smallUsdFormatter(borrowStatisticDisplayedValue)}
+            />
+          </Card>
+        </HStack>
+        {!!address && (
+          <HStack>
+            <Card justifyContent="center" flex={1} w="100%" p={3}>
+              <Text variant="secondary" fontSize="sm" mb={2}>
+                Borrow Balance
+              </Text>
+              <Progress
+                variant="light"
+                barVariant={color}
+                value={userHealth}
+                height={4}
+              />
+            </Card>
+          </HStack>
+        )}
+      </VStack>
+    </Flex>
   );
 };
 

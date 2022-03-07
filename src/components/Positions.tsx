@@ -102,7 +102,7 @@ const PositionCard = ({
   index: number;
   tokenData: TokenData
 }) => {
-  const { pool } = usePoolContext()
+  const { pool } = usePoolContext();
   const isBorrowing = action === ActionType.borrow;
 
   if (!pool) return (
@@ -195,7 +195,7 @@ const Internal = ({
   pool: PoolInstance;
   tokenData: TokenData
 }) => {
-  const { address } = useRari()
+  const { address } = useRari();
   const { marketsDynamicData } = usePoolContext();
 
   // Will determine actionType and amount to send for interaction.
@@ -215,10 +215,18 @@ const Internal = ({
   return (
     <Tabs>
       <TabList>
-        <Tab onClick={() => setAction(isBorrowing ? ActionType.borrow : ActionType.supply)}>
+        <Tab
+          onClick={() =>
+            setAction(isBorrowing ? ActionType.borrow : ActionType.supply)
+          }
+        >
           {isBorrowing ? "Borrow" : "Supply"}
         </Tab>
-        <Tab onClick={() => setAction(isBorrowing ? ActionType.repay : ActionType.withdraw)}>
+        <Tab
+          onClick={() =>
+            setAction(isBorrowing ? ActionType.repay : ActionType.withdraw)
+          }
+        >
           {isBorrowing ? "Repay" : "Withdraw"}
         </Tab>
       </TabList>

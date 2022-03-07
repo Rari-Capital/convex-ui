@@ -135,7 +135,6 @@ const MarketTLDR = ({
 
 export default MarketCard;
 
-
 const Internal = ({
   market,
   action,

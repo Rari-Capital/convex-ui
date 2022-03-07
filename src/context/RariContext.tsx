@@ -20,19 +20,21 @@ import { useDisclosure, useToast } from "@chakra-ui/react";
 import { isSupportedChainId } from "constants/networks";
 
 export interface RariContextData {
-  provider: any,
-  chainId: number,
-  address: string | undefined,
-  accountData: any,
-  isAuthed: boolean,
-  previewMode: boolean,
-  logout: () => void,
-  login: () => void,
-  isModalOpen: boolean,
-  onClose: () => void,
+  provider: any;
+  chainId: number;
+  address: string | undefined;
+  accountData: any;
+  isAuthed: boolean;
+  previewMode: boolean;
+  logout: () => void;
+  login: () => void;
+  isModalOpen: boolean;
+  onClose: () => void;
 }
 
-export const RariContext = createContext<undefined | RariContextData>(undefined);
+export const RariContext = createContext<undefined | RariContextData>(
+  undefined
+);
 
 export const RariProvider = ({ children }: { children: ReactNode }) => {
   const [{ data }] = useNetwork();
@@ -42,10 +44,13 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
 
   const [{ data: UsersConnector }] = useConnect();
 
-  const chainId = useMemo(() => isSupportedChainId(data.chain?.id) ? data.chain!.id : 1, [data]);
+  const chainId = useMemo(
+    () => (isSupportedChainId(data.chain?.id) ? data.chain!.id : 1),
+    [data]
+  );
 
   // Warn on unsupported network
-  const toast = useToast()
+  const toast = useToast();
   useEffect(() => {
     if (!!data.chain?.id && !isSupportedChainId(data.chain.id)) {
       setTimeout(() => {
@@ -59,7 +64,7 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
         });
       }, 1500);
     }
-  }, [data.chain])
+  }, [data.chain]);
 
   const provider = useMemo(() => {
     return UsersConnector.connector

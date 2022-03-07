@@ -22,11 +22,7 @@ type PoolContextData = {
   } | undefined;
 };
 
-export const PoolProvider = ({
-  children,
-}: {
-  children: ReactChildren;
-}) => {
+export const PoolProvider = ({ children }: { children: ReactChildren }) => {
   const { chainId } = useRari();
   const poolIndex = networkConfig[chainId].poolId
 
