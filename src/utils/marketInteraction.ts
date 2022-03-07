@@ -1,16 +1,19 @@
 import { ActionType } from "components/pages/Pool";
 import { usePoolContext } from "context/PoolContext";
 import { PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
+import { Dispatch, SetStateAction } from "react";
+import { QueryClient } from "react-query";
 
 export const marketInteraction = async (
   amount: string,
-  pool: PoolInstance,
+  pool: PoolInstance | undefined,
   market: USDPricedFuseAsset,
   action: ActionType,
-  comptroller: string,
-  enterMarket: boolean
+  increaseActiveStep: (step: string) => void,
+  comptroller: string | undefined,
+  enterMarket: boolean,
 ) => {
-  if (amount === "") return;
+  if (amount === "" || !pool || !comptroller) return;
 
   const address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
 
@@ -18,6 +21,7 @@ export const marketInteraction = async (
     case  ActionType.supply:
 
       if (enterMarket) {
+        increaseActiveStep("Approving market")
         await pool?.collateral(
           comptroller,
           [market.cToken],
@@ -25,6 +29,7 @@ export const marketInteraction = async (
         )
       }
 
+      increaseActiveStep("Approving Asset")
       await pool?.checkAllowanceAndApprove(
         address,
         market.cToken,
@@ -33,6 +38,7 @@ export const marketInteraction = async (
         market.underlyingDecimals
       );
 
+      increaseActiveStep("Supplying")
       await pool?.marketInteraction(
         "supply",
         market.cToken,
@@ -40,6 +46,7 @@ export const marketInteraction = async (
         market.underlyingToken,
         market.underlyingDecimals
       );
+      increaseActiveStep("Done")
       break;
 
     case ActionType.borrow:
