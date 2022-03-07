@@ -18,7 +18,7 @@
     "ethers": "^5.5.4",
     "framer-motion": "^6",
     "next": "12.1.0",
-    "rari-components": "git+https://github.com/Rari-Capital/rari-components#3ee433497084400c15918e83133a02087c9f2288",
+    "rari-components": "git+https://github.com/Rari-Capital/rari-components#2148cacaba410c3f58566239f136e832edef1eb6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-query": "^3.34.16",
