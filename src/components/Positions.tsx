@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { MarketsWithData, PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
+import {
+  MarketsWithData,
+  PoolInstance,
+  USDPricedFuseAsset,
+} from "lib/esm/types";
 import { BigNumber, constants, utils } from "ethers";
 import {
   Badge,
@@ -90,14 +94,15 @@ const PositionCard = ({
   action: ActionType;
   index: number;
 }) => {
-  const { pool } = usePoolContext()
+  const { pool } = usePoolContext();
   const isBorrowing = action === ActionType.borrow;
 
-  if (!pool ) return (
-    <Center>
-      <Spinner/>
-    </Center>
-  )
+  if (!pool)
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
 
   return (
     <ExpandableCard
@@ -137,10 +142,12 @@ const PositionCard = ({
               )}
             </Heading>
             <Text variant="secondary" fontSize="xs">
-              {utils.commify((isBorrowing ? market.borrowBalance : market.supplyBalance)
-                .div(BigNumber.from(10).pow(market.underlyingDecimals))
-                .toNumber()
-                .toFixed(2))}{" "}
+              {utils.commify(
+                (isBorrowing ? market.borrowBalance : market.supplyBalance)
+                  .div(BigNumber.from(10).pow(market.underlyingDecimals))
+                  .toNumber()
+                  .toFixed(2)
+              )}{" "}
               {market.underlyingSymbol}
             </Text>
           </Box>
@@ -172,7 +179,7 @@ const Internal = ({
   market,
   index,
   type,
-  pool
+  pool,
 }: {
   isBorrowing: boolean;
   market: USDPricedFuseAsset;
@@ -180,18 +187,19 @@ const Internal = ({
   type: ActionType;
   pool: PoolInstance;
 }) => {
-  const { address } = useRari()
+  const { address } = useRari();
   const { marketsDynamicData } = usePoolContext();
   const [action, setAction] = useState<ActionType>(type);
 
   const [amount, setAmount] = useState<string>("0");
 
   const maxClickHandle = async () => {
-    if (!address) return
+    if (!address) {
+      return;
+    }
     const answer: number = await fetchMaxAmount(action, pool, address, market)
     setAmount(answer.toString())
   }
-  console.log({amount})
 
   const authedHandleClick = useAuthedCallback(marketInteraction, [
     amount,
@@ -199,14 +207,22 @@ const Internal = ({
     market,
     action,
   ]);
-  
+
   return (
     <Tabs>
       <TabList>
-        <Tab onClick={() => setAction(isBorrowing ? ActionType.borrow : ActionType.supply)}>
+        <Tab
+          onClick={() =>
+            setAction(isBorrowing ? ActionType.borrow : ActionType.supply)
+          }
+        >
           {isBorrowing ? "Borrow" : "Supply"}
         </Tab>
-        <Tab onClick={() => setAction(isBorrowing ? ActionType.repay : ActionType.withdraw)}>
+        <Tab
+          onClick={() =>
+            setAction(isBorrowing ? ActionType.repay : ActionType.withdraw)
+          }
+        >
           {isBorrowing ? "Repay" : "Withdraw"}
         </Tab>
       </TabList>

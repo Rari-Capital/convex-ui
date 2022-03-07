@@ -13,7 +13,6 @@ import { getBorrowLimit } from "hooks/getBorrowLimit";
 import { StatisticTable } from "rari-components";
 import { ActionType } from "./pages/Pool";
 
-
 export const Stats = ({
   marketData,
   action,
@@ -104,7 +103,7 @@ const getStats = (
     ];
   }
 
-  if (action === ActionType.borrow|| action === ActionType.repay) {
+  if (action === ActionType.borrow || action === ActionType.repay) {
     const textOne = `${smallStringUsdFormatter(
       marketData.borrowBalanceUSD.toString()
     )} 

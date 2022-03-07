@@ -40,7 +40,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
   tokenData,
   ...restProps
 }) => {
-  const { pool } = usePoolContext()
+  const { pool } = usePoolContext();
   const isSupply = action === ActionType.supply;
 
   const APY = convertMantissaToAPY(
@@ -48,18 +48,19 @@ const MarketCard: React.FC<MarketCardProps> = ({
     365
   );
 
-  if (!pool ) return (
-    <Center>
-      <Spinner/>
-    </Center>
-  )
+  if (!pool)
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
   return (
     <ExpandableCard
       width="100%"
       variant="light"
       inAccordion={true}
       expandableChildren={
-        <Internal 
+        <Internal
           market={marketData}
           action={action}
           index={index}
@@ -69,7 +70,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
       {...restProps}
     >
       <Flex alignItems="center" width="100%">
-       { tokenData ? <Avatar src={tokenData.logoURL} mr={4}/> : <Spinner />}
+        {tokenData ? <Avatar src={tokenData.logoURL} mr={4} /> : <Spinner />}
         <Flex direction="column" width="100%">
           <Flex width="auto">
             <Heading size="lg" mr={4}>
@@ -128,29 +129,28 @@ const MarketTLDR = ({
 
 export default MarketCard;
 
-
 const Internal = ({
   market,
   action,
   index,
-  pool
+  pool,
 }: {
   market: USDPricedFuseAsset;
   index: number;
   action: ActionType;
   pool: PoolInstance;
 }) => {
-  const { address } = useRari()
+  const { address } = useRari();
   const { marketsDynamicData } = usePoolContext();
   const [amount, setAmount] = useState<string>("0");
 
   const debouncedValue = useDebounce(amount, 3000);
 
   const maxClickHandle = async () => {
-    const answer: number = await fetchMaxAmount(action, pool, address, market)
-    setAmount(answer.toString())
-  }
-  console.log({amount})
+    const answer: number = await fetchMaxAmount(action, pool, address, market);
+    setAmount(answer.toString());
+  };
+  console.log({ amount });
 
   const authedHandleClick = useAuthedCallback(marketInteraction, [
     debouncedValue,
@@ -161,24 +161,24 @@ const Internal = ({
 
   return (
     <VStack spacing={4} alignItems="stretch">
-          <TokenAmountInput
-            variant="light"
-            tokenSymbol={market.underlyingSymbol}
-            tokenAddress={market.underlyingToken}
-            value={amount}
-            onChange={(e: any) => setAmount(e.target.value)}
-            onClickMax={maxClickHandle}
-          />
-          {!marketsDynamicData || amount === "0" || amount === "" ? null : (
-            <Stats
-              marketData={market}
-              amount={amount}
-              action={action}
-              markets={marketsDynamicData?.assets}
-              index={index}
-            />
-          )}
-          <Button onClick={authedHandleClick}>Approve</Button>
-        </VStack>
-  )
-}
+      <TokenAmountInput
+        variant="light"
+        tokenSymbol={market.underlyingSymbol}
+        tokenAddress={market.underlyingToken}
+        value={amount}
+        onChange={(e: any) => setAmount(e.target.value)}
+        onClickMax={maxClickHandle}
+      />
+      {!marketsDynamicData || amount === "0" || amount === "" ? null : (
+        <Stats
+          marketData={market}
+          amount={amount}
+          action={action}
+          markets={marketsDynamicData?.assets}
+          index={index}
+        />
+      )}
+      <Button onClick={authedHandleClick}>Approve</Button>
+    </VStack>
+  );
+};

@@ -14,18 +14,14 @@ type PoolContextData = {
   poolInfo?: FusePoolData;
   marketsDynamicData?: MarketsWithData;
   pool: PoolInstance | undefined;
-  borrowLimit: number | undefined;
-  userHealth: number | undefined;
-  borrowLimitBN: BigNumber | undefined;
+  borrowLimit: number;
+  userHealth: number;
+  borrowLimitBN: BigNumber;
 };
 
-export const PoolProvider = ({
-  children,
-}: {
-  children: ReactChildren;
-}) => {
+export const PoolProvider = ({ children }: { children: ReactChildren }) => {
   const { chainId } = useRari();
-  const poolIndex = networkConfig[chainId].poolId
+  const poolIndex = networkConfig[chainId].poolId;
   const { poolInfo, marketsDynamicData, pool } = usePoolData(poolIndex);
   const { borrowLimit, userHealth, borrowLimitBN } =
     useUserHealth(marketsDynamicData);
