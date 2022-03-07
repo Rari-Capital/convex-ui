@@ -75,7 +75,7 @@ const getStats = (
     const textOne = `${smallUsdFormatter(
       marketData.supplyBalanceUSD.toString()
     )}
-                => ${smallStringUsdFormatter(
+                -> ${smallStringUsdFormatter(
                   updatedMarket.supplyBalanceUSD.toString()
                 )}`;
 
