@@ -31,9 +31,9 @@ const useUserHealth = (marketsDynamicData: MarketsWithData | undefined) => {
   );
 
   return {
-    userHealth: borrowLimit?.userHealth,
-    borrowLimit: borrowLimit?.borrowLimit,
-    borrowLimitBN: borrowLimit?.borrowLimitBN,
+    userHealth: borrowLimit?.userHealth ?? 0,
+    borrowLimit: borrowLimit?.borrowLimit ?? 0,
+    borrowLimitBN: borrowLimit?.borrowLimitBN ?? constants.Zero,
   };
 };
 

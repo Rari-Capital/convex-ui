@@ -14,9 +14,9 @@ type PoolContextData = {
   poolInfo?: FusePoolData;
   marketsDynamicData?: MarketsWithData;
   pool: PoolInstance | undefined;
-  borrowLimit: number | undefined;
-  userHealth: number | undefined;
-  borrowLimitBN: BigNumber | undefined;
+  borrowLimit: number;
+  userHealth: number;
+  borrowLimitBN: BigNumber;
 };
 
 export const PoolProvider = ({
