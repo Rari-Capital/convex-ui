@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { usePoolContext } from "context/PoolContext";
 import { Avatar, Box, Center, Flex, Spinner, Switch, VStack } from "@chakra-ui/react";
 import { utils } from "ethers";
@@ -145,7 +145,7 @@ const Internal = ({
   const { marketsDynamicData } = usePoolContext();
 
   const [amount, setAmount] = useState<string>("0");
-  const [enterMarket, setEnterMarket] = useState<boolean>(true)
+  const [enterMarket, setEnterMarket] = useState<boolean>(false)
 
   const debouncedAmount = useDebounce(amount, 1000);
 
@@ -182,10 +182,12 @@ const Internal = ({
                 index={index}
                 enterMarket={enterMarket}
               />
-              <EnterMarket
-                setEnterMarket={setEnterMarket}
-                enterMarket={enterMarket}
-              />
+              { action === ActionType.supply ?
+                <EnterMarket
+                  setEnterMarket={setEnterMarket}
+                  enterMarket={enterMarket}
+                /> : null
+              }
             </>
           )}
           <Button onClick={authedHandleSubmit}>Approve</Button>
@@ -200,6 +202,10 @@ const EnterMarket = ({
   setEnterMarket: Dispatch<SetStateAction<boolean>>
   enterMarket: boolean
 }) => {
+  useEffect(() => {
+    setEnterMarket(true)
+  }, [])
+
   return (
     <Card backgroundColor="white" display="flex" height="1vh" justifyContent="center" alignItems="center">
       <Flex backgroundColor="white" color="black" justifyContent="space-between" width="100%">
