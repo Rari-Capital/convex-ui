@@ -1,6 +1,6 @@
 // Ethers
 import { ActionType } from "components/pages/Pool";
-import { constants, utils } from "ethers";
+import { constants } from "ethers";
 
 // Types
 import { PoolInstance, USDPricedFuseAsset } from "lib/esm/types";

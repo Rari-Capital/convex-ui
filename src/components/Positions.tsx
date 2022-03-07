@@ -24,6 +24,7 @@ import {
   Accordion,
   Center,
   Spinner,
+  Avatar,
 } from "@chakra-ui/react";
 import {
   convertMantissaToAPR,
@@ -38,18 +39,23 @@ import { useAuthedCallback } from "hooks/useAuthedCallback";
 import { ActionType } from "./pages/Pool";
 import { fetchMaxAmount } from "utils/fetchMaxAmount";
 import useDebounce from "hooks/useDebounce";
+import { TokenData, TokensDataMap } from "hooks/useTokenData";
+import { formatUnits } from "ethers/lib/utils";
 
 const Positions = ({
   marketsDynamicData,
+  tokensData
 }: {
   marketsDynamicData: MarketsWithData;
+  tokensData: TokensDataMap
 }) => {
   const { address } = useRari();
+
   return (
     <Accordion allowToggle>
       <VStack mt={4} mb={8} align="stretch" spacing={4}>
         {marketsDynamicData.assets.map((market, i) => {
-          if (market.supplyBalanceUSD.gt(constants.Zero) && address){
+          if (market.supplyBalanceUSD.gt(constants.Zero) && address) {
             return (
               <PositionCard
                 market={market}
@@ -57,6 +63,7 @@ const Positions = ({
                 index={i}
                 key={i}
                 action={ActionType.supply}
+                tokenData={tokensData[market.underlyingToken]}
               />
             );
           }
@@ -70,6 +77,7 @@ const Positions = ({
                 index={i}
                 key={i}
                 action={ActionType.borrow}
+                tokenData={tokensData[market.underlyingToken]}
               />
             );
           }
@@ -86,18 +94,20 @@ const PositionCard = ({
   address,
   action,
   index,
+  tokenData
 }: {
   market: USDPricedFuseAsset;
   address: string;
   action: ActionType;
   index: number;
+  tokenData: TokenData
 }) => {
   const { pool } = usePoolContext()
   const isBorrowing = action === ActionType.borrow;
 
-  if (!pool ) return (
+  if (!pool) return (
     <Center>
-      <Spinner/>
+      <Spinner />
     </Center>
   )
 
@@ -112,13 +122,14 @@ const PositionCard = ({
           isBorrowing={isBorrowing}
           index={index}
           pool={pool}
+          tokenData={tokenData}
         />
       }
     >
       <Flex alignItems="center">
-        <TokenIcon tokenAddress={market.underlyingToken} mr={4} />
+        {tokenData ? <Avatar src={tokenData.logoURL} mr={4} /> : <Spinner />}
         <Heading size="xl" mr={4}>
-          {market.underlyingSymbol}
+          {tokenData?.symbol}
         </Heading>
         <Badge variant={isBorrowing ? "warning" : "success"}>
           <Text alignSelf="center" align="center">{isBorrowing ? "Borrowed" : "Supplied"}</Text>
@@ -143,7 +154,7 @@ const PositionCard = ({
                 .div(BigNumber.from(10).pow(market.underlyingDecimals))
                 .toNumber()
                 .toFixed(2))}{" "}
-              {market.underlyingSymbol}
+              {tokenData?.symbol}
             </Text>
           </Box>
           <Box>
@@ -154,8 +165,8 @@ const PositionCard = ({
               {isBorrowing
                 ? convertMantissaToAPR(market.borrowRatePerBlock).toFixed(2)
                 : convertMantissaToAPY(market.supplyRatePerBlock, 365).toFixed(
-                    2
-                  )}
+                  2
+                )}
               %
             </Heading>
             {/* Empty text is here to align the APR/APY with the supply number */}
@@ -174,13 +185,15 @@ const Internal = ({
   market,
   index,
   type,
-  pool
+  pool,
+  tokenData,
 }: {
   isBorrowing: boolean;
   market: USDPricedFuseAsset;
   index: number;
   type: ActionType;
   pool: PoolInstance;
+  tokenData: TokenData
 }) => {
   const { address } = useRari()
   const { marketsDynamicData } = usePoolContext();
@@ -196,6 +209,8 @@ const Internal = ({
     const answer: number = await fetchMaxAmount(action, pool, address, market)
     setAmount(answer.toString())
   }
+
+  const balance = parseFloat(formatUnits(market.underlyingBalance, market.underlyingDecimals)).toFixed(2)
 
   return (
     <Tabs>
@@ -213,11 +228,12 @@ const Internal = ({
             size="lg"
             variant="light"
             value={amount}
-            tokenSymbol={market.underlyingSymbol}
+            tokenSymbol={tokenData?.symbol}
             tokenAddress={market.underlyingToken}
             onChange={(e: any) => setAmount(e.target.value)}
             onClickMax={maxClickHandle}
           />
+          <Text ml={"auto"} color="grey" fontWeight={"medium"}> You have {balance} {tokenData?.symbol}</Text>
           {!marketsDynamicData || amount === "" || amount === "0" ? null : (
             <Stats
               amount={debouncedAmount}
@@ -228,11 +244,11 @@ const Internal = ({
               enterMarket={market.membership}
             />
           )}
-         <SubmitButton 
-          debouncedAmount={debouncedAmount}
-          market={market}
-          action={action}
-         />
+          <SubmitButton
+            debouncedAmount={debouncedAmount}
+            market={market}
+            action={action}
+          />
         </VStack>
       </TabPanels>
     </Tabs>
@@ -263,7 +279,7 @@ const SubmitButton = ({
   debouncedAmount,
   market,
   action
-} : {
+}: {
   debouncedAmount: string,
   market: USDPricedFuseAsset,
   action: ActionType
@@ -278,7 +294,7 @@ const SubmitButton = ({
   };
 
   useEffect(() => {
-    if(activeStep === steps.length) {
+    if (activeStep === steps.length) {
       console.log("hello")
     }
   })
@@ -292,25 +308,25 @@ const SubmitButton = ({
     increaseActiveStep
   ]);
 
-  const isEmpty =  debouncedAmount === "0" || debouncedAmount === ""
+  const isEmpty = debouncedAmount === "0" || debouncedAmount === ""
   const ButtonText = getButtonText(
     steps,
     activeStep,
     isEmpty
   )
-  
+
   return (
     <>
-    <Button 
-      alignSelf="stretch" 
-      onClick={handleSubmitClick}
-      disabled={isEmpty}
-    >
-      {ButtonText}
-    </Button>
-    <Center>
-    { !activeStep ? null : <StepBubbles steps={steps.length} activeIndex={activeStep}/>}
-    </Center>
+      <Button
+        alignSelf="stretch"
+        onClick={handleSubmitClick}
+        disabled={isEmpty}
+      >
+        {ButtonText}
+      </Button>
+      <Center>
+        {!activeStep ? null : <StepBubbles steps={steps.length} activeIndex={activeStep} />}
+      </Center>
     </>
   )
 }
@@ -321,7 +337,7 @@ const getButtonText = (
   isEmpty: boolean
 ) => {
   if (activeStep === undefined) {
-      return isEmpty ? "Please enter a valid amount" : "Approve"
+    return isEmpty ? "Please enter a valid amount" : "Approve"
   } else {
     return steps[activeStep]
   }

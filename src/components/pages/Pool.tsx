@@ -5,9 +5,6 @@ import { Heading } from "rari-components";
 import MarketCard from "components/MarketCard";
 import Positions from "components/Positions";
 import { useTokensDataAsMap } from "hooks/useTokenData";
-import { PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
-import { useQuery } from "react-query";
-import { useRari } from "context/RariContext";
 
 export enum ActionType {
   "supply",
@@ -36,7 +33,7 @@ const Pool = () => {
         Active Positions
       </Heading>
       {hasSupplied && marketsDynamicData ? (
-        <Positions marketsDynamicData={marketsDynamicData} />
+        <Positions marketsDynamicData={marketsDynamicData} tokensData={tokensData} />
       ) : null}
       <Heading size="md" color="black">
         Markets
