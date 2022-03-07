@@ -78,7 +78,7 @@ export const PoolOverview: React.FC<BoxProps> = (props) => {
     return () => {
       supplyStatisticValueAnimation.stop();
       borrowStatisticValueAnimation.stop();
-      borrowPercentageValue.stop();
+      borrowPercentageValueAnimation.stop();
     };
   }, [supplyStatisticValue, borrowStatisticValue, borrowPercentageValue]);
 
