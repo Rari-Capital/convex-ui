@@ -41,7 +41,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
   tokenData,
   ...restProps
 }) => {
-  const { pool } = usePoolContext()
+  const { pool, poolInfo } = usePoolContext()
   const isSupply = action === ActionType.supply;
 
   const APY = convertMantissaToAPY(
@@ -49,7 +49,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
     365
   );
 
-  if (!pool ) return (
+  if (!pool || !poolInfo ) return (
     <Center>
       <Spinner/>
     </Center>
@@ -142,7 +142,7 @@ const Internal = ({
   pool: PoolInstance;
 }) => {
   const { address } = useRari()
-  const { marketsDynamicData } = usePoolContext();
+  const { marketsDynamicData, poolInfo } = usePoolContext();
 
   const [amount, setAmount] = useState<string>("0");
   const [enterMarket, setEnterMarket] = useState<boolean>(false)
@@ -154,6 +154,8 @@ const Internal = ({
     pool,
     market,
     action,
+    poolInfo?.comptroller,
+    enterMarket
   ]);
 
   const maxClickHandle = async () => {
