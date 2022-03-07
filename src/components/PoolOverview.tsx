@@ -1,17 +1,16 @@
-import { Box, Stack } from "@chakra-ui/react";
+import { Box, Stack, Flex, VStack, HStack, BoxProps } from "@chakra-ui/react";
 import { useRari } from "context/RariContext";
 import { usePoolContext } from "context/PoolContext";
 import { animate, useMotionValue } from "framer-motion";
 import { Card, Heading, Progress, Statistic, Text } from "rari-components";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { smallUsdFormatter } from "utils/formatters";
 
-export const PoolOverview = () => {
+export const PoolOverview: React.FC<BoxProps> = ({ ...restProps }) => {
   const { address } = useRari();
   const { marketsDynamicData, borrowLimit, userHealth } = usePoolContext();
 
   // Show total market statistics if user's wallet is not connected.
-  const heading = !!address ? "Portfolio Overview" : "Pool Overview";
   const supplyStatisticTitle = !!address ? "You Supplied" : "Total Supplied";
   const borrowStatisticTitle = !!address ? "You Borrowed" : "Total Borrowed";
   const supplyStatisticValue =
@@ -65,8 +64,34 @@ export const PoolOverview = () => {
   }, [supplyStatisticValue, borrowStatisticValue]);
 
   return (
-    <Box paddingTop={16}>
-      <Heading size="md">{heading}</Heading>
+    <Flex justify="center" align="center" {...restProps}>
+      <VStack align="stretch">
+        <HStack>
+          <Card minWidth={48}>
+            <Statistic
+              title={supplyStatisticTitle}
+              value={smallUsdFormatter(supplyStatisticDisplayedValue)}
+            />
+          </Card>
+          <Card minWidth={48}>
+            <Statistic
+              title={borrowStatisticTitle}
+              value={smallUsdFormatter(borrowStatisticDisplayedValue)}
+            />
+          </Card>
+        </HStack>
+        {!!address && (
+          <HStack>
+            <Card justifyContent="center" flex={1} w="100%" p={3}>
+              <Text variant="secondary" fontSize="sm" mb={2}>
+                Borrow Balance
+              </Text>
+              <Progress variant="light" barVariant="gradient" value={80} height={4} />
+            </Card>
+          </HStack>
+        )}
+      </VStack>
+      {/* 
       <Stack paddingTop={8} spacing={8} direction={["column", "row"]}>
         <Card minWidth={48}>
           <Statistic
@@ -86,8 +111,8 @@ export const PoolOverview = () => {
           </Text>
           <Progress variant="light" barVariant="gradient" value={userHealth} />
         </Card>
-      </Stack>
-    </Box>
+      </Stack> */}
+    </Flex>
   );
 };
 
