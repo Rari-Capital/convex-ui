@@ -1,9 +1,5 @@
-import { useState } from "react";
-import {
-  MarketsWithData,
-  PoolInstance,
-  USDPricedFuseAsset,
-} from "lib/esm/types";
+import { useEffect, useState } from "react";
+import { MarketsWithData, PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
 import { BigNumber, constants, utils } from "ethers";
 import {
   Badge,
@@ -14,6 +10,7 @@ import {
   Text,
   TokenAmountInput,
   TokenIcon,
+  StepBubbles
 } from "rari-components";
 import {
   VStack,
@@ -27,6 +24,7 @@ import {
   Accordion,
   Center,
   Spinner,
+  Avatar,
 } from "@chakra-ui/react";
 import {
   convertMantissaToAPR,
@@ -40,18 +38,24 @@ import { marketInteraction } from "utils/marketInteraction";
 import { useAuthedCallback } from "hooks/useAuthedCallback";
 import { ActionType } from "./pages/Pool";
 import { fetchMaxAmount } from "utils/fetchMaxAmount";
+import useDebounce from "hooks/useDebounce";
+import { TokenData, TokensDataMap } from "hooks/useTokenData";
+import { formatUnits } from "ethers/lib/utils";
 
 const Positions = ({
   marketsDynamicData,
+  tokensData
 }: {
   marketsDynamicData: MarketsWithData;
+  tokensData: TokensDataMap
 }) => {
   const { address } = useRari();
+
   return (
     <Accordion allowToggle>
       <VStack mt={4} mb={8} align="stretch" spacing={4}>
         {marketsDynamicData.assets.map((market, i) => {
-          if (market.supplyBalanceUSD.gt(constants.Zero) && address){
+          if (market.supplyBalanceUSD.gt(constants.Zero) && address) {
             return (
               <PositionCard
                 market={market}
@@ -59,6 +63,7 @@ const Positions = ({
                 index={i}
                 key={i}
                 action={ActionType.supply}
+                tokenData={tokensData[market.underlyingToken]}
               />
             );
           }
@@ -72,6 +77,7 @@ const Positions = ({
                 index={i}
                 key={i}
                 action={ActionType.borrow}
+                tokenData={tokensData[market.underlyingToken]}
               />
             );
           }
@@ -88,21 +94,22 @@ const PositionCard = ({
   address,
   action,
   index,
+  tokenData
 }: {
   market: USDPricedFuseAsset;
   address: string;
   action: ActionType;
   index: number;
+  tokenData: TokenData
 }) => {
   const { pool } = usePoolContext();
   const isBorrowing = action === ActionType.borrow;
 
-  if (!pool)
-    return (
-      <Center>
-        <Spinner />
-      </Center>
-    );
+  if (!pool) return (
+    <Center>
+      <Spinner />
+    </Center>
+  )
 
   return (
     <ExpandableCard
@@ -115,16 +122,17 @@ const PositionCard = ({
           isBorrowing={isBorrowing}
           index={index}
           pool={pool}
+          tokenData={tokenData}
         />
       }
     >
       <Flex alignItems="center">
-        <TokenIcon tokenAddress={market.underlyingToken} mr={4} />
+        {tokenData ? <Avatar src={tokenData.logoURL} mr={4} /> : <Spinner />}
         <Heading size="xl" mr={4}>
-          {market.underlyingSymbol}
+          {tokenData?.symbol}
         </Heading>
         <Badge variant={isBorrowing ? "warning" : "success"}>
-          {isBorrowing ? "Borrowed" : "Supplied"}
+          <Text alignSelf="center" align="center">{isBorrowing ? "Borrowed" : "Supplied"}</Text>
         </Badge>
         <Spacer />
         <HStack spacing={12} mr={12} textAlign="center">
@@ -142,13 +150,11 @@ const PositionCard = ({
               )}
             </Heading>
             <Text variant="secondary" fontSize="xs">
-              {utils.commify(
-                (isBorrowing ? market.borrowBalance : market.supplyBalance)
-                  .div(BigNumber.from(10).pow(market.underlyingDecimals))
-                  .toNumber()
-                  .toFixed(2)
-              )}{" "}
-              {market.underlyingSymbol}
+              {utils.commify((isBorrowing ? market.borrowBalance : market.supplyBalance)
+                .div(BigNumber.from(10).pow(market.underlyingDecimals))
+                .toNumber()
+                .toFixed(2))}{" "}
+              {tokenData?.symbol}
             </Text>
           </Box>
           <Box>
@@ -159,8 +165,8 @@ const PositionCard = ({
               {isBorrowing
                 ? convertMantissaToAPR(market.borrowRatePerBlock).toFixed(2)
                 : convertMantissaToAPY(market.supplyRatePerBlock, 365).toFixed(
-                    2
-                  )}
+                  2
+                )}
               %
             </Heading>
             {/* Empty text is here to align the APR/APY with the supply number */}
@@ -180,33 +186,31 @@ const Internal = ({
   index,
   type,
   pool,
+  tokenData,
 }: {
   isBorrowing: boolean;
   market: USDPricedFuseAsset;
   index: number;
   type: ActionType;
   pool: PoolInstance;
+  tokenData: TokenData
 }) => {
   const { address } = useRari();
   const { marketsDynamicData } = usePoolContext();
+
+  // Will determine actionType and amount to send for interaction.
   const [action, setAction] = useState<ActionType>(type);
-
   const [amount, setAmount] = useState<string>("0");
+  const debouncedAmount = useDebounce(amount, 1000);
 
+  // Triggered to get max amount user can use for a given actionType.
   const maxClickHandle = async () => {
-    if (!address) {
-      return;
-    }
+    if (!address) return
     const answer: number = await fetchMaxAmount(action, pool, address, market)
     setAmount(answer.toString())
   }
 
-  const authedHandleClick = useAuthedCallback(marketInteraction, [
-    amount,
-    pool,
-    market,
-    action,
-  ]);
+  const balance = parseFloat(formatUnits(market.underlyingBalance, market.underlyingDecimals)).toFixed(2)
 
   return (
     <Tabs>
@@ -232,25 +236,132 @@ const Internal = ({
             size="lg"
             variant="light"
             value={amount}
-            tokenSymbol={market.underlyingSymbol}
+            tokenSymbol={tokenData?.symbol}
             tokenAddress={market.underlyingToken}
             onChange={(e: any) => setAmount(e.target.value)}
             onClickMax={maxClickHandle}
           />
+          <Text ml={"auto"} color="grey" fontWeight={"medium"}> You have {balance} {tokenData?.symbol}</Text>
           {!marketsDynamicData || amount === "" || amount === "0" ? null : (
             <Stats
-              amount={amount}
+              amount={debouncedAmount}
               action={action}
               index={index}
               markets={marketsDynamicData?.assets}
               marketData={market}
+              enterMarket={market.membership}
             />
           )}
-          <Button alignSelf="stretch" onClick={authedHandleClick}>
-            {isBorrowing ? "Borrow" : "Supply"}
-          </Button>
+          <SubmitButton
+            debouncedAmount={debouncedAmount}
+            market={market}
+            action={action}
+          />
         </VStack>
       </TabPanels>
     </Tabs>
   );
 };
+
+const supplySteps = [
+  "Approving market",
+  "Approving Asset",
+  "Supplying",
+  "Done"
+]
+
+const borrowSteps = [
+  "Borrowing",
+  "Done"
+]
+const withdrawSteps = [
+  "Withdrawing",
+  "Done"
+]
+const repaySteps = [
+  "Repaying",
+  "Done"
+]
+
+const SubmitButton = ({
+  debouncedAmount,
+  market,
+  action
+}: {
+  debouncedAmount: string,
+  market: USDPricedFuseAsset,
+  action: ActionType
+}) => {
+  const { pool } = usePoolContext()
+
+  const [activeStep, setActiveStep] = useState<number | undefined>()
+  const steps: string[] = getSteps(action)
+
+  const increaseActiveStep = (step: string) => {
+    setActiveStep(steps.indexOf(step));
+  };
+
+  useEffect(() => {
+    if (activeStep === steps.length) {
+      console.log("hello")
+    }
+  })
+
+  // Triggered when the user is interacting with the market.
+  const handleSubmitClick = useAuthedCallback(marketInteraction, [
+    debouncedAmount,
+    pool,
+    market,
+    action,
+    increaseActiveStep
+  ]);
+
+  const isEmpty = debouncedAmount === "0" || debouncedAmount === ""
+  const ButtonText = getButtonText(
+    steps,
+    activeStep,
+    isEmpty
+  )
+
+  return (
+    <>
+      <Button
+        alignSelf="stretch"
+        onClick={handleSubmitClick}
+        disabled={isEmpty}
+      >
+        {ButtonText}
+      </Button>
+      <Center>
+        {!activeStep ? null : <StepBubbles steps={steps.length} activeIndex={activeStep} />}
+      </Center>
+    </>
+  )
+}
+
+const getButtonText = (
+  steps: string[],
+  activeStep: number | undefined,
+  isEmpty: boolean
+) => {
+  if (activeStep === undefined) {
+    return isEmpty ? "Please enter a valid amount" : "Approve"
+  } else {
+    return steps[activeStep]
+  }
+}
+
+const getSteps = (action: ActionType) => {
+  switch (action) {
+    case ActionType.borrow:
+      return borrowSteps
+    case ActionType.supply:
+      return supplySteps
+    case ActionType.repay:
+      return repaySteps
+    case ActionType.withdraw:
+      return withdrawSteps
+    default:
+      return ['']
+  }
+}

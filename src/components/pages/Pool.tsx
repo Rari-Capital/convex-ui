@@ -11,11 +11,12 @@ export enum ActionType {
   "borrow",
   "withdraw",
   "repay",
+  "enterMarket"
 }
 
 const Pool = () => {
   const { poolInfo, marketsDynamicData } = usePoolContext();
-
+  
   const hasSupplied = marketsDynamicData?.totalSupplyBalanceUSD.gt(
     constants.Zero
   );
@@ -32,7 +33,7 @@ const Pool = () => {
         Active Positions
       </Heading>
       {hasSupplied && marketsDynamicData ? (
-        <Positions marketsDynamicData={marketsDynamicData} />
+        <Positions marketsDynamicData={marketsDynamicData} tokensData={tokensData} />
       ) : null}
       <Heading size="md" color="black">
         Markets

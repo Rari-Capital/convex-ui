@@ -30,7 +30,6 @@ export function fetchTokenBalance(tokenAddress, address) {
             const contract = new Contract(tokenAddress, ERC20Interface, this._provider);
             balance = yield contract.callStatic.balanceOf(address);
         }
-        console.log(balance)
         const parsedBalance = parseFloat(balance.div(WeiPerEther).toString());
         return parsedBalance;
     });

@@ -14,28 +14,37 @@ type PoolContextData = {
   poolInfo?: FusePoolData;
   marketsDynamicData?: MarketsWithData;
   pool: PoolInstance | undefined;
-  borrowLimit: number;
-  userHealth: number;
-  borrowLimitBN: BigNumber;
+  borrowLimit: number | undefined;
+  userHealth: number | undefined;
+  borrowLimitBN: BigNumber | undefined;
+  balances: {
+      [cToken: string]: BigNumber;
+  } | undefined;
 };
 
 export const PoolProvider = ({ children }: { children: ReactChildren }) => {
   const { chainId } = useRari();
-  const poolIndex = networkConfig[chainId].poolId;
+  const poolIndex = networkConfig[chainId].poolId
+
   const { poolInfo, marketsDynamicData, pool } = usePoolData(poolIndex);
+
   const { borrowLimit, userHealth, borrowLimitBN } =
     useUserHealth(marketsDynamicData);
+  
+  const balances = pool && marketsDynamicData ? pool.getUnderlyingBalancesForPool(marketsDynamicData?.assets) : undefined
+
 
   const value = useMemo(
     () => ({
-      poolInfo,
-      marketsDynamicData,
-      pool,
-      borrowLimit,
-      userHealth,
-      borrowLimitBN,
-    }),
-    [poolInfo, marketsDynamicData, pool, borrowLimit, userHealth, borrowLimitBN]
+        poolInfo,
+        marketsDynamicData,
+        pool,
+        borrowLimit,
+        userHealth,
+        borrowLimitBN,
+        balances
+      }),
+    [poolInfo, marketsDynamicData, pool, borrowLimit, userHealth, borrowLimitBN, balances]
   );
 
   return <PoolContext.Provider value={value}>{children}</PoolContext.Provider>;

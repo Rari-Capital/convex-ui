@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { usePoolContext } from "context/PoolContext";
-import { Avatar, Box, Center, Flex, Spinner, VStack } from "@chakra-ui/react";
-import { utils } from "ethers";
+import { Avatar, Box, Center, Flex, Spinner, Switch, VStack } from "@chakra-ui/react";
+import { BigNumber, constants, utils } from "ethers";
 import { TokenData } from "hooks/useTokenData";
 import { PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
 import {
   Badge,
   Button,
+  Card,
   ExpandableCard,
   Heading,
   Text,
@@ -20,6 +21,7 @@ import useDebounce from "hooks/useDebounce";
 import { ActionType } from "./pages/Pool";
 import { fetchMaxAmount } from "utils/fetchMaxAmount";
 import { useRari } from "context/RariContext";
+import { formatUnits } from "ethers/lib/utils";
 
 type MarketCardProps = Omit<
   React.ComponentProps<typeof ExpandableCard>,
@@ -40,7 +42,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
   tokenData,
   ...restProps
 }) => {
-  const { pool } = usePoolContext();
+  const { pool, poolInfo } = usePoolContext()
   const isSupply = action === ActionType.supply;
 
   const APY = convertMantissaToAPY(
@@ -48,12 +50,11 @@ const MarketCard: React.FC<MarketCardProps> = ({
     365
   );
 
-  if (!pool)
-    return (
-      <Center>
-        <Spinner />
-      </Center>
-    );
+  if (!pool || !poolInfo) return (
+    <Center>
+      <Spinner />
+    </Center>
+  )
   return (
     <ExpandableCard
       width="100%"
@@ -65,6 +66,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
           action={action}
           index={index}
           pool={pool}
+          tokenData={tokenData}
         />
       }
       {...restProps}
@@ -74,7 +76,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
         <Flex direction="column" width="100%">
           <Flex width="auto">
             <Heading size="lg" mr={4}>
-              {markets[index].underlyingSymbol}
+              {tokenData?.symbol}
             </Heading>
             <Box alignSelf="center">
               <Badge variant={isSupply ? "success" : "warning"}>
@@ -86,6 +88,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
             marketData={markets[index]}
             APY={APY}
             isSupply={isSupply}
+            tokenData={tokenData}
           />
         </Flex>
       </Flex>
@@ -97,10 +100,12 @@ const MarketTLDR = ({
   marketData,
   isSupply,
   APY,
+  tokenData
 }: {
   marketData: USDPricedFuseAsset;
   isSupply: boolean;
   APY: number;
+  tokenData: TokenData;
 }) => {
   const Text1 = isSupply
     ? `${utils.formatEther(marketData.collateralFactor.mul(100))}% LTV`
@@ -112,7 +117,8 @@ const MarketTLDR = ({
         {Text1}
       </Text>
       &middot;
-      <Text variant="secondary" mr="1.5vh" ml="1.5vh">
+      <Text variant="secondary" mr
+        ="1.5vh" ml="1.5vh">
         {APY.toFixed(2)}% APY
       </Text>
       {isSupply ? (
@@ -134,51 +140,71 @@ const Internal = ({
   action,
   index,
   pool,
+  tokenData
 }: {
   market: USDPricedFuseAsset;
   index: number;
   action: ActionType;
   pool: PoolInstance;
+  tokenData: TokenData;
 }) => {
-  const { address } = useRari();
-  const { marketsDynamicData } = usePoolContext();
+  const { address } = useRari()
+  const { marketsDynamicData, poolInfo, balances } = usePoolContext();
+
+  const balance = parseFloat(formatUnits(market.underlyingBalance, market.underlyingDecimals)).toFixed(2)
+
   const [amount, setAmount] = useState<string>("0");
+  const [enterMarket, setEnterMarket] = useState<boolean>(market.membership)
 
-  const debouncedValue = useDebounce(amount, 3000);
+  const debouncedAmount = useDebounce(amount, 1000);
 
-  const maxClickHandle = async () => {
-    const answer: number = await fetchMaxAmount(action, pool, address, market);
-    setAmount(answer.toString());
-  };
-  console.log({ amount });
-
-  const authedHandleClick = useAuthedCallback(marketInteraction, [
-    debouncedValue,
+  const authedHandleSubmit = useAuthedCallback(marketInteraction, [
+    debouncedAmount,
     pool,
     market,
     action,
+    poolInfo?.comptroller,
+    enterMarket
   ]);
 
+  const maxClickHandle = async () => {
+    if (!address) return
+    const answer: number = await fetchMaxAmount(action, pool, address, market)
+    setAmount(answer.toString())
+  }
+
+  const isEmpty = debouncedAmount === "0" || debouncedAmount === ""
+
   return (
-    <VStack spacing={4} alignItems="stretch">
+    <VStack spacing={4} alignItems="stretch" background="#F0F0F0">
       <TokenAmountInput
+        border="none"
         variant="light"
-        tokenSymbol={market.underlyingSymbol}
+        tokenSymbol={tokenData?.symbol}
         tokenAddress={market.underlyingToken}
         value={amount}
         onChange={(e: any) => setAmount(e.target.value)}
         onClickMax={maxClickHandle}
       />
-      {!marketsDynamicData || amount === "0" || amount === "" ? null : (
-        <Stats
-          marketData={market}
-          amount={amount}
-          action={action}
-          markets={marketsDynamicData?.assets}
-          index={index}
-        />
+      <Text ml={"auto"} color="grey" fontWeight={"medium"}> You have {balance} {tokenData?.symbol}</Text>
+      {!marketsDynamicData || isEmpty ? null : (
+        <>
+          <Stats
+            marketData={market}
+            amount={debouncedAmount}
+            action={action}
+            markets={marketsDynamicData?.assets}
+            index={index}
+            enterMarket={enterMarket}
+          />
+        </>
       )}
-      <Button onClick={authedHandleClick}>Approve</Button>
+      <Button
+        onClick={authedHandleSubmit}
+        disabled={isEmpty}
+      >
+        {isEmpty ? "Please enter a valid amount" : "Approve"}
+      </Button>
     </VStack>
-  );
-};
+  )
+}

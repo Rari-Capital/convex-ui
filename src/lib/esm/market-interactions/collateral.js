@@ -16,13 +16,13 @@ import { Contract } from "@ethersproject/contracts";
  * @param actionType - Enter or exit.
  * @param provider - An initiated ethers provider.
  */
-export function collateral(comptrollerAddress, marketAddress, action, provider) {
+export function collateral(comptrollerAddress, marketAddress, action) {
     return __awaiter(this, void 0, void 0, function* () {
         const comptrollerInterface = new Interface([
             'function enterMarkets(address[] calldata cTokens) external returns (uint[] memory)',
             'function exitMarket(address cTokenAddress) external returns (uint) '
         ]);
-        const comptrollerContract = new Contract(comptrollerAddress, comptrollerInterface, provider.getSigner());
+        const comptrollerContract = new Contract(comptrollerAddress, comptrollerInterface, this._provider.getSigner());
         // Don't await this, we don't care if it gets executed first!
         if (action === "enter") {
             yield comptrollerContract.enterMarkets(marketAddress);
