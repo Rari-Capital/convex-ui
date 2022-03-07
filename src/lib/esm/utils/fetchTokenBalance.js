@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { Interface } from "@ethersproject/abi";
 import { WeiPerEther } from '@ethersproject/constants';
 import { Contract } from "@ethersproject/contracts";
+
 export function fetchTokenBalance(tokenAddress, address) {
     return __awaiter(this, void 0, void 0, function* () {
         let balance;
@@ -30,7 +31,6 @@ export function fetchTokenBalance(tokenAddress, address) {
             const contract = new Contract(tokenAddress, ERC20Interface, this._provider);
             balance = yield contract.callStatic.balanceOf(address);
         }
-        console.log(balance)
         const parsedBalance = parseFloat(balance.div(WeiPerEther).toString());
         return parsedBalance;
     });
