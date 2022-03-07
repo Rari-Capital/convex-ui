@@ -13,12 +13,15 @@ export const marketInteraction = async (
   comptroller: string | undefined,
   enterMarket: boolean,
 ) => {
+  console.log({amount, pool, comptroller})
   if (amount === "" || !pool || !comptroller) return;
+  console.log("hello")
 
   const address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
 
   switch (action) {
     case  ActionType.supply:
+      console.log("hello")
 
       if (enterMarket) {
         increaseActiveStep("Approving market")

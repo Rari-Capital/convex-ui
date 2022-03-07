@@ -12,6 +12,7 @@ import {
   Heading,
   Text,
   TokenAmountInput,
+  StepBubbles
 } from "rari-components";
 import { getMillions, convertMantissaToAPY } from "utils/formatters";
 import { useAuthedCallback } from "hooks/useAuthedCallback";
@@ -88,7 +89,6 @@ const MarketCard: React.FC<MarketCardProps> = ({
             marketData={markets[index]}
             APY={APY}
             isSupply={isSupply}
-            tokenData={tokenData}
           />
         </Flex>
       </Flex>
@@ -100,12 +100,10 @@ const MarketTLDR = ({
   marketData,
   isSupply,
   APY,
-  tokenData
 }: {
   marketData: USDPricedFuseAsset;
   isSupply: boolean;
   APY: number;
-  tokenData: TokenData;
 }) => {
   const Text1 = isSupply
     ? `${utils.formatEther(marketData.collateralFactor.mul(100))}% LTV`
@@ -167,6 +165,8 @@ const Internal = ({
     enterMarket
   ]);
 
+  console.log({action})
+
   const maxClickHandle = async () => {
     if (!address) return
     const answer: number = await fetchMaxAmount(action, pool, address, market)
@@ -199,12 +199,117 @@ const Internal = ({
           />
         </>
       )}
-      <Button
-        onClick={authedHandleSubmit}
-        disabled={isEmpty}
-      >
-        {isEmpty ? "Please enter a valid amount" : "Approve"}
-      </Button>
+      <SubmitButton 
+        debouncedAmount={debouncedAmount}
+        market={market}
+        action={action}
+      />
     </VStack>
   )
 }
+
+const supplySteps = [
+  "Approving market",
+  "Approving Asset",
+  "Supplying",
+  "Done"
+]
+
+const borrowSteps = [
+  "Borrowing",
+  "Done"
+]
+const withdrawSteps = [
+  "Withdrawing",
+  "Done"
+]
+const repaySteps = [
+  "Repaying",
+  "Done"
+]
+
+const SubmitButton = ({
+  debouncedAmount,
+  market,
+  action
+}: {
+  debouncedAmount: string,
+  market: USDPricedFuseAsset,
+  action: ActionType
+}) => {
+  const { pool, poolInfo } = usePoolContext()
+
+  const [activeStep, setActiveStep] = useState<number | undefined>()
+  const steps: string[] = getSteps(action)
+
+  const increaseActiveStep = (step: string) => {
+    setActiveStep(steps.indexOf(step));
+  };
+
+  useEffect(() => {
+    if (activeStep === steps.length) {
+      console.log("hello")
+    }
+  })
+
+  // Triggered when the user is interacting with the market.
+  const handleSubmitClick = useAuthedCallback(marketInteraction, [
+    debouncedAmount,
+    pool,
+    market,
+    action,
+    increaseActiveStep,
+    poolInfo?.comptroller,
+    true
+  ]);
+
+  const isEmpty = debouncedAmount === "0" || debouncedAmount === ""
+  const ButtonText = getButtonText(
+    steps,
+    activeStep,
+    isEmpty
+  )
+
+  return (
+    <>
+      <Button
+        alignSelf="stretch"
+        onClick={handleSubmitClick}
+        disabled={isEmpty}
+      >
+        {ButtonText}
+      </Button>
+      <Center>
+        {typeof activeStep === "undefined" ? null : <StepBubbles steps={steps.length} activeIndex={activeStep} />}
+      </Center>
+    </>
+  )
+}
+
+const getButtonText = (
+  steps: string[],
+  activeStep: number | undefined,
+  isEmpty: boolean
+) => {
+  if (activeStep === undefined) {
+    return isEmpty ? "Please enter a valid amount" : "Approve"
+  } else {
+    return steps[activeStep]
+  }
+}
+
+const getSteps = (action: ActionType) => {
+  switch (action) {
+    case ActionType.borrow:
+      return borrowSteps
+    case ActionType.supply:
+      return supplySteps
+    case ActionType.repay:
+      return repaySteps
+    case ActionType.withdraw:
+      return withdrawSteps
+    default:
+      return ['']
+  }
+}
+
