@@ -1,22 +1,19 @@
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
   Box,
   BoxProps,
   HStack,
-  Center,
   Image,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Spacer,
   StyleProps,
   useDisclosure,
 } from "@chakra-ui/react";
 import { useRari } from "context/RariContext";
-import {
-  Button,
-  Heading,
-  Link,
-  Progress,
-  Text,
-  TokenGroup,
-} from "rari-components";
+import { Button, Heading, Link, Text, TokenGroup } from "rari-components";
 import { truncate } from "utils/stringUtils";
 import ConnectModal from "./modals/ConnectModal";
 import ClaimModal from "./modals/ClaimModal";
@@ -76,16 +73,29 @@ const Header: React.FC<HeaderProps> = ({ contentSx, ...restProps }) => {
       />
       <Box position="relative" zIndex={1} sx={contentSx}>
         <HStack alignItems="center" spacing={12} width="100%">
-          <HStack spacing={4}>
-            <Link href="/">
-              <TokenGroup
-                size="sm"
-                addresses={[
-                  "0xd291e7a03283640fdc51b121ac401383a46cc623",
-                  "0xD533a949740bb3306d119CC777fa900bA034cd52",
-                ]}
-              />
-            </Link>
+          <HStack spacing={12}>
+            <HStack spacing={4}>
+              <Link href="/">
+                <TokenGroup
+                  size="sm"
+                  addresses={[
+                    "0xd291e7a03283640fdc51b121ac401383a46cc623",
+                    "0xD533a949740bb3306d119CC777fa900bA034cd52",
+                  ]}
+                />
+              </Link>
+              <Link href="/">Tribe Convex Pool</Link>
+            </HStack>
+            <Menu>
+              <MenuButton>More</MenuButton>
+              <MenuList>
+                <MenuItem>
+                  <Link href="/faq" color="black">
+                    FAQ
+                  </Link>
+                </MenuItem>
+              </MenuList>
+            </Menu>
           </HStack>
           {/* <Link href="/claim">Rewards</Link> */}
           <Spacer />
