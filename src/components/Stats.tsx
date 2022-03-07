@@ -20,7 +20,7 @@ export const Stats = ({
   amount,
   markets,
   index,
-  enterMarket
+  enterMarket,
 }: {
   marketData: USDPricedFuseAsset;
   action: ActionType;
@@ -52,7 +52,22 @@ export const Stats = ({
     enterMarket
   );
 
-  return <StatisticTable variant="light" backgroundColor="white" border="none" statistics={stats} />;
+  if (stats.length == 0) {
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
+  }
+
+  return (
+    <StatisticTable
+      variant="light"
+      backgroundColor="white"
+      border="none"
+      statistics={stats}
+    />
+  );
 };
 
 const getStats = (
@@ -80,17 +95,17 @@ const getStats = (
     const textOne = `${smallUsdFormatter(
       marketData.supplyBalanceUSD.toString()
     )}
-                -> ${smallStringUsdFormatter(
+                → ${smallStringUsdFormatter(
                   updatedMarket.supplyBalanceUSD.toString()
                 )}`;
 
-    const newBorrow = getBorrowLimit(updatedMarkets,  {
+    const newBorrow = getBorrowLimit(updatedMarkets, {
       ignoreIsEnabledCheckFor: enterMarket ? marketData.cToken : undefined,
     });
 
     const textTwo = `${smallUsdFormatter(
       borrowLimit ?? 0
-    )} -> ${smallUsdFormatter(newBorrow.toString())}`;
+    )} → ${smallUsdFormatter(newBorrow.toString())}`;
 
     const supplyAPY = convertMantissaToAPY(
       marketData.supplyRatePerBlock,
@@ -102,7 +117,7 @@ const getStats = (
       365
     ).toFixed(2);
 
-    const textThree = `${supplyAPY}% -> ${updatedSupplyAPY}%`;
+    const textThree = `${supplyAPY}% → ${updatedSupplyAPY}%`;
 
     _stats = [
       ["Supply Balance", textOne],
@@ -115,7 +130,7 @@ const getStats = (
     const textOne = `${smallStringUsdFormatter(
       marketData.borrowBalanceUSD.toString()
     )} 
-                -> ${smallStringUsdFormatter(
+                → ${smallStringUsdFormatter(
                   updatedMarket.borrowBalanceUSD.toString()
                 )}`;
 
@@ -127,7 +142,7 @@ const getStats = (
       updatedMarket.borrowRatePerBlock ?? 0
     ).toFixed(2);
 
-    const textThree = `${borrowAPR}% -> ${updatedBorrowAPR}%`;
+    const textThree = `${borrowAPR}% → ${updatedBorrowAPR}%`;
 
     _stats = [
       ["Borrow Balance", textOne],
