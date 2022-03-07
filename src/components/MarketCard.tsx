@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { usePoolContext } from "context/PoolContext";
 import { Avatar, Box, Center, Flex, Spinner, Switch, VStack } from "@chakra-ui/react";
-import { utils } from "ethers";
+import { BigNumber, utils } from "ethers";
 import { TokenData } from "hooks/useTokenData";
 import { PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
 import {
@@ -145,7 +145,7 @@ const Internal = ({
   const { marketsDynamicData, poolInfo } = usePoolContext();
 
   const [amount, setAmount] = useState<string>("0");
-  const [enterMarket, setEnterMarket] = useState<boolean>(false)
+  const [enterMarket, setEnterMarket] = useState<boolean>(market.membership)
 
   const debouncedAmount = useDebounce(amount, 1000);
 
@@ -163,6 +163,8 @@ const Internal = ({
     setAmount(answer.toString())
   }
 
+  const isEmpty =  debouncedAmount === "0" || debouncedAmount === ""
+
   return (
     <VStack spacing={4} alignItems="stretch" background="#F0F0F0">
           <TokenAmountInput
@@ -174,7 +176,7 @@ const Internal = ({
             onChange={(e: any) => setAmount(e.target.value)}
             onClickMax={maxClickHandle}
           />
-          {!marketsDynamicData || debouncedAmount === "0" || debouncedAmount === "" ? null : (
+          {!marketsDynamicData || isEmpty ? null : (
             <>
               <Stats
                 marketData={market}
@@ -185,39 +187,56 @@ const Internal = ({
                 enterMarket={enterMarket}
               />
               { action === ActionType.supply ?
-                <EnterMarket
+                <CollateralSwitch
                   setEnterMarket={setEnterMarket}
                   enterMarket={enterMarket}
+                  collateralFactor={market.collateralFactor}
                 /> : null
               }
             </>
           )}
-          <Button onClick={authedHandleSubmit}>Approve</Button>
+          <Button 
+            onClick={authedHandleSubmit}
+            disabled={isEmpty}
+          >
+            {isEmpty ? "Please enter a valid amount" : "Approve"}
+          </Button>
         </VStack>
   )
 }
 
-const EnterMarket = ({
+export const CollateralSwitch = ({
   setEnterMarket,
-  enterMarket
+  enterMarket,
+  collateralFactor
 }: {
   setEnterMarket: Dispatch<SetStateAction<boolean>>
-  enterMarket: boolean
+  enterMarket: boolean,
+  collateralFactor: BigNumber
 }) => {
   useEffect(() => {
     setEnterMarket(true)
   }, [])
 
   return (
-    <Card backgroundColor="white" display="flex" height="1vh" justifyContent="center" alignItems="center">
-      <Flex backgroundColor="white" color="black" justifyContent="space-between" width="100%">
-        <Text>
-          Enable as collateral
-        </Text>
+    <Card backgroundColor="white" display="flex" justifyContent="center" alignItems="center">
+      <Flex backgroundColor="white" color="black" align="center" justifyContent="space-between" width="100%">
+        <Flex width="100%" justifyContent="space-between" direction="column">
+          <Text>
+            {enterMarket ? "Enabled as collateral" : "Enable as collateral"}
+          </Text>
+          <Text variant="secondary" fontSize="10px">
+            { enterMarket 
+              ? `You'll be able to borrow ${utils.formatUnits(collateralFactor, 16)}% of the supplied amount` 
+              : "You won't be able to borrow against the supplied amount."
+            }
+          </Text>
+          
+        </Flex>
         <Switch 
-          onChange={() => setEnterMarket(!enterMarket)} 
-          isChecked={enterMarket}
-        />
+            onChange={() => setEnterMarket(!enterMarket)} 
+            isChecked={enterMarket}
+          />
       </Flex>
     </Card>
   )
