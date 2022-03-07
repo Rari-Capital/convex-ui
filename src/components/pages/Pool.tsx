@@ -18,21 +18,11 @@ export enum ActionType {
 }
 
 const Pool = () => {
-  const { poolInfo, marketsDynamicData, pool } = usePoolContext();
-  const { address } = useRari();
-
+  const { poolInfo, marketsDynamicData } = usePoolContext();
+  
   const hasSupplied = marketsDynamicData?.totalSupplyBalanceUSD.gt(
     constants.Zero
   );
-
-  const {data} = useQuery('hello', async () => {
-    if(!pool || !marketsDynamicData || !address) return
-
-    const answer = pool.getUnderlyingBalancesForPool(marketsDynamicData?.assets)
-    return answer
-  })
-
-  console.log({data})
 
   const tokensData = useTokensDataAsMap(
     marketsDynamicData?.assets.map(({ underlyingToken }) => underlyingToken)
