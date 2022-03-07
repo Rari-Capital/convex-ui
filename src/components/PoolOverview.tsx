@@ -6,7 +6,7 @@ import { Card, Heading, Progress, Statistic, Text } from "rari-components";
 import React, { useEffect, useMemo, useState } from "react";
 import { smallUsdFormatter } from "utils/formatters";
 
-export const PoolOverview: React.FC<BoxProps> = ({ ...restProps }) => {
+export const PoolOverview: React.FC<BoxProps> = (props) => {
   const { address } = useRari();
   const {
     marketsDynamicData,
@@ -69,16 +69,17 @@ export const PoolOverview: React.FC<BoxProps> = ({ ...restProps }) => {
     };
   }, [supplyStatisticValue, borrowStatisticValue]);
 
-  const color = useMemo(() => {
-    if (userHealth < 25)
-      return "linear-gradient(90.12deg, #4AFA5B 5.91%, #40FFBA 96.27%)";
-    else if (userHealth < 70)
-      return "linear-gradient(90.12deg, #40C6FF 5.91%, #4A5BFA 96.27%)";
-    else return "linear-gradient(90.12deg, #F67B36 5.91%, #F64D36 96.27%)";
-  }, [userHealth]);
+  let color;
+  if (userHealth < 25) {
+    color = "linear-gradient(90.12deg, #4AFA5B 5.91%, #40FFBA 96.27%)";
+  } else if (userHealth < 70) {
+    color = "linear-gradient(90.12deg, #40C6FF 5.91%, #4A5BFA 96.27%)";
+  } else { 
+    color = "linear-gradient(90.12deg, #F67B36 5.91%, #F64D36 96.27%)";
+  }
 
   return (
-    <Flex justify="center" align="center" {...restProps}>
+    <Flex justify="center" align="center" {...props}>
       <VStack align="stretch">
         <HStack>
           <Card minWidth={48}>
@@ -110,27 +111,6 @@ export const PoolOverview: React.FC<BoxProps> = ({ ...restProps }) => {
           </HStack>
         )}
       </VStack>
-      {/* 
-      <Stack paddingTop={8} spacing={8} direction={["column", "row"]}>
-        <Card minWidth={48}>
-          <Statistic
-            title={supplyStatisticTitle}
-            value={smallUsdFormatter(supplyStatisticDisplayedValue)}
-          />
-        </Card>
-        <Card minWidth={48}>
-          <Statistic
-            title={borrowStatisticTitle}
-            value={smallUsdFormatter(borrowStatisticDisplayedValue)}
-          />
-        </Card>
-        <Card justifyContent="center" flex={1}>
-          <Text variant="secondary" fontSize="sm" mb={2}>
-            Borrow Balance
-          </Text>
-          <Progress variant="light" barVariant="gradient" value={userHealth} />
-        </Card>
-      </Stack> */}
     </Flex>
   );
 };
