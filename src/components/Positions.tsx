@@ -36,6 +36,7 @@ import { marketInteraction } from "utils/marketInteraction";
 import { useAuthedCallback } from "hooks/useAuthedCallback";
 import { ActionType } from "./pages/Pool";
 import { fetchMaxAmount } from "utils/fetchMaxAmount";
+import { CollateralSwitch } from "./MarketCard";
 
 const Positions = ({
   marketsDynamicData,
@@ -119,7 +120,8 @@ const PositionCard = ({
           {market.underlyingSymbol}
         </Heading>
         <Badge variant={isBorrowing ? "warning" : "success"}>
-          {isBorrowing ? "Borrowed" : "Supplied"}
+          <Text alignSelf="center" align="center">{isBorrowing ? "Borrowed" : "Supplied"}</Text>
+          <Text variant="secondary" fontSize="8px" align="center">not collateral</Text>
         </Badge>
         <Spacer />
         <HStack spacing={12} mr={12} textAlign="center">
@@ -183,8 +185,8 @@ const Internal = ({
   const { address } = useRari()
   const { marketsDynamicData } = usePoolContext();
   const [action, setAction] = useState<ActionType>(type);
-
   const [amount, setAmount] = useState<string>("0");
+  const [enterMarket, setEnterMarket] = useState<boolean>(market.membership)
 
   const maxClickHandle = async () => {
     const answer: number = await fetchMaxAmount(action, pool, address, market)
@@ -227,6 +229,7 @@ const Internal = ({
               index={index}
               markets={marketsDynamicData?.assets}
               marketData={market}
+              enterMarket={market.membership}
             />
           )}
           <Button alignSelf="stretch" onClick={authedHandleClick}>
