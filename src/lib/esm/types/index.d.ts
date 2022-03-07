@@ -110,9 +110,9 @@ export declare type PoolInstance = {
     }>;
     getInterestRateModel: (assetAddress: string) => Promise<any | undefined>;
     marketInteraction(action: marketInteractionType, cTokenAddress: string, amount: string, tokenAddress: string, decimals?: BigNumber): Promise<void>;
-    collateral(comptrollerAddress: string, marketAddress: string[], action: actionType, provider: Web3Provider | JsonRpcProvider): Promise<void>;
     checkAllowanceAndApprove(userAddress: string, marketAddress: string, underlyingAddress: string, amount: string, decimals: BigNumber): Promise<void>;
     fetchTokenBalance(tokenAddress: string | undefined, address?: string): Promise<number>;
+    collateral(comptrollerAddress: string, marketAddress: string[], action: actionType): Promise<void>;
 };
 export declare type marketInteractionType = "withdraw" | "borrow" | "repay" | "supply";
 export declare type actionType = "enter" | "exit";
