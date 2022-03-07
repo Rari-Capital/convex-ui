@@ -113,7 +113,9 @@ export declare type PoolInstance = {
     checkAllowanceAndApprove(userAddress: string, marketAddress: string, underlyingAddress: string, amount: string, decimals: BigNumber): Promise<void>;
     fetchTokenBalance(tokenAddress: string | undefined, address?: string): Promise<number>;
     collateral(comptrollerAddress: string, marketAddress: string[], action: actionType): Promise<void>;
-    fetchTokenBalancesForPool: (markets: USDPricedFuseAsset[], userAddress: string) => Promise<BigNumber[]>;
+    getUnderlyingBalancesForPool(markets: USDPricedFuseAsset[]): {
+        [cToken: string]: BigNumber;
+    };
 };
 export declare type marketInteractionType = "withdraw" | "borrow" | "repay" | "supply";
 export declare type actionType = "enter" | "exit";

@@ -1,2 +1,2 @@
 export { fetchTokenBalance } from "./fetchTokenBalance";
-export { fetchTokenBalancesForPool } from './fetchTokenBalancesForPool';
+export { getUnderlyingBalancesForPool } from './getUnderlyingBalancesForPool';

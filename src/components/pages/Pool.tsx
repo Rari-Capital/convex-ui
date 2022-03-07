@@ -28,10 +28,10 @@ const Pool = () => {
   const {data} = useQuery('hello', async () => {
     if(!pool || !marketsDynamicData || !address) return
 
-    console.log({pool})
-    const answer = await getBalances(pool, marketsDynamicData?.assets, address)
+    const answer = pool.getUnderlyingBalancesForPool(marketsDynamicData?.assets)
     return answer
   })
+
   console.log({data})
 
   const tokensData = useTokensDataAsMap(
@@ -117,10 +117,3 @@ export const convertMantissaToAPR = (mantissa: any) => {
   const parsedMantissa = toInt(mantissa);
   return (parsedMantissa * 2372500) / 1e16;
 };
-
-
-const getBalances = async (pool: PoolInstance, markets: USDPricedFuseAsset[], userAddress: string) => {
-  console.log('hey thers')
-  const balances = await pool.fetchTokenBalancesForPool(markets, userAddress)
-  console.log({balances}, 'lol')
-}
