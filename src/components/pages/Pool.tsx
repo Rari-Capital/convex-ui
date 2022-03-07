@@ -10,7 +10,7 @@ export enum ActionType {
   "supply",
   "borrow",
   "withdraw",
-  "repay"
+  "repay",
 }
 
 const Pool = () => {

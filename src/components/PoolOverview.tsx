@@ -8,9 +8,13 @@ import { smallUsdFormatter } from "utils/formatters";
 
 export const PoolOverview: React.FC<BoxProps> = ({ ...restProps }) => {
   const { address } = useRari();
-  const { marketsDynamicData, borrowLimit, userHealth: _userHealth } = usePoolContext();
-  
-  let userHealth = 80
+  const {
+    marketsDynamicData,
+    borrowLimit,
+    userHealth: _userHealth,
+  } = usePoolContext();
+
+  let userHealth = 80;
 
   // Show total market statistics if user's wallet is not connected.
   const supplyStatisticTitle = !!address ? "You Supplied" : "Total Supplied";
@@ -65,12 +69,13 @@ export const PoolOverview: React.FC<BoxProps> = ({ ...restProps }) => {
     };
   }, [supplyStatisticValue, borrowStatisticValue]);
 
-
   const color = useMemo(() => {
-    if (userHealth < 25) return 'linear-gradient(90.12deg, #4AFA5B 5.91%, #40FFBA 96.27%)'
-    else if (userHealth < 70) return 'linear-gradient(90.12deg, #40C6FF 5.91%, #4A5BFA 96.27%)'
-    else return 'linear-gradient(90.12deg, #F67B36 5.91%, #F64D36 96.27%)'
-  }, [userHealth])
+    if (userHealth < 25)
+      return "linear-gradient(90.12deg, #4AFA5B 5.91%, #40FFBA 96.27%)";
+    else if (userHealth < 70)
+      return "linear-gradient(90.12deg, #40C6FF 5.91%, #4A5BFA 96.27%)";
+    else return "linear-gradient(90.12deg, #F67B36 5.91%, #F64D36 96.27%)";
+  }, [userHealth]);
 
   return (
     <Flex justify="center" align="center" {...restProps}>
@@ -95,7 +100,12 @@ export const PoolOverview: React.FC<BoxProps> = ({ ...restProps }) => {
               <Text variant="secondary" fontSize="sm" mb={2}>
                 Borrow Balance
               </Text>
-              <Progress variant="light" barVariant={color} value={userHealth} height={4} />
+              <Progress
+                variant="light"
+                barVariant={color}
+                value={userHealth}
+                height={4}
+              />
             </Card>
           </HStack>
         )}

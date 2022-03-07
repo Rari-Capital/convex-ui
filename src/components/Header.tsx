@@ -101,13 +101,13 @@ const Header: React.FC<HeaderProps> = ({ contentSx, ...restProps }) => {
           <ConnectModal />
           <ClaimModal isOpen={isClaimModalOpen} onClose={closeClaimModal} />
         </HStack>
-          <Box pt={12} w="100%" textAlign={"center"}>
-            <Heading>Tribe Convex Pool</Heading>
-            <Text mt={2}>
-              Leverage off your Curve LPs while keeping Convex Rewards
-            </Text>
-          </Box>
-        <PoolOverview pt={8}  maxW={{ base: "100%", md: "100%" }}  mx="auto" />
+        <Box pt={12} w="100%" textAlign={"center"}>
+          <Heading>Tribe Convex Pool</Heading>
+          <Text mt={2}>
+            Leverage off your Curve LPs while keeping Convex Rewards
+          </Text>
+        </Box>
+        <PoolOverview pt={8} maxW={{ base: "100%", md: "100%" }} mx="auto" />
       </Box>
     </Box>
   );

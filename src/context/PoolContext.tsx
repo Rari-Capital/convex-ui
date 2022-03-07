@@ -19,13 +19,9 @@ type PoolContextData = {
   borrowLimitBN: BigNumber;
 };
 
-export const PoolProvider = ({
-  children,
-}: {
-  children: ReactChildren;
-}) => {
+export const PoolProvider = ({ children }: { children: ReactChildren }) => {
   const { chainId } = useRari();
-  const poolIndex = networkConfig[chainId].poolId
+  const poolIndex = networkConfig[chainId].poolId;
   const { poolInfo, marketsDynamicData, pool } = usePoolData(poolIndex);
   const { borrowLimit, userHealth, borrowLimitBN } =
     useUserHealth(marketsDynamicData);
