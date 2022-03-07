@@ -1,8 +1,10 @@
+import { networkConfig } from "constants/networks";
 import { BigNumber } from "ethers";
 import usePoolData from "hooks/pool/usePoolData";
 import useUserHealth from "hooks/useUserHealth";
 import { FusePoolData, MarketsWithData, PoolInstance } from "lib/esm/types";
 import { createContext, ReactChildren, useContext, useMemo } from "react";
+import { useRari } from "./RariContext";
 
 export const PoolContext = createContext<undefined | PoolContextData>(
   undefined
@@ -18,12 +20,12 @@ type PoolContextData = {
 };
 
 export const PoolProvider = ({
-  poolIndex,
   children,
 }: {
-  poolIndex: number;
   children: ReactChildren;
 }) => {
+  const { chainId } = useRari();
+  const poolIndex = networkConfig[chainId].poolId
   const { poolInfo, marketsDynamicData, pool } = usePoolData(poolIndex);
   const { borrowLimit, userHealth, borrowLimitBN } =
     useUserHealth(marketsDynamicData);

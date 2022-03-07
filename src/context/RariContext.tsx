@@ -5,6 +5,7 @@ import {
   ReactNode,
   useMemo,
   useCallback,
+  useEffect,
 } from "react";
 import { useRouter } from "next/router";
 
@@ -15,24 +16,51 @@ import { useNetwork } from "wagmi";
 // Utils
 import { alchemyURL } from "utils/connectors";
 import { providers } from "ethers";
-import { useDisclosure } from "@chakra-ui/react";
+import { useDisclosure, useToast } from "@chakra-ui/react";
+import { isSupportedChainId } from "constants/networks";
 
-const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID;
-if (!CHAIN_ID) {
-  throw new Error("Must set `NEXT_PUBLIC_CHAIN_ID` environment variable!");
+export interface RariContextData {
+  provider: any,
+  chainId: number,
+  address: string | undefined,
+  accountData: any,
+  isAuthed: boolean,
+  previewMode: boolean,
+  logout: () => void,
+  login: () => void,
+  isModalOpen: boolean,
+  onClose: () => void,
 }
 
-export const RariContext = createContext<undefined | any>(undefined);
+export const RariContext = createContext<undefined | RariContextData>(undefined);
 
 export const RariProvider = ({ children }: { children: ReactNode }) => {
-  const [{ data, error, loading }, switchNetwork] = useNetwork();
+  const [{ data }] = useNetwork();
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
   });
 
-  const [{ data: UsersConnector }, connect] = useConnect();
+  const [{ data: UsersConnector }] = useConnect();
 
-  const chainId = useMemo(() => parseInt(CHAIN_ID), [data]);
+  const chainId = useMemo(() => isSupportedChainId(data.chain?.id) ? data.chain!.id : 1, [data]);
+
+  // Warn on unsupported network
+  const toast = useToast()
+  useEffect(() => {
+    if (!!data.chain?.id && !isSupportedChainId(data.chain.id)) {
+      setTimeout(() => {
+        toast({
+          title: "Unsupported network!",
+          description: "Please switch to mainnet",
+          status: "warning",
+          position: "bottom-right",
+          duration: 300000,
+          isClosable: true,
+        });
+      }, 1500);
+    }
+  }, [data.chain])
+
   const provider = useMemo(() => {
     return UsersConnector.connector
       ? new providers.Web3Provider(UsersConnector?.connector?.getProvider())
@@ -44,10 +72,11 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
   // Whether you have forced an address
   const router = useRouter();
   const address = useMemo(
-    () => router?.query.address ?? accountData?.address,
+    () => (router?.query.address ?? accountData?.address) as string | undefined,
     [router, accountData]
   );
-  
+
+  // If you are previewing an address
   const previewMode = useMemo(
     () => !!address && address === router?.query.address,
     [router, address]
