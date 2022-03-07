@@ -49,7 +49,7 @@ const Positions = ({
     <Accordion allowToggle>
       <VStack mt={4} mb={8} align="stretch" spacing={4}>
         {marketsDynamicData.assets.map((market, i) => {
-          if (market.supplyBalanceUSD.gt(constants.Zero)) {
+          if (market.supplyBalanceUSD.gt(constants.Zero) && address){
             return (
               <PositionCard
                 market={market}
@@ -62,7 +62,7 @@ const Positions = ({
           }
         })}
         {marketsDynamicData.assets.map((market, i) => {
-          if (market.borrowBalanceUSD.gt(constants.Zero)) {
+          if (market.borrowBalanceUSD.gt(constants.Zero) && address) {
             return (
               <PositionCard
                 market={market}
@@ -192,6 +192,7 @@ const Internal = ({
 
   // Triggered to get max amount user can use for a given actionType.
   const maxClickHandle = async () => {
+    if (!address) return
     const answer: number = await fetchMaxAmount(action, pool, address, market)
     setAmount(answer.toString())
   }
