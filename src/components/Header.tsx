@@ -87,7 +87,9 @@ const Header: React.FC<HeaderProps> = ({ contentSx, ...restProps }) => {
               <Link href="/">Tribe Convex Pool</Link>
             </HStack>
             <Menu>
-              <MenuButton>More</MenuButton>
+              <MenuButton fontWeight={600}>
+                More <ChevronDownIcon />
+              </MenuButton>
               <MenuList>
                 <MenuItem>
                   <Link href="/faq" color="black">
