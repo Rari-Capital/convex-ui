@@ -239,7 +239,7 @@ const Internal = ({
             value={amount}
             tokenSymbol={tokenData?.symbol}
             tokenAddress={market.underlyingToken}
-            onChange={(newValue: any) => setAmount(newValue.target.value)}
+            onChange={(newValue) => setAmount(newValue)}
             onClickMax={maxClickHandle}
           />
           <Text ml={"auto"} color="grey" fontWeight={"medium"}> You have {balance} {tokenData?.symbol}</Text>
