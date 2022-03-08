@@ -11,12 +11,12 @@ export enum ActionType {
   "borrow",
   "withdraw",
   "repay",
-  "enterMarket"
+  "enterMarket",
 }
 
 const Pool = () => {
   const { poolInfo, marketsDynamicData } = usePoolContext();
-  
+
   const hasSupplied = marketsDynamicData?.totalSupplyBalanceUSD.gt(
     constants.Zero
   );
@@ -25,17 +25,26 @@ const Pool = () => {
     marketsDynamicData?.assets.map(({ underlyingToken }) => underlyingToken)
   );
 
+  const showActivePositions = !!(hasSupplied && marketsDynamicData);
+
   if (!poolInfo) return <Spinner />;
 
   return (
     <Box>
-      <Heading size="md" color="white">
-        Active Positions
-      </Heading>
-      {hasSupplied && marketsDynamicData ? (
-        <Positions marketsDynamicData={marketsDynamicData} tokensData={tokensData} />
-      ) : null}
-      <Heading size="md" color="black">
+      {showActivePositions && (
+        <>
+          <Heading size="md" color="white">
+            Active Positions
+          </Heading>
+          <Positions
+            marketsDynamicData={marketsDynamicData}
+            tokensData={tokensData}
+          />
+        </>
+      )}
+      {/* If active positions aren't shown, this `Heading` will be over a black
+      background, so we should invert the color. */}
+      <Heading size="md" color={showActivePositions ? "black" : "white"}>
         Markets
       </Heading>
       <Stack mt={4} width="100%" direction={["column", "row"]} spacing={2}>
