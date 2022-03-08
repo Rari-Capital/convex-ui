@@ -228,6 +228,7 @@ const SubmitButton = ({
   market: USDPricedFuseAsset,
   action: ActionType
 }) => {
+  const { address } = useRari()
   const { pool, poolInfo } = usePoolContext()
 
   const [activeStep, setActiveStep] = useState<number | undefined>()
@@ -251,7 +252,8 @@ const SubmitButton = ({
     action,
     increaseActiveStep,
     poolInfo?.comptroller,
-    true
+    true,//!market.membership,
+    address
   ]);
 
   const isEmpty = debouncedAmount === "0" || debouncedAmount === ""
@@ -270,7 +272,7 @@ const SubmitButton = ({
       >
         {ButtonText}
       </Button>
-      <Center>
+      <Center color="white">
         {typeof activeStep === "undefined" ? null : <StepBubbles steps={steps.length} activeIndex={activeStep} />}
       </Center>
     </>
