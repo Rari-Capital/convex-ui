@@ -115,6 +115,7 @@ export const PoolOverview: React.FC<BoxProps> = (props) => {
                 Borrow Balance
               </Text>
               <Progress
+                height={5}
                 variant="light"
                 barVariant={color}
                 value={borrowPercentageDisplayedValue}
