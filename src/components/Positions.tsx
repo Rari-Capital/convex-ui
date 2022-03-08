@@ -347,7 +347,7 @@ const SubmitButton = ({
       >
         {ButtonText}
       </Button>
-      <Center>
+      <Center color="white">
         {typeof activeStep === "undefined" ? null : <StepBubbles steps={steps.length} activeIndex={activeStep} />}
       </Center>
     </>

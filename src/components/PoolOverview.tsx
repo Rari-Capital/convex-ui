@@ -27,7 +27,7 @@ export const PoolOverview: React.FC<BoxProps> = (props) => {
       ? marketsDynamicData?.totalBorrowBalanceUSD
       : marketsDynamicData?.totalBorrowedUSD
     )?.toNumber() ?? 0;
-  let borrowPercentageValue = borrowLimit ?? 0;
+  let borrowPercentageValue = _userHealth ?? 0;
 
   // Initialize animated values at 0.
   const supplyStatisticInitialValue = useMotionValue(0);
