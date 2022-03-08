@@ -27,7 +27,7 @@ export const PoolOverview: React.FC<BoxProps> = (props) => {
       ? marketsDynamicData?.totalBorrowBalanceUSD
       : marketsDynamicData?.totalBorrowedUSD
     )?.toNumber() ?? 0;
-  let borrowPercentageValue = 80;
+  let borrowPercentageValue = _userHealth ?? 0;
 
   // Initialize animated values at 0.
   const supplyStatisticInitialValue = useMotionValue(0);
@@ -119,7 +119,7 @@ export const PoolOverview: React.FC<BoxProps> = (props) => {
                 barVariant={color}
                 value={borrowPercentageDisplayedValue}
               />
-              <Flex justifyContent="space-between" mt="2">
+              <Flex justifyContent="space-between" mt="1">
                 <Text variant="secondary" fontSize="sm">
                   $0
                 </Text>

@@ -12,12 +12,9 @@ export const marketInteraction = async (
   increaseActiveStep: (step: string) => void,
   comptroller: string | undefined,
   enterMarket: boolean,
+  address: string
 ) => {
-  console.log({amount, pool, comptroller})
   if (amount === "" || !pool || !comptroller) return;
-  console.log("hello")
-
-  const address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
 
   switch (action) {
     case  ActionType.supply:
@@ -30,16 +27,16 @@ export const marketInteraction = async (
           [market.cToken],
           "enter"
         )
-      }
 
-      increaseActiveStep("Approving Asset")
-      await pool?.checkAllowanceAndApprove(
-        address,
-        market.cToken,
-        market.underlyingToken,
-        amount,
-        market.underlyingDecimals
-      );
+        increaseActiveStep("Approving Asset")
+        await pool?.checkAllowanceAndApprove(
+          address,
+          market.cToken,
+          market.underlyingToken,
+          amount,
+          market.underlyingDecimals
+        );
+      }
 
       increaseActiveStep("Supplying")
       await pool?.marketInteraction(
