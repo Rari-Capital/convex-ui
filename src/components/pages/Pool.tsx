@@ -28,9 +28,9 @@ const Pool = () => {
   const showActivePositions = !!(hasSupplied && marketsDynamicData);
 
   const supplyAssets = marketsDynamicData?.assets?.filter((market => !market.supplyBalanceUSD.gt(0))).sort((a, b) => {
-    if (a.underlyingBalance < b.underlyingBalance) {
+    if (a.underlyingBalance.lt(b.underlyingBalance)) {
       return 1
-    } else if (b.underlyingBalance < a.underlyingBalance) {
+    } else if (b.underlyingBalance.lt(a.underlyingBalance)) {
       return -1
     } else {
       return 0

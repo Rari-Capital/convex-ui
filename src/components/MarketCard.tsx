@@ -22,7 +22,7 @@ import useDebounce from "hooks/useDebounce";
 import { ActionType } from "./pages/Pool";
 import { fetchMaxAmount } from "utils/fetchMaxAmount";
 import { useRari } from "context/RariContext";
-import { formatUnits } from "ethers/lib/utils";
+import { formatUnits, parseUnits } from "ethers/lib/utils";
 
 type MarketCardProps = Omit<
   React.ComponentProps<typeof ExpandableCard>,
@@ -158,21 +158,10 @@ const Internal = ({
 
   const debouncedAmount = useDebounce(amount, 1000);
 
-  const authedHandleSubmit = useAuthedCallback(marketInteraction, [
-    debouncedAmount,
-    pool,
-    market,
-    action,
-    poolInfo?.comptroller,
-    enterMarket
-  ]);
-
-  console.log({action})
-
   const maxClickHandle = async () => {
     if (!address) return
     const answer: number = await fetchMaxAmount(action, pool, address, market)
-    setAmount(answer.toString())
+    setAmount(formatUnits(answer, market.underlyingDecimals))
   }
 
   const isEmpty = debouncedAmount === "0" || debouncedAmount === ""
@@ -188,7 +177,7 @@ const Internal = ({
         onChange={(e: any) => setAmount(e.target.value)}
         onClickMax={maxClickHandle}
       />
-      <Text ml={"auto"} color="grey" fontWeight={"medium"}> You have {balance} {tokenData?.symbol}</Text>
+      {!address ? null : <Text ml={"auto"} color="grey" fontWeight={"medium"}> You have {balance} {tokenData?.symbol}</Text> }
       {!marketsDynamicData || isEmpty ? null : (
         <>
           <Stats

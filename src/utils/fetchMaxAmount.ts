@@ -12,26 +12,19 @@ export async function fetchMaxAmount(
   asset: USDPricedFuseAsset
 ) {
   if (mode === ActionType.supply) {
-    const balance = await pool.fetchTokenBalance(
-      asset.underlyingToken,
-      address
-    );
+    const balance = asset.underlyingBalance
 
     return balance;
   }
 
   if (mode === ActionType.repay) {
-    const balance = await pool.fetchTokenBalance(
-      asset.underlyingToken,
-      address
-    );
+    const balance = asset.underlyingBalance
 
     const borrowBalance = asset.borrowBalance
       .div(constants.WeiPerEther)
-      .toNumber();
 
-    if (borrowBalance < balance) {
-      return asset.borrowBalance.div(constants.WeiPerEther).toString();
+    if (borrowBalance.lt(balance)) {
+      return asset.borrowBalance.div(constants.WeiPerEther);
     } else {
       return balance;
     }
@@ -46,7 +39,7 @@ export async function fetchMaxAmount(
           asset.cToken
         );
 
-      return maxBorrow.div(constants.WeiPerEther).toString();
+      return maxBorrow.div(constants.WeiPerEther);
     } catch (err) {
       throw new Error("Could not fetch your max borrow amount! Code: " + err);
     }
@@ -60,7 +53,7 @@ export async function fetchMaxAmount(
           asset.cToken
         );
 
-      return maxRedeem.div(constants.WeiPerEther).toString();
+      return maxRedeem.div(constants.WeiPerEther);
     } catch (err) {
       throw new Error("Could not fetch your max borrow amount! Code: " + err);
     }
