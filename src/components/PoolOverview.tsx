@@ -95,13 +95,13 @@ export const PoolOverview: React.FC<BoxProps> = (props) => {
     <Flex justify="center" align="center" {...props}>
       <VStack align="stretch">
         <HStack>
-          <Card minWidth={48}>
+          <Card minWidth={48} p={4}>
             <Statistic
               title={supplyStatisticTitle}
               value={smallUsdFormatter(supplyStatisticDisplayedValue)}
             />
           </Card>
-          <Card minWidth={48}>
+          <Card minWidth={48} p={4}>
             <Statistic
               title={borrowStatisticTitle}
               value={smallUsdFormatter(borrowStatisticDisplayedValue)}
@@ -110,7 +110,7 @@ export const PoolOverview: React.FC<BoxProps> = (props) => {
         </HStack>
         {!!address && (
           <HStack>
-            <Card justifyContent="center" flex={1} w="100%" p={3}>
+            <Card justifyContent="center" flex={1} w="100%" p={4}>
               <Text variant="secondary" fontSize="sm" mb={2}>
                 Borrow Balance
               </Text>
@@ -118,7 +118,6 @@ export const PoolOverview: React.FC<BoxProps> = (props) => {
                 variant="light"
                 barVariant={color}
                 value={borrowPercentageDisplayedValue}
-                height={4}
               />
             </Card>
           </HStack>
