@@ -117,14 +117,14 @@ export const PoolOverview: React.FC<BoxProps> = (props) => {
               <Progress
                 variant="light"
                 barVariant={color}
-                value={borrowLimit}
+                value={borrowPercentageDisplayedValue}
               />
               <Flex justifyContent="space-between" mt="2">
                 <Text variant="secondary" fontSize="sm">
-                  0$
+                  $0
                 </Text>
                 <Text variant="secondary" fontSize="sm">
-                  {borrowLimit}$
+                  ${borrowLimit}
                 </Text>
               </Flex>
             </Card>
