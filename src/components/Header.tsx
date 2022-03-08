@@ -11,6 +11,7 @@ import {
   Spacer,
   StyleProps,
   useDisclosure,
+  Link as ChakraLink
 } from "@chakra-ui/react";
 import { useRari } from "context/RariContext";
 import { Button, Heading, Link, Text, TokenGroup } from "rari-components";
@@ -95,6 +96,12 @@ const Header: React.FC<HeaderProps> = ({ contentSx, ...restProps }) => {
                   <Link href="/faq" color="black">
                     FAQ
                   </Link>
+                </MenuItem>
+
+                <MenuItem>
+                  <ChakraLink fontWeight={600} href="https://app.rari.capital/fuse/pool/156" color="black">
+                    Rari Capital Dapp
+                  </ChakraLink>
                 </MenuItem>
               </MenuList>
             </Menu>
