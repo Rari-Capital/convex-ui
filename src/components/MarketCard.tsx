@@ -59,6 +59,7 @@ const MarketCard: React.FC<MarketCardProps> = ({
   return (
     <ExpandableCard
       p={4}
+      py={6}
       width="100%"
       variant="light"
       inAccordion={true}
