@@ -4,7 +4,7 @@ import { Footer } from "./Footer";
 
 export const Layout = ({ children }: { children: any }) => {
   return (
-    <Box pb={10}>
+    <Box pb={10} background="darkmatte">
       <Header
         pb={40}
         position="relative"
@@ -23,7 +23,7 @@ export const Layout = ({ children }: { children: any }) => {
       >
         {children}
       </Box>
-      <Footer/>
+      <Footer />
     </Box>
   );
 };
