@@ -119,7 +119,7 @@ export const PoolOverview: React.FC<BoxProps> = (props) => {
                 barVariant={color}
                 value={borrowPercentageDisplayedValue}
               />
-              <Flex justifyContent="space-between" mt="2">
+              <Flex justifyContent="space-between" mt="1">
                 <Text variant="secondary" fontSize="sm">
                   $0
                 </Text>
