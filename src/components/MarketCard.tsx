@@ -61,7 +61,6 @@ const MarketCard: React.FC<MarketCardProps> = ({
       p={4}
       py={6}
       width="100%"
-      variant="light"
       inAccordion={true}
       expandableChildren={
         <Internal
@@ -167,10 +166,9 @@ const Internal = ({
   const isEmpty = debouncedAmount === "0" || debouncedAmount === ""
 
   return (
-    <VStack spacing={4} alignItems="stretch" background="#F0F0F0">
+    <VStack spacing={4} alignItems="stretch">
       <TokenAmountInput
         border="none"
-        variant="light"
         tokenSymbol={tokenData?.symbol}
         tokenAddress={market.underlyingToken}
         value={amount}

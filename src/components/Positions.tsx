@@ -114,7 +114,6 @@ const PositionCard = ({
   return (
     <ExpandableCard
       inAccordion
-      variant="active"
       expandableChildren={
         <Internal
           type={action}
@@ -234,7 +233,6 @@ const Internal = ({
         <VStack mt={4} spacing={4} alignItems="stretch">
           <TokenAmountInput
             size="lg"
-            variant="light"
             value={amount}
             tokenSymbol={tokenData?.symbol}
             tokenAddress={market.underlyingToken}

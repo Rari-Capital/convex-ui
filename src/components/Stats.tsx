@@ -62,8 +62,6 @@ export const Stats = ({
 
   return (
     <StatisticTable
-      variant="light"
-      backgroundColor="white"
       border="none"
       statistics={stats}
     />
