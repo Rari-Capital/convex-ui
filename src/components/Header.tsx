@@ -87,7 +87,9 @@ const Header: React.FC<HeaderProps> = ({ contentSx, ...restProps }) => {
               <Link href="/">Tribe Convex Pool</Link>
             </HStack>
             <Menu>
-              <MenuButton>More</MenuButton>
+              <MenuButton fontWeight={600}>
+                More <ChevronDownIcon />
+              </MenuButton>
               <MenuList>
                 <MenuItem>
                   <Link href="/faq" color="black">
@@ -112,7 +114,9 @@ const Header: React.FC<HeaderProps> = ({ contentSx, ...restProps }) => {
           <ClaimModal isOpen={isClaimModalOpen} onClose={closeClaimModal} />
         </HStack>
         <Box pt={12} w="100%" textAlign={"center"}>
-          <Heading>Tribe Convex Pool</Heading>
+          <Heading>
+            {!!address ? "Your Portfolio" : "Tribe Convex Pool"}
+          </Heading>
           <Text mt={2}>
             Leverage off your Curve LPs while keeping Convex Rewards
           </Text>
