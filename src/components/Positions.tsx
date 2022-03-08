@@ -196,7 +196,7 @@ const Internal = ({
   tokenData: TokenData
 }) => {
   const { address } = useRari();
-  const { marketsDynamicData } = usePoolContext();
+  const { marketsDynamicData, poolInfo } = usePoolContext();
 
   // Will determine actionType and amount to send for interaction.
   const [action, setAction] = useState<ActionType>(type);
@@ -212,6 +212,7 @@ const Internal = ({
 
   const balance = parseFloat(formatUnits(market.underlyingBalance, market.underlyingDecimals)).toFixed(2)
 
+  if (!poolInfo || !address) return null
   return (
     <Tabs>
       <TabList>
@@ -256,6 +257,8 @@ const Internal = ({
             debouncedAmount={debouncedAmount}
             market={market}
             action={action}
+            comptrollerAddress={poolInfo?.comptroller}
+            userAddress={address}
           />
         </VStack>
       </TabPanels>
@@ -263,9 +266,14 @@ const Internal = ({
   );
 };
 
-const supplySteps = [
-  "Approving market",
+const supplyApproveSteps = [
+  "Enter market",
   "Approving Asset",
+  "Supplying",
+  "Done"
+]
+
+const supplySteps = [
   "Supplying",
   "Done"
 ]
@@ -286,17 +294,21 @@ const repaySteps = [
 const SubmitButton = ({
   debouncedAmount,
   market,
-  action
+  action,
+  comptrollerAddress,
+  userAddress
 }: {
   debouncedAmount: string,
   market: USDPricedFuseAsset,
-  action: ActionType
+  action: ActionType,
+  comptrollerAddress: string
+  userAddress: string
 }) => {
   const { pool } = usePoolContext()
 
   const [activeStep, setActiveStep] = useState<number | undefined>()
-  const steps: string[] = getSteps(action)
-
+  const steps: string[] = getSteps(action, market.membership)
+  
   const increaseActiveStep = (step: string) => {
     setActiveStep(steps.indexOf(step));
   };
@@ -313,7 +325,10 @@ const SubmitButton = ({
     pool,
     market,
     action,
-    increaseActiveStep
+    increaseActiveStep,
+    comptrollerAddress,
+    !market.membership,
+    userAddress
   ]);
 
   const isEmpty = debouncedAmount === "0" || debouncedAmount === ""
@@ -333,7 +348,7 @@ const SubmitButton = ({
         {ButtonText}
       </Button>
       <Center>
-        {!activeStep ? null : <StepBubbles steps={steps.length} activeIndex={activeStep} />}
+        {typeof activeStep === "undefined" ? null : <StepBubbles steps={steps.length} activeIndex={activeStep} />}
       </Center>
     </>
   )
@@ -351,12 +366,15 @@ const getButtonText = (
   }
 }
 
-const getSteps = (action: ActionType) => {
+const getSteps = (action: ActionType, membership: boolean) => {
   switch (action) {
     case ActionType.borrow:
       return borrowSteps
     case ActionType.supply:
-      return supplySteps
+      if (membership) {
+        return supplySteps
+      }
+      else return supplyApproveSteps
     case ActionType.repay:
       return repaySteps
     case ActionType.withdraw:

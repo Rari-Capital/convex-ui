@@ -239,7 +239,7 @@ const SubmitButton = ({
 
   useEffect(() => {
     if (activeStep === steps.length) {
-      console.log("hello")
+      
     }
   })
 
