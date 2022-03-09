@@ -5,6 +5,7 @@ import { animate, useMotionValue } from "framer-motion";
 import { Card, Heading, Progress, Statistic, Text } from "rari-components";
 import React, { useEffect, useMemo, useState } from "react";
 import { smallUsdFormatter } from "utils/formatters";
+import { utils } from "ethers";
 
 export const PoolOverview: React.FC<BoxProps> = (props) => {
   const { address } = useRari();
@@ -115,6 +116,7 @@ export const PoolOverview: React.FC<BoxProps> = (props) => {
                 Borrow Balance
               </Text>
               <Progress
+                fontSize="10px"
                 height={5}
                 variant="light"
                 barVariant={color}
@@ -125,7 +127,7 @@ export const PoolOverview: React.FC<BoxProps> = (props) => {
                   $0
                 </Text>
                 <Text variant="secondary" fontSize="sm">
-                  ${borrowLimit}
+                  ${utils.commify(borrowLimit ?? 0)}
                 </Text>
               </Flex>
             </Card>
