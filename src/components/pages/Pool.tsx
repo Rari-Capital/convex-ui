@@ -19,8 +19,10 @@ export enum ActionType {
 }
 
 const Pool = () => {
-  const { poolInfo, marketsDynamicData} = usePoolContext();
+  const { poolInfo, marketsDynamicData } = usePoolContext();
   const { isAuthed, login } = useRari();
+
+  // Accordion
   const [rightAccordionIndex, setRightIndex] = useState<number | undefined>()
   const [leftAccordionIndex, setLeftIndex] = useState<number | undefined>()
 
@@ -38,6 +40,7 @@ const Pool = () => {
       return
     }
     login()
+    side === "right" ? setRightIndex(-1) : setLeftIndex(-1)
   }
 
   const showActivePositions = !!(hasSupplied && marketsDynamicData && isAuthed);
