@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {  PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
-import { BigNumber, utils } from "ethers";
+import { BigNumber, constants, utils } from "ethers";
 import {
   Button,
   Text,
@@ -21,7 +21,7 @@ import { ActionType } from "./pages/Pool";
 import { fetchMaxAmount } from "utils/fetchMaxAmount";
 import useDebounce from "hooks/useDebounce";
 import { TokenData } from "hooks/useTokenData";
-import { formatUnits, parseUnits } from "ethers/lib/utils";
+import { formatEther, formatUnits, parseUnits } from "ethers/lib/utils";
 import { useQueryClient } from "react-query";
 
 export const Internal = ({
@@ -61,7 +61,11 @@ export const Internal = ({
     const maxClickHandle = async () => {
       if (!address) return
       const answer: number = await fetchMaxAmount(internalAction, pool, address, market)
-      setAmount(formatUnits(answer, market.underlyingDecimals));
+      
+      setAmount(
+        internalAction === ActionType.SUPPLY || internalAction === ActionType.BORROW ? 
+        formatUnits(answer, market.underlyingDecimals) : formatEther(answer)
+      );
     }
   
     const [activeStep, setActiveStep] = useState<number | undefined>();

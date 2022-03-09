@@ -24,7 +24,7 @@ export async function fetchMaxAmount(
       .div(constants.WeiPerEther)
 
     if (borrowBalance.lt(balance)) {
-      return asset.borrowBalance.div(constants.WeiPerEther);
+      return asset.borrowBalance
     } else {
       return balance;
     }
@@ -39,7 +39,7 @@ export async function fetchMaxAmount(
           asset.cToken
         );
 
-      return maxBorrow.div(constants.WeiPerEther);
+      return maxBorrow
     } catch (err) {
       throw new Error("Could not fetch your max borrow amount! Code: " + err);
     }
@@ -53,7 +53,7 @@ export async function fetchMaxAmount(
           asset.cToken
         );
 
-      return maxRedeem.div(constants.WeiPerEther);
+      return maxRedeem
     } catch (err) {
       throw new Error("Could not fetch your max borrow amount! Code: " + err);
     }
