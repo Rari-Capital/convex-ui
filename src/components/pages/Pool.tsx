@@ -9,7 +9,7 @@ import { useState } from "react";
 
 export enum ActionType {
   SUPPLY = "Supply",
-  BORROW ="Borrow",
+  BORROW = "Borrow",
   WITHDRAW = "Withdraw",
   REPAY = "Repay",
   ENTER_MARKET = "Enter Market",
@@ -28,16 +28,6 @@ const Pool = () => {
   );
 
   const showActivePositions = !!(hasSupplied && marketsDynamicData);
-
-  const supplyAssets = marketsDynamicData?.assets?.filter((market => !market.supplyBalanceUSD.gt(0))).sort((a, b) => {
-    if (a.underlyingBalance.lt(b.underlyingBalance)) {
-      return 1
-    } else if (b.underlyingBalance.lt(a.underlyingBalance)) {
-      return -1
-    } else {
-      return 0
-    }
-  }) ?? []
 
   if (!poolInfo) return <Spinner />;
 
@@ -63,7 +53,7 @@ const Pool = () => {
         <VStack alignItems="stretch" spacing={2} flex={1}>
           <Accordion allowToggle index={index} onChange={(i: number) => setIndex(i)}>
             <VStack alignItems="stretch" spacing={2} flex={1}>
-              {marketsDynamicData && supplyAssets.map((market, i) =>
+              {marketsDynamicData && marketsDynamicData?.assets?.map((market, i) =>
                 market.supplyBalanceUSD.gt(0) ? null : (
                   <MarketCard
                     markets={marketsDynamicData?.assets}

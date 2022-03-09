@@ -139,6 +139,7 @@ export const Internal = ({
                 index={index}
                 markets={marketsDynamicData?.assets}
                 marketData={market}
+                tokenData={tokenData}
               />
             )}
             <SubmitButton

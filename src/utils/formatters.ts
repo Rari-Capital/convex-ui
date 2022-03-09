@@ -1,4 +1,5 @@
-import { BigNumber } from "ethers";
+import { BigNumber, BigNumberish } from "ethers";
+import { formatUnits } from "ethers/lib/utils";
 
 const formatter = Intl.NumberFormat("en-US", {
   style: "currency",
@@ -75,3 +76,6 @@ export const convertMantissaToAPR = (mantissa: any) => {
   const parsedMantissa = toInt(mantissa);
   return (parsedMantissa * 2372500) / 1e16;
 };
+
+
+export const formatBNToFixed = (bn: BigNumber, decimals: BigNumberish = 18, fixedDecimals = 4) => parseFloat(formatUnits(bn, decimals)).toFixed(fixedDecimals)

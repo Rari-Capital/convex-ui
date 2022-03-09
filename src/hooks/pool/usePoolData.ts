@@ -18,9 +18,23 @@ const usePoolData = (poolIndex: number) => {
     `Pool Markets PoolID ${pool?.poolId} for address ${address}`,
     async () => {
       if (pool && poolInfo) {
-        return await pool.getMarketsWithData(poolInfo.comptroller, {
+        let data = await pool.getMarketsWithData(poolInfo.comptroller, {
           from: address,
         });
+        // Sort by balance
+        if (!!address) {
+          data.assets = data.assets.sort((a, b) => {
+            if (a.underlyingBalance.lt(b.underlyingBalance)) {
+              return 1
+            } else if (b.underlyingBalance.lt(a.underlyingBalance)) {
+              return -1
+            } else {
+              return 0
+            }
+          })
+        }
+
+        return data
       }
     },
     {
