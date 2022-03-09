@@ -23,6 +23,7 @@ import useDebounce from "hooks/useDebounce";
 import { TokenData } from "hooks/useTokenData";
 import { formatEther, formatUnits, parseUnits } from "ethers/lib/utils";
 import { useQueryClient } from "react-query";
+import { CTokenInfoModal } from "./CTokenInfoModal";
 
 export const Internal = ({
   isBorrowing,
@@ -32,7 +33,7 @@ export const Internal = ({
   pool,
   tokenData,
   isPosition,
-  setIndex
+  setIndex,
 }: {
   isBorrowing: boolean;
   market: USDPricedFuseAsset;
@@ -44,7 +45,7 @@ export const Internal = ({
   setIndex: Dispatch<SetStateAction<number | undefined>>;
 }) => {
   const { address } = useRari();
-  const { marketsDynamicData, poolInfo, openCTokenInfo } = usePoolContext();
+  const { marketsDynamicData, poolInfo } = usePoolContext();
 
   const balance = parseFloat(
     formatUnits(market.underlyingBalance, market.underlyingDecimals)
@@ -122,13 +123,6 @@ export const Internal = ({
             </Button>
             </>: null
         }
-         <Button
-            opacity={0.5}
-            width="48%"
-            onClick={() => openCTokenInfo(market)}
-          >
-            CTokenInfo
-          </Button>
         </Flex> 
       <VStack mt={4} spacing={4} alignItems="stretch">
         <TokenAmountInput

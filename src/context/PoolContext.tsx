@@ -3,8 +3,8 @@ import { networkConfig } from "constants/networks";
 import { BigNumber } from "ethers";
 import usePoolData from "hooks/pool/usePoolData";
 import useUserHealth from "hooks/useUserHealth";
-import { FusePoolData, MarketsWithData, PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
-import { createContext, ReactChildren, useCallback, useContext, useMemo } from "react";
+import { FusePoolData, MarketsWithData, PoolInstance } from "lib/esm/types";
+import { createContext, ReactChildren, useContext } from "react";
 import { useRari } from "./RariContext";
 
 export const PoolContext = createContext<undefined | PoolContextData>(
@@ -21,10 +21,6 @@ type PoolContextData = {
   balances: {
       [cToken: string]: BigNumber;
   } | undefined;
-  isOpen: boolean;
-  onClose: () => void;
-  openCTokenInfo: (e: any) => void,
-  activeCToken: undefined | USDPricedFuseAsset
 }
 
 export const PoolProvider = ({ children }: { children: ReactChildren }) => {
@@ -38,21 +34,9 @@ export const PoolProvider = ({ children }: { children: ReactChildren }) => {
   
   const balances = pool && marketsDynamicData ? pool.getUnderlyingBalancesForPool(marketsDynamicData?.assets) : undefined
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
-  let activeCToken: undefined | USDPricedFuseAsset
   // When opening save the given cToken info in state to access once in modal 
-  const openCTokenInfo = useCallback((e) => {
-    activeCToken = (e)
-    onOpen();
-
-  }, [onOpen]);
 
   const value = {
-        isOpen,
-        onClose,
-        openCTokenInfo,
-        activeCToken,
         poolInfo,
         pool,
         marketsDynamicData,
