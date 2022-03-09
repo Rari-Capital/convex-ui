@@ -9,18 +9,23 @@ import {
     ModalCloseButton,
 } from "@chakra-ui/react"
 import { usePoolContext } from "context/PoolContext"
+import { USDPricedFuseAsset } from "lib/esm/types"
 
 export const CTokenInfoModal = ({
+  market,
+  isOpen,
+  onClose
 } : {
+  market: USDPricedFuseAsset,
+  isOpen: boolean,
+  onClose: () => void
 }) => {
-    const { isOpen, onClose, activeCToken } = usePoolContext()
-  console.log({activeCToken})
     return (
       <>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>{activeCToken?.underlyingSymbol}</ModalHeader>
+          <ModalHeader>{market.underlyingSymbol}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
           </ModalBody>

@@ -8,8 +8,9 @@ import {
   SkeletonCircle,
   Spacer,
   Spinner,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { usePoolContext } from "context/PoolContext";
+import { InfoOutlineIcon } from '@chakra-ui/icons';
 import { utils } from "ethers";
 import { TokenData } from "hooks/useTokenData";
 import { USDPricedFuseAsset } from "lib/esm/types";
@@ -17,7 +18,10 @@ import { Badge, Card, ExpandableCard, Heading, Text } from "rari-components";
 import { Dispatch, SetStateAction } from "react";
 import { getMillions, convertMantissaToAPY } from "utils/formatters";
 import { ActionType } from "./pages/Pool";
-import { Internal } from "./Internal";
+import { Internal } from './Internal';
+import { CTokenInfoModal } from "./CTokenInfoModal";
+import { usePoolContext } from "context/PoolContext";
+
 
 type MarketCardProps = Omit<
   React.ComponentProps<typeof ExpandableCard>,
@@ -54,6 +58,9 @@ const MarketCard: React.FC<MarketCardProps> & { Skeleton: React.FC } = ({
     365
   );
 
+  const { onOpen, onClose, isOpen } = useDisclosure();
+
+
   if (!pool || !poolInfo)
     return (
       <Center>
@@ -88,17 +95,21 @@ const MarketCard: React.FC<MarketCardProps> & { Skeleton: React.FC } = ({
       }
       {...restProps}
     >
+      <CTokenInfoModal market={marketData} onClose={onClose} isOpen={isOpen}/>
       <Flex alignItems="center" width="100%">
         {tokenData ? <Avatar src={tokenData.logoURL} mr={4} /> : <Spinner />}
         <Flex direction="column" width="100%">
-          <Flex width="auto">
+          <Flex width="50%">
             <Heading size="lg" mr={4}>
               {tokenData?.symbol}
             </Heading>
-            <Box alignSelf="center">
+            <Box alignSelf="center" mr={4}>
               <Badge variant={isSupply ? "success" : "warning"}>
                 {isSupply ? "Supply" : "Borrow"}
               </Badge>
+            </Box>
+            <Box alignSelf="center" onClick={onOpen}>
+              <InfoOutlineIcon/>
             </Box>
           </Flex>
           <MarketTLDR
