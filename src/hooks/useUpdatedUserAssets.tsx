@@ -20,7 +20,7 @@ export const useUpdatedUserAssets = ({
 
   const { data: updatedAssets }: UseQueryResult<USDPricedFuseAsset[]> =
     useQuery(
-      action + " " + index + " " + JSON.stringify(assets) + " " + amount,
+      action + " " + index + " " + assets.map(asset => asset.cToken).join(",") + " " + amount,
       async () => {
         if (!assets || !assets.length || !pool) return [];
 
@@ -33,7 +33,7 @@ export const useUpdatedUserAssets = ({
         );
 
         let updatedAsset: USDPricedFuseAsset;
-        if (action === ActionType.supply) {
+        if (action === ActionType.SUPPLY) {
           const supplyBalance = assetToBeUpdated.supplyBalance.add(amount);
 
           const totalSupply = assetToBeUpdated.totalSupply.add(amount);
@@ -56,7 +56,7 @@ export const useUpdatedUserAssets = ({
                 : constants.Zero
             ),
           };
-        } else if (action === ActionType.withdraw) {
+        } else if (action === ActionType.WITHDRAW) {
           const supplyBalance = assetToBeUpdated.supplyBalance.sub(amount);
           const totalSupply = assetToBeUpdated.totalSupply.sub(amount);
 
@@ -78,7 +78,7 @@ export const useUpdatedUserAssets = ({
                 : constants.Zero
             ),
           };
-        } else if (action === ActionType.borrow) {
+        } else if (action === ActionType.BORROW) {
           const borrowBalance = assetToBeUpdated.borrowBalance.add(amount);
 
           const totalBorrow = assetToBeUpdated.totalBorrow.add(amount);
@@ -105,7 +105,7 @@ export const useUpdatedUserAssets = ({
                 : constants.Zero
             ),
           };
-        } else if (action === ActionType.repay) {
+        } else if (action === ActionType.REPAY) {
           const borrowBalance = assetToBeUpdated.borrowBalance.sub(amount);
 
           const totalBorrow = assetToBeUpdated.totalBorrow.sub(amount);
