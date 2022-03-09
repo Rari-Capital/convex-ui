@@ -44,7 +44,7 @@ export const Internal = ({
   setIndex: Dispatch<SetStateAction<number | undefined>>;
 }) => {
   const { address } = useRari();
-  const { marketsDynamicData, poolInfo } = usePoolContext();
+  const { marketsDynamicData, poolInfo, openCTokenInfo } = usePoolContext();
 
   const balance = parseFloat(
     formatUnits(market.underlyingBalance, market.underlyingDecimals)
@@ -99,28 +99,37 @@ export const Internal = ({
 
   return (
     <>
-      {isPosition ?
         <Flex width="70%" justifyContent="space-between">
-          <Button
+        {isPosition ?
+        <>
+            <Button
+              width="48%"
+              onClick={() =>
+                setAction(isBorrowing ? ActionType.BORROW : ActionType.SUPPLY)
+              }
+              opacity={internalAction === ActionType.BORROW || internalAction === ActionType.SUPPLY ? 1 : 0.5}
+            >
+              {isBorrowing ? "Borrow" : "Supply"}
+            </Button>
+            <Button
+              opacity={internalAction === ActionType.REPAY || internalAction === ActionType.WITHDRAW ? 1 : 0.5}
+              width="48%"
+              onClick={() =>
+                setAction(isBorrowing ? ActionType.REPAY : ActionType.WITHDRAW)
+              }
+            >
+              {isBorrowing ? "Repay" : "Withdraw"}
+            </Button>
+            </>: null
+        }
+         <Button
+            opacity={0.5}
             width="48%"
-            onClick={() =>
-              setAction(isBorrowing ? ActionType.BORROW : ActionType.SUPPLY)
-            }
-            opacity={internalAction === ActionType.BORROW || internalAction === ActionType.SUPPLY ? 1 : 0.5}
+            onClick={() => openCTokenInfo(market)}
           >
-            {isBorrowing ? "Borrow" : "Supply"}
+            CTokenInfo
           </Button>
-          <Button
-            opacity={internalAction === ActionType.REPAY || internalAction === ActionType.WITHDRAW ? 1 : 0.5}
-            width="48%"
-            onClick={() =>
-              setAction(isBorrowing ? ActionType.REPAY : ActionType.WITHDRAW)
-            }
-          >
-            {isBorrowing ? "Repay" : "Withdraw"}
-          </Button>
-        </Flex> : null
-      }
+        </Flex> 
       <VStack mt={4} spacing={4} alignItems="stretch">
         <TokenAmountInput
           size="lg"
@@ -133,7 +142,9 @@ export const Internal = ({
           mb={0}
         />
         {action === ActionType.SUPPLY && (
-          <Text alignSelf="flex-end" color="grey" fontWeight={"medium"} fontSize="sm"> You have {utils.commify(balance)} {tokenData?.symbol}</Text>
+          <Text alignSelf="flex-end" color="grey" fontWeight={"medium"} fontSize="sm"> 
+            You have {utils.commify(balance)} {tokenData?.symbol}
+          </Text>
         )}
         {!marketsDynamicData || debouncedAmount === "" || debouncedAmount === "0" ? null : (
           <Stats

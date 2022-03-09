@@ -1,13 +1,14 @@
-import { Accordion, Box, Spinner, Stack, VStack } from "@chakra-ui/react";
+import { Accordion, Box, ModalOverlay, Spinner, Stack, VStack } from "@chakra-ui/react";
 import { usePoolContext } from "context/PoolContext";
 import { BigNumber, constants } from "ethers";
-import { Heading } from "rari-components";
+import { Button, Heading } from "rari-components";
 import MarketCard from "components/MarketCard";
 import Positions from "components/Positions";
 import { useTokensDataAsMap } from "hooks/useTokenData";
 import { useState } from "react";
 import { useRari } from "context/RariContext";
 import { useAuthedCallback } from "hooks/useAuthedCallback";
+import { CTokenInfoModal } from "components/CTokenInfoModal";
 
 export enum ActionType {
   SUPPLY = "Supply",
@@ -18,7 +19,7 @@ export enum ActionType {
 }
 
 const Pool = () => {
-  const { poolInfo, marketsDynamicData } = usePoolContext();
+  const { poolInfo, marketsDynamicData, openCTokenInfo} = usePoolContext();
   const { isAuthed, login } = useRari();
   const [index, setIndex] = useState<number | undefined>()
 
@@ -42,6 +43,8 @@ const Pool = () => {
   const showActivePositions = !!(hasSupplied && marketsDynamicData && isAuthed);
 
   return (
+    <>
+    <CTokenInfoModal />
     <Box>
       {(showActivePositions  ) && (
         <>
@@ -84,7 +87,7 @@ const Pool = () => {
           </Accordion>
         </VStack>
         <VStack alignItems="stretch" spacing={2} flex={1}>
-          <Accordion allowToggle>
+          <Accordion allowToggle  index={index} onChange={(i: number) => handleAccordionChange(i)}>
             <VStack alignItems="stretch" spacing={2} flex={1}>
               {marketsDynamicData ?
                 marketsDynamicData?.assets?.map((market, i) =>
@@ -108,6 +111,7 @@ const Pool = () => {
         </VStack>
       </Stack>
     </Box>
+    </>
   );
 };
 
