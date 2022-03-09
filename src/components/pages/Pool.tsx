@@ -19,9 +19,10 @@ export enum ActionType {
 }
 
 const Pool = () => {
-  const { poolInfo, marketsDynamicData, openCTokenInfo} = usePoolContext();
+  const { poolInfo, marketsDynamicData} = usePoolContext();
   const { isAuthed, login } = useRari();
-  const [index, setIndex] = useState<number | undefined>()
+  const [rightAccordionIndex, setRightIndex] = useState<number | undefined>()
+  const [leftAccordionIndex, setLeftIndex] = useState<number | undefined>()
 
   const hasSupplied = marketsDynamicData?.totalSupplyBalanceUSD.gt(
     constants.Zero
@@ -31,20 +32,18 @@ const Pool = () => {
     marketsDynamicData?.assets.map(({ underlyingToken }) => underlyingToken)
   );
 
-  const handleAccordionChange = (i: number) => {
+  const handleAccordionChange = (i: number, side: string) => {
     if (isAuthed) {
-      setIndex(i)
+      side === "right" ? setRightIndex(i) : setLeftIndex(i)
       return
     }
     login()
-    setIndex(-1)
   }
 
   const showActivePositions = !!(hasSupplied && marketsDynamicData && isAuthed);
 
   return (
     <>
-    <CTokenInfoModal />
     <Box>
       {(showActivePositions  ) && (
         <>
@@ -64,48 +63,45 @@ const Pool = () => {
       </Heading>
       <Stack mt={4} width="100%" direction={["column", "row"]} spacing={2}>
         <VStack alignItems="stretch" spacing={2} flex={1}>
-          <Accordion allowToggle index={index} onChange={(i: number) => handleAccordionChange(i)}>
+          <Accordion allowToggle index={leftAccordionIndex} onChange={(i: number) => handleAccordionChange(i, "left")}>
             <VStack alignItems="stretch" spacing={2} flex={1}>
-              {marketsDynamicData
-                  ? marketsDynamicData.assets?.map((market, i) =>
-                      market.supplyBalanceUSD.gt(1) ? null : (
-                        <MarketCard
-                          markets={marketsDynamicData?.assets}
-                          marketData={market}
-                          index={i}
-                          key={i}
-                          action={ActionType.SUPPLY}
-                          tokenData={tokensData[market.underlyingToken]}
-                          setIndex={setIndex}
-                        />
-                      )
-                    )
-                  : Array.from({ length: 6 }).map((_, i) => (
-                      <MarketCard.Skeleton key={i} />
-                    ))}
+              {marketsDynamicData ? marketsDynamicData?.assets?.map((market, i) =>
+                market.supplyBalanceUSD.gt(1) ? null : (
+                  <MarketCard
+                    markets={marketsDynamicData?.assets}
+                    marketData={market}
+                    index={i}
+                    key={i}
+                    action={ActionType.SUPPLY}
+                    tokenData={tokensData[market.underlyingToken]}
+                    setIndex={setLeftIndex}
+                  />
+                )
+              ): Array.from({ length: 6 }).map((_, i) => (
+                <MarketCard.Skeleton key={i} />
+              ))}
             </VStack>
           </Accordion>
         </VStack>
         <VStack alignItems="stretch" spacing={2} flex={1}>
-          <Accordion allowToggle  index={index} onChange={(i: number) => handleAccordionChange(i)}>
+          <Accordion allowToggle  index={rightAccordionIndex} onChange={(i: number) => handleAccordionChange(i, "right")}>
             <VStack alignItems="stretch" spacing={2} flex={1}>
-              {marketsDynamicData ?
-                marketsDynamicData?.assets?.map((market, i) =>
-                  market.borrowGuardianPaused ||
-                    market.borrowBalanceUSD.gt(constants.Zero) ? null : (
-                    <MarketCard
-                      markets={marketsDynamicData?.assets}
-                      index={i}
-                      marketData={market}
-                      key={i}
-                      action={ActionType.BORROW}
-                      tokenData={tokensData[market.underlyingToken]}
-                      setIndex={setIndex}
-                    />
-                  )
-                 ) : Array.from({ length: 6 }).map((_, i) => (
-                  <MarketCard.Skeleton key={i} />
-                ))}
+              {marketsDynamicData ? marketsDynamicData?.assets?.map((market, i) =>
+                market.borrowGuardianPaused ||
+                  market.borrowBalanceUSD.gt(constants.Zero) ? null : (
+                  <MarketCard
+                    markets={marketsDynamicData?.assets}
+                    index={i}
+                    marketData={market}
+                    key={i}
+                    action={ActionType.BORROW}
+                    tokenData={tokensData[market.underlyingToken]}
+                    setIndex={setRightIndex}
+                  />
+                )
+              ): Array.from({ length: 6 }).map((_, i) => (
+                <MarketCard.Skeleton key={i} />
+              ))}
             </VStack>
           </Accordion>
         </VStack>
