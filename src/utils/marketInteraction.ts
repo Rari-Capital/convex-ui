@@ -9,26 +9,20 @@ export const marketInteraction = async (
   pool: PoolInstance | undefined,
   market: USDPricedFuseAsset,
   action: ActionType,
-  increaseActiveStep: (step: string) => void,
+  increaseActiveStep: (step: number) => void,
   comptroller: string | undefined,
   enterMarket: boolean,
-  address: string
+  address: string,
+  shouldApprove: boolean = true
 ) => {
   if (amount === "" || !pool || !comptroller) return;
+  // const parsedAmount =
 
   switch (action) {
-    case  ActionType.supply:
-      console.log("hello")
+    case ActionType.SUPPLY:
 
-      if (enterMarket) {
-        increaseActiveStep("Approving market")
-        await pool?.collateral(
-          comptroller,
-          [market.cToken],
-          "enter"
-        )
-
-        increaseActiveStep("Approving Asset")
+      if (shouldApprove) {
+        increaseActiveStep(0);
         await pool?.checkAllowanceAndApprove(
           address,
           market.cToken,
@@ -38,7 +32,12 @@ export const marketInteraction = async (
         );
       }
 
-      increaseActiveStep("Supplying")
+      if (enterMarket) {
+        increaseActiveStep(1);
+        await pool?.collateral(comptroller, [market.cToken], "enter");
+      }
+
+      increaseActiveStep(2);
       await pool?.marketInteraction(
         "supply",
         market.cToken,
@@ -46,10 +45,11 @@ export const marketInteraction = async (
         market.underlyingToken,
         market.underlyingDecimals
       );
-      increaseActiveStep("Done")
+      increaseActiveStep(3);
       break;
 
-    case ActionType.borrow:
+    case ActionType.BORROW:
+      increaseActiveStep(0)
       await pool?.marketInteraction(
         "borrow",
         market.cToken,
@@ -57,9 +57,11 @@ export const marketInteraction = async (
         market.underlyingToken,
         market.underlyingDecimals
       );
+      increaseActiveStep(1)
       break;
 
-    case ActionType.repay:
+    case ActionType.REPAY:
+      increaseActiveStep(0)
       await pool?.marketInteraction(
         "repay",
         market.cToken,
@@ -67,9 +69,11 @@ export const marketInteraction = async (
         market.underlyingToken,
         market.underlyingDecimals
       );
+      increaseActiveStep(1)
       break;
 
-    case ActionType.withdraw:
+    case ActionType.WITHDRAW:
+      increaseActiveStep(0)
       await pool?.marketInteraction(
         "withdraw",
         market.cToken,
@@ -77,6 +81,7 @@ export const marketInteraction = async (
         market.underlyingToken,
         market.underlyingDecimals
       );
+      increaseActiveStep(1)
       break;
 
     default:

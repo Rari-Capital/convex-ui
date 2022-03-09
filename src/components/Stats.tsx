@@ -20,14 +20,12 @@ export const Stats = ({
   amount,
   markets,
   index,
-  enterMarket,
 }: {
   marketData: USDPricedFuseAsset;
   action: ActionType;
   amount: string;
   markets: USDPricedFuseAsset[];
   index: number;
-  enterMarket: boolean;
 }) => {
   const parsedAmount = utils.parseUnits(amount, marketData.underlyingDecimals);
   const { borrowLimit, marketsDynamicData, borrowLimitBN } = usePoolContext();
@@ -49,7 +47,6 @@ export const Stats = ({
     updatedMarkets,
     borrowLimit,
     borrowLimitBN,
-    enterMarket
   );
 
   if (stats.length == 0) {
@@ -78,7 +75,6 @@ const getStats = (
   updatedMarkets: USDPricedFuseAsset[] | undefined,
   borrowLimit: number | undefined,
   borrowLimitBN: BigNumber | undefined,
-  enterMarket: boolean
 ) => {
   if (
     !updatedMarket ||
@@ -91,7 +87,7 @@ const getStats = (
 
   let _stats: [title: string, value: string][] = [];
 
-  if (action === ActionType.supply || action === ActionType.withdraw) {
+  if (action === ActionType.SUPPLY || action === ActionType.WITHDRAW) {
     const textOne = `${smallUsdFormatter(
       marketData.supplyBalanceUSD.toString()
     )}
@@ -100,7 +96,7 @@ const getStats = (
                 )}`;
 
     const newBorrow = getBorrowLimit(updatedMarkets, {
-      ignoreIsEnabledCheckFor: enterMarket ? marketData.cToken : undefined,
+      ignoreIsEnabledCheckFor: marketData.cToken
     });
 
     const textTwo = `${smallUsdFormatter(
@@ -126,7 +122,7 @@ const getStats = (
     ];
   }
 
-  if (action === ActionType.borrow || action === ActionType.repay) {
+  if (action === ActionType.BORROW || action === ActionType.REPAY) {
     const textOne = `${smallStringUsdFormatter(
       marketData.borrowBalanceUSD.toString()
     )} 

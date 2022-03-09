@@ -27,7 +27,7 @@ const usePoolData = (poolIndex: number) => {
       enabled: poolInfo ? true : false,
       refetchInterval: 60000,
       refetchOnMount: false,
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true,
     }
   );
 

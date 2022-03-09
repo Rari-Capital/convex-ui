@@ -5,17 +5,19 @@ import { Heading } from "rari-components";
 import MarketCard from "components/MarketCard";
 import Positions from "components/Positions";
 import { useTokensDataAsMap } from "hooks/useTokenData";
+import { useState } from "react";
 
 export enum ActionType {
-  "supply",
-  "borrow",
-  "withdraw",
-  "repay",
-  "enterMarket",
+  SUPPLY = "Supply",
+  BORROW ="Borrow",
+  WITHDRAW = "Withdraw",
+  REPAY = "Repay",
+  ENTER_MARKET = "Enter Market",
 }
 
 const Pool = () => {
   const { poolInfo, marketsDynamicData } = usePoolContext();
+  const [index, setIndex] = useState<number | undefined>()
 
   const hasSupplied = marketsDynamicData?.totalSupplyBalanceUSD.gt(
     constants.Zero
@@ -59,7 +61,7 @@ const Pool = () => {
       </Heading>
       <Stack mt={4} width="100%" direction={["column", "row"]} spacing={2}>
         <VStack alignItems="stretch" spacing={2} flex={1}>
-          <Accordion allowToggle>
+          <Accordion allowToggle index={index} onChange={(i: number) => setIndex(i)}>
             <VStack alignItems="stretch" spacing={2} flex={1}>
               {marketsDynamicData && supplyAssets.map((market, i) =>
                 market.supplyBalanceUSD.gt(0) ? null : (
@@ -68,8 +70,9 @@ const Pool = () => {
                     marketData={market}
                     index={i}
                     key={i}
-                    action={ActionType.supply}
+                    action={ActionType.SUPPLY}
                     tokenData={tokensData[market.underlyingToken]}
+                    setIndex={setIndex}
                   />
                 )
               )}
@@ -87,8 +90,9 @@ const Pool = () => {
                     index={i}
                     marketData={market}
                     key={i}
-                    action={ActionType.borrow}
+                    action={ActionType.BORROW}
                     tokenData={tokensData[market.underlyingToken]}
+                    setIndex={setIndex}
                   />
                 )
               )}

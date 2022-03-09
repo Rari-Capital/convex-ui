@@ -11,13 +11,13 @@ export async function fetchMaxAmount(
   address: string,
   asset: USDPricedFuseAsset
 ) {
-  if (mode === ActionType.supply) {
+  if (mode === ActionType.SUPPLY) {
     const balance = asset.underlyingBalance
 
     return balance;
   }
 
-  if (mode === ActionType.repay) {
+  if (mode === ActionType.REPAY) {
     const balance = asset.underlyingBalance
 
     const borrowBalance = asset.borrowBalance
@@ -30,7 +30,7 @@ export async function fetchMaxAmount(
     }
   }
 
-  if (mode === ActionType.borrow) {
+  if (mode === ActionType.BORROW) {
     if (!asset.membership) return constants.Zero;
     try {
       const maxBorrow =
@@ -45,7 +45,7 @@ export async function fetchMaxAmount(
     }
   }
 
-  if (mode === ActionType.withdraw) {
+  if (mode === ActionType.WITHDRAW) {
     try {
       const maxRedeem =
         await pool.contracts.secondaryFuseLens.callStatic.getMaxRedeem(

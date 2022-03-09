@@ -34,19 +34,16 @@ export const PoolProvider = ({ children }: { children: ReactChildren }) => {
   const balances = pool && marketsDynamicData ? pool.getUnderlyingBalancesForPool(marketsDynamicData?.assets) : undefined
 
 
-  const value = useMemo(
-    () => ({
+  const value = {
         poolInfo,
-        marketsDynamicData,
         pool,
+        marketsDynamicData,
         borrowLimit,
+        balances,
         userHealth,
         borrowLimitBN,
-        balances
-      }),
-    [poolInfo, marketsDynamicData, pool, borrowLimit, userHealth, borrowLimitBN, balances]
-  );
-
+  } 
+  
   return <PoolContext.Provider value={value}>{children}</PoolContext.Provider>;
 };
 
