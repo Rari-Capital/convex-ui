@@ -61,6 +61,7 @@ const MarketCard: React.FC<MarketCardProps> & { Skeleton: React.FC } = ({
   const { onOpen, onClose, isOpen } = useDisclosure();
 
 
+
   if (!pool || !poolInfo)
     return (
       <Center>
