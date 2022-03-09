@@ -292,10 +292,16 @@ const getButtonText = (
       }
     }
     if (action === ActionType.SUPPLY && amount.gt(market.underlyingBalance)) {
-      return "You cannot supply this much.";
+      return {
+        text: "You cannot supply this much.",
+        isValid: false 
+      }
     }
     if (action === ActionType.WITHDRAW && amount.gt(market.supplyBalance)) {
-      return "You cannot withdraw this much.";
+      return {
+        text: "You cannot withdraw this much.",
+        isValid: false
+      };
     }
     return {
       text: action,

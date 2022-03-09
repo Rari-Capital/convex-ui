@@ -54,7 +54,7 @@ export const Stats = ({
     borrowLimit,
     borrowLimitBN,
     tokenData,
-    userHealth,
+    userHealth ?? 0,
     updatedBorrowLimit.userHealth
   );
 
