@@ -6,6 +6,8 @@ import MarketCard from "components/MarketCard";
 import Positions from "components/Positions";
 import { useTokensDataAsMap } from "hooks/useTokenData";
 import { useState } from "react";
+import { useRari } from "context/RariContext";
+import { useAuthedCallback } from "hooks/useAuthedCallback";
 
 export enum ActionType {
   SUPPLY = "Supply",
@@ -17,6 +19,7 @@ export enum ActionType {
 
 const Pool = () => {
   const { poolInfo, marketsDynamicData } = usePoolContext();
+  const { isAuthed, login } = useRari();
   const [index, setIndex] = useState<number | undefined>()
 
   const hasSupplied = marketsDynamicData?.totalSupplyBalanceUSD.gt(
@@ -27,13 +30,22 @@ const Pool = () => {
     marketsDynamicData?.assets.map(({ underlyingToken }) => underlyingToken)
   );
 
-  const showActivePositions = !!(hasSupplied && marketsDynamicData);
+  const handleAccordionChange = (i: number) => {
+    if (isAuthed) {
+      setIndex(i)
+      return
+    }
+    login()
+    setIndex(-1)
+  }
+
+  const showActivePositions = !!(hasSupplied && marketsDynamicData && isAuthed);
 
   if (!poolInfo) return <Spinner />;
 
   return (
     <Box>
-      {showActivePositions && (
+      {(showActivePositions  ) && (
         <>
           <Heading size="md" color="white">
             Active Positions
@@ -51,10 +63,10 @@ const Pool = () => {
       </Heading>
       <Stack mt={4} width="100%" direction={["column", "row"]} spacing={2}>
         <VStack alignItems="stretch" spacing={2} flex={1}>
-          <Accordion allowToggle index={index} onChange={(i: number) => setIndex(i)}>
+          <Accordion allowToggle index={index} onChange={(i: number) => handleAccordionChange(i)}>
             <VStack alignItems="stretch" spacing={2} flex={1}>
               {marketsDynamicData && marketsDynamicData?.assets?.map((market, i) =>
-                market.supplyBalanceUSD.gt(0) ? null : (
+                market.supplyBalanceUSD.gt(1) ? null : (
                   <MarketCard
                     markets={marketsDynamicData?.assets}
                     marketData={market}
