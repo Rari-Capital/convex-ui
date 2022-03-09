@@ -46,7 +46,6 @@ export const Internal = ({
     const { address } = useRari();
     const { marketsDynamicData, poolInfo } = usePoolContext();
   
-    const [isApproved, setIsApproved] = useState(false);
     const balance = parseFloat(
       formatUnits(market.underlyingBalance, market.underlyingDecimals)
     ).toFixed(2);
@@ -93,7 +92,6 @@ export const Internal = ({
       isEmpty,
       parseUnits(debouncedAmount === "" ? "0" : debouncedAmount, market.underlyingDecimals),
       market,
-      isApproved,
       internalAction
     );
   
@@ -230,7 +228,10 @@ export const Internal = ({
     steps: Step[];
     activeStep: number | undefined;
     increaseActiveStep: (step: number) => void;
-    buttonText: string;
+    buttonText: {
+      text: string,
+      isValid: boolean
+    }
   }) => {
     const { address } = useRari();
     const { pool, poolInfo } = usePoolContext();
@@ -248,16 +249,14 @@ export const Internal = ({
       address,
     ]);
   
-    const isEmpty = debouncedAmount === "0" || debouncedAmount === "";
-  
     return (
       <>
         <Button
           alignSelf="stretch"
           onClick={handleSubmitClick}
-          disabled={isEmpty}
+          disabled={!buttonText.isValid}
         >
-          {buttonText}
+          {buttonText.text}
         </Button>
         <Center color="white">
           {typeof activeStep === "undefined" ? null : (
@@ -280,19 +279,30 @@ export const Internal = ({
     isEmpty: boolean,
     amount: BigNumber,
     market: USDPricedFuseAsset,
-    isApproved: boolean,
     action: ActionType
   ) => {
     if (activeStep === undefined) {
       if (isEmpty) {
-        return "Please enter a valid amount";
+        return {
+          text: "Please enter a valid amount",
+          isValid: false
+        }
       }
       if (amount.gt(market.underlyingBalance)) {
-        return "You do not enough balance.";
+        return {
+          text: "You do not enough balance.",
+          isValid: false
+        }
       }
-      return action;
+      return {
+        text: action,
+        isValid: true
+      }
     } else {
-      return steps[activeStep].buttonText;
+      return {
+        text: steps[activeStep].buttonText,
+        isValid: false
+      }
     }
   };
   

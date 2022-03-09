@@ -45,7 +45,7 @@ export const RariProvider = ({ children }: { children: ReactNode }) => {
   const [{ data: UsersConnector }] = useConnect();
 
   const chainId = useMemo(
-    () => (isSupportedChainId(data.chain?.id) ? data.chain!.id : 31337),
+    () => (isSupportedChainId(data.chain?.id) ? data.chain!.id : 1),
     [data]
   );
 

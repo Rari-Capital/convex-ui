@@ -27,7 +27,7 @@ export const Stats = ({
   markets: USDPricedFuseAsset[];
   index: number;
 }) => {
-  const parsedAmount = utils.parseUnits(amount, marketData.underlyingDecimals);
+  const parsedAmount = marketData.underlyingDecimals.eq(18) ? utils.parseEther(amount) : utils.parseUnits(amount, marketData.underlyingDecimals);
   const { borrowLimit, marketsDynamicData, borrowLimitBN } = usePoolContext();
 
   const updatedMarkets = useUpdatedUserAssets({
