@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {  PoolInstance, USDPricedFuseAsset } from "lib/esm/types";
-import { BigNumber } from "ethers";
+import { BigNumber, utils } from "ethers";
 import {
   Button,
   Text,
@@ -129,7 +129,7 @@ export const Internal = ({
               onChange={(newValue: any) => setAmount(newValue.target.value)}
               onClickMax={maxClickHandle}
             />
-            <Text ml={"auto"} color="grey" fontWeight={"medium"}> You have {balance} {tokenData?.symbol}</Text>
+            <Text ml={"auto"} color="grey" fontWeight={"medium"} fontSize="sm"> You have {utils.commify(balance)} {tokenData?.symbol}</Text>
             {!marketsDynamicData || debouncedAmount === "" || debouncedAmount === "0" ? null : (
               <Stats
                 amount={debouncedAmount}
