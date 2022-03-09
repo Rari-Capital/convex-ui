@@ -14,6 +14,7 @@ import { getBorrowLimit } from "hooks/getBorrowLimit";
 import { StatisticTable } from "rari-components";
 import { ActionType } from "./pages/Pool";
 import { Center, Spinner } from "@chakra-ui/react";
+import { useBorrowLimit } from "hooks/useUserHealth";
 
 export const Stats = ({
   marketData,
@@ -31,7 +32,7 @@ export const Stats = ({
   tokenData: TokenData
 }) => {
   const parsedAmount = marketData.underlyingDecimals.eq(18) ? utils.parseEther(amount) : utils.parseUnits(amount, marketData.underlyingDecimals);
-  const { borrowLimit, marketsDynamicData, borrowLimitBN } = usePoolContext();
+  const { borrowLimit, marketsDynamicData, borrowLimitBN, userHealth } = usePoolContext();
 
   const updatedMarkets = useUpdatedUserAssets({
     action,
@@ -42,6 +43,8 @@ export const Stats = ({
 
   const updatedMarket = updatedMarkets ? updatedMarkets[index] : null;
 
+  const updatedBorrowLimit = useBorrowLimit(updatedMarkets ?? [])
+
   const stats: [title: string, value: string][] = getStats(
     action,
     updatedMarket,
@@ -51,6 +54,8 @@ export const Stats = ({
     borrowLimit,
     borrowLimitBN,
     tokenData,
+    userHealth,
+    updatedBorrowLimit.userHealth
   );
 
   if (stats.length == 0) {
@@ -79,22 +84,22 @@ const getStats = (
   updatedMarkets: USDPricedFuseAsset[] | undefined,
   borrowLimit: number | undefined,
   borrowLimitBN: BigNumber | undefined,
-  tokenData: TokenData
+  tokenData: TokenData,
+  userHealth: number,
+  updatedUserHealth: number
 ) => {
   if (
     !updatedMarket ||
     !marketsDynamicData ||
     typeof borrowLimit === "undefined" ||
     !borrowLimitBN ||
-    !updatedMarkets
+    !updatedMarkets 
   )
     return [];
 
   let _stats: [title: string, value: string][] = [];
 
   if (action === ActionType.SUPPLY || action === ActionType.WITHDRAW) {
-
-    // Showing Unit value 
 
     const textOne = `${formatBNToFixed(marketData.supplyBalance, marketData.underlyingDecimals)} ${tokenData?.symbol ?? marketData.underlyingSymbol}
                 → ${formatBNToFixed(updatedMarket.supplyBalance, updatedMarket.underlyingDecimals)} ${tokenData?.symbol ?? marketData.underlyingSymbol} `;
@@ -103,11 +108,10 @@ const getStats = (
       ignoreIsEnabledCheckFor: marketData.cToken
     });
 
-    const textTwo = `${
-  smallUsdFormatter(
-    borrowLimit ?? 0
-  )
-} → ${ smallUsdFormatter(newBorrow.toString()) } `;
+    const textTwo = `${smallUsdFormatter(
+      borrowLimit ?? 0
+    )
+      } → ${smallUsdFormatter(newBorrow.toString())} `;
 
     const supplyAPY = convertMantissaToAPY(
       marketData.supplyRatePerBlock,
@@ -119,7 +123,7 @@ const getStats = (
       365
     ).toFixed(2);
 
-    const textThree = `${ supplyAPY }% → ${ updatedSupplyAPY }% `;
+    const textThree = `${supplyAPY}% → ${updatedSupplyAPY}% `;
 
     _stats = [
       ["Supply Balance", textOne],
@@ -129,16 +133,11 @@ const getStats = (
   }
 
   if (action === ActionType.BORROW || action === ActionType.REPAY) {
-    const textOne = `${
-  smallStringUsdFormatter(
-    marketData.borrowBalanceUSD.toString()
-  )
-} 
-                → ${
-  smallStringUsdFormatter(
-    updatedMarket.borrowBalanceUSD.toString()
-  )
-} `;
+
+    const textOne = `${formatBNToFixed(marketData.borrowBalance, marketData.underlyingDecimals)} ${tokenData?.symbol ?? marketData.underlyingSymbol}
+→ ${formatBNToFixed(updatedMarket.borrowBalance, updatedMarket.underlyingDecimals)} ${tokenData?.symbol ?? marketData.underlyingSymbol} `;
+
+    const textTwo = `${userHealth}% → ${updatedUserHealth}%`
 
     const borrowAPR = convertMantissaToAPR(
       marketData.borrowRatePerBlock
@@ -148,11 +147,11 @@ const getStats = (
       updatedMarket.borrowRatePerBlock ?? 0
     ).toFixed(2);
 
-    const textThree = `${ borrowAPR }% → ${ updatedBorrowAPR }% `;
+    const textThree = `${borrowAPR}% → ${updatedBorrowAPR}% `;
 
     _stats = [
       ["Borrow Balance", textOne],
-      ["Borrow Limit", smallUsdFormatter(borrowLimit ?? 0)],
+      ["Health", textTwo],
       ["Borrow APY", textThree],
     ];
   }
