@@ -8,4 +8,4 @@ import { BigNumber } from "@ethersproject/bignumber";
  * @param tokenAddress - Address of the market's underlying asset.
  * @param decimals - Underlying token's decimals. i.e DAI = 18.
  */
-export declare function marketInteraction(action: marketInteractionType, cTokenAddress: string, amount: string, tokenAddress: string, decimals?: BigNumber): Promise<void>;
+export declare function marketInteraction(action: marketInteractionType, cTokenAddress: string, amount: string, tokenAddress: string, decimals?: BigNumber): Promise<any>;

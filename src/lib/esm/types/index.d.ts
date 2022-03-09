@@ -109,7 +109,7 @@ export declare type PoolInstance = {
         supplyAPY: number;
     }>;
     getInterestRateModel: (assetAddress: string) => Promise<any | undefined>;
-    marketInteraction(action: marketInteractionType, cTokenAddress: string, amount: string, tokenAddress: string, decimals?: BigNumber): Promise<void>;
+    marketInteraction(action: marketInteractionType, cTokenAddress: string, amount: string, tokenAddress: string, decimals?: BigNumber): Promise<any>;
     checkAllowanceAndApprove(userAddress: string, marketAddress: string, underlyingAddress: string, amount: string, decimals: BigNumber): Promise<void>;
     fetchTokenBalance(tokenAddress: string | undefined, address?: string): Promise<number>;
     collateral(comptrollerAddress: string, marketAddress: string[], action: actionType): Promise<void>;

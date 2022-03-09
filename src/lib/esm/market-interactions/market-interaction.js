@@ -47,31 +47,27 @@ export function marketInteraction(action, cTokenAddress, amount, tokenAddress, d
         // 4. Perform action.
         switch (action) {
             case 'withdraw':
-                yield testForCTokenErrorAndSend(cTokenContract.callStatic.redeemUnderlying, parsedAmount, cTokenContract.redeemUnderlying, "Cannot withdraw this amount right now!");
-                break;
+                return testForCTokenErrorAndSend(cTokenContract.callStatic.redeemUnderlying, parsedAmount, cTokenContract.redeemUnderlying, "Cannot withdraw this amount right now!");
             case 'borrow':
-                yield testForCTokenErrorAndSend(cTokenContract.callStatic['borrow(uint256)'], parsedAmount, cTokenContract['borrow(uint256)'], "Cannot borrow this amount right now!");
-                break;
+                return testForCTokenErrorAndSend(cTokenContract.callStatic['borrow(uint256)'], parsedAmount, cTokenContract['borrow(uint256)'], "Cannot borrow this amount right now!");
             case 'repay':
                 if (!isEth) {
-                    yield testForCTokenErrorAndSend(cTokenContract.callStatic['repayBorrow(uint256)'], parsedAmount, cTokenContract['repayBorrow(uint256)'], "Cannot repay this amount right now!");
+                    return testForCTokenErrorAndSend(cTokenContract.callStatic['repayBorrow(uint256)'], parsedAmount, cTokenContract['repayBorrow(uint256)'], "Cannot repay this amount right now!");
                 }
                 else {
-                    yield cTokenContract['repayBorrow()']({
+                    return cTokenContract['repayBorrow()']({
                         value: parsedAmount,
                     });
                 }
-                break;
             case 'supply':
                 if (!isEth) {
-                    yield testForCTokenErrorAndSend(cTokenContract.callStatic['mint(uint256)'], parsedAmount, cTokenContract['mint(uint256)'], "Cannot deposit this amount right now!");
+                    return testForCTokenErrorAndSend(cTokenContract.callStatic['mint(uint256)'], parsedAmount, cTokenContract['mint(uint256)'], "Cannot deposit this amount right now!");
                 }
                 else {
-                    yield cTokenContract['mint()']({
+                    return cTokenContract['mint()']({
                         value: parsedAmount
                     });
                 }
-                break;
             default:
                 break;
         }
