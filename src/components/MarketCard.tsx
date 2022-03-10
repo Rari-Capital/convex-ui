@@ -96,7 +96,7 @@ const MarketCard: React.FC<MarketCardProps> & { Skeleton: React.FC } = ({
       }
       {...restProps}
     >
-      <CTokenInfoModal market={marketData} onClose={onClose} isOpen={isOpen}/>
+      <CTokenInfoModal tokenData={tokenData} market={marketData} onClose={onClose} isOpen={isOpen}/>
       <Flex alignItems="center" width="100%">
         {tokenData ? <Avatar src={tokenData.logoURL} mr={4} /> : <Spinner />}
         <Flex direction="column" width="100%">
