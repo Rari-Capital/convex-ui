@@ -1,9 +1,10 @@
+import { useDisclosure } from "@chakra-ui/react";
 import { networkConfig } from "constants/networks";
 import { BigNumber } from "ethers";
 import usePoolData from "hooks/pool/usePoolData";
 import useUserHealth from "hooks/useUserHealth";
 import { FusePoolData, MarketsWithData, PoolInstance } from "lib/esm/types";
-import { createContext, ReactChildren, useContext, useMemo } from "react";
+import { createContext, ReactChildren, useContext } from "react";
 import { useRari } from "./RariContext";
 
 export const PoolContext = createContext<undefined | PoolContextData>(
@@ -20,7 +21,7 @@ type PoolContextData = {
   balances: {
       [cToken: string]: BigNumber;
   } | undefined;
-};
+}
 
 export const PoolProvider = ({ children }: { children: ReactChildren }) => {
   const { chainId } = useRari();
@@ -33,6 +34,7 @@ export const PoolProvider = ({ children }: { children: ReactChildren }) => {
   
   const balances = pool && marketsDynamicData ? pool.getUnderlyingBalancesForPool(marketsDynamicData?.assets) : undefined
 
+  // When opening save the given cToken info in state to access once in modal 
 
   const value = {
         poolInfo,
@@ -42,6 +44,7 @@ export const PoolProvider = ({ children }: { children: ReactChildren }) => {
         balances,
         userHealth,
         borrowLimitBN,
+        
   } 
   
   return <PoolContext.Provider value={value}>{children}</PoolContext.Provider>;
