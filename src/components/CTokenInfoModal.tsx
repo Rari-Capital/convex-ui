@@ -10,7 +10,8 @@ import {
     Text,
     Avatar,
     Spinner,
-    Flex
+    Flex,
+    Link
 } from "@chakra-ui/react"
 import { USDPricedFuseAsset } from "lib/esm/types"
 import { TokenData } from "hooks/useTokenData"
@@ -44,7 +45,13 @@ export const CTokenInfoModal = ({
           <ModalCloseButton />
           <ModalBody>
             {index === -1 ? null :
+            <Flex direction="column" height="100%">
               <InfoPairs title="Fuse Market" info={tokenInfo[market.underlyingSymbol].cToken} />
+              <InfoPairs title="Plugin" info={tokenInfo[market.underlyingSymbol].plugin} />
+              <InfoPairs title="Curve LP Token" info={tokenInfo[market.underlyingSymbol].lpToken} />
+              <InfoPairs title="Curve Contract" info={tokenInfo[market.underlyingSymbol].depositContract} />
+              <InfoPairs title="Curve Rewards" info={tokenInfo[market.underlyingSymbol].rewardsContract} />
+            </Flex>
             }
 
           </ModalBody>
@@ -67,16 +74,23 @@ export const CTokenInfoModal = ({
     info: string
   }) => {
     return (
-      <Flex>
-        <Text>{title} </Text>
-        <Text>{info}</Text>
+      <Flex justifyContent="space-between">
+        <Text fontSize="xs">{title} </Text>
+        <Link href={`https://etherscan.io/address/${info}`} target="_blank">
+          <Text fontSize="xs" alignSelf="center">{info}</Text>
+        </Link>
       </Flex>
     )
   }
 
+ 
   type tokenInfoType = {
     [title: string]: {
-      [entry: string]: string
+      "cToken": string,
+      "plugin": string,
+      "lpToken": string,
+      "depositContract": string,
+      "rewardsContract": string
     }
   }
 
@@ -126,7 +140,7 @@ export const CTokenInfoModal = ({
       "rewardsContract": "0x3133A4428AAC0b4ad96a09845363386ECd289A9c"
     },
     "alUSD3CRV-f": {
-      "ctoken": "0x3c37CdA5C30952E48aFcc40443A9296e59DAAcA9", 
+      "cToken": "0x3c37CdA5C30952E48aFcc40443A9296e59DAAcA9", 
       "plugin": "0x7e5723782f6274124bdbe5bea7202c62813d939e",
       "lpToken": "0x43b4FdFD4Ff969587185cDB6f0BD875c5Fc83f8c",
       "depositContract": "0xF403C135812408BFbE8713b5A23a04b3D48AAE31",
