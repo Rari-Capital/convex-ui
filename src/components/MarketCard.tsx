@@ -1,24 +1,23 @@
-import { usePoolContext } from "context/PoolContext";
+import { TriangleDownIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
   Center,
   Flex,
+  Skeleton,
+  SkeletonCircle,
+  Spacer,
   Spinner,
 } from "@chakra-ui/react";
+import { usePoolContext } from "context/PoolContext";
 import { utils } from "ethers";
 import { TokenData } from "hooks/useTokenData";
 import { USDPricedFuseAsset } from "lib/esm/types";
-import {
-  Badge,
-  ExpandableCard,
-  Heading,
-  Text,
-} from "rari-components";
+import { Badge, Card, ExpandableCard, Heading, Text } from "rari-components";
+import { Dispatch, SetStateAction } from "react";
 import { getMillions, convertMantissaToAPY } from "utils/formatters";
 import { ActionType } from "./pages/Pool";
-import { Internal } from './Internal';
-import { Dispatch, SetStateAction } from "react";
+import { Internal } from "./Internal";
 
 type MarketCardProps = Omit<
   React.ComponentProps<typeof ExpandableCard>,
@@ -29,10 +28,15 @@ type MarketCardProps = Omit<
   markets: USDPricedFuseAsset[];
   index: number;
   tokenData: TokenData;
-  setIndex: Dispatch<SetStateAction<number | undefined>>
+  setIndex: Dispatch<SetStateAction<number | undefined>>;
 };
 
-const MarketCard: React.FC<MarketCardProps> = ({
+/**
+ * Card which displays information about a specific market. Also includes
+ * a skeleton component to be displayed while loading:
+ * `<MarketCard.Skeleton />`
+ */
+const MarketCard: React.FC<MarketCardProps> & { Skeleton: React.FC } = ({
   markets,
   marketData,
   index,
@@ -56,6 +60,13 @@ const MarketCard: React.FC<MarketCardProps> = ({
         <Spinner />
       </Center>
     );
+
+  if (!tokenData) {
+    return (
+      <MarketCard.Skeleton />
+    );
+  }
+
   return (
     <ExpandableCard
       p={4}
@@ -98,6 +109,26 @@ const MarketCard: React.FC<MarketCardProps> = ({
         </Flex>
       </Flex>
     </ExpandableCard>
+  );
+};
+
+MarketCard.Skeleton = () => {
+  return (
+    <Card variant="light" p={4} py={6}>
+      <Flex alignItems="center">
+        <SkeletonCircle size="12" mr={4} />
+        <Box flex={1}>
+          <Flex mb={1} alignItems="center">
+            <Skeleton height={9} width={36} mr={4} />
+            <Skeleton height={6} width={16} />
+          </Flex>
+          <Skeleton height={5} maxWidth={72} />
+        </Box>
+        <Center alignItems="center" width={10}>
+          <TriangleDownIcon />
+        </Center>
+      </Flex>
+    </Card>
   );
 };
 

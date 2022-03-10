@@ -1,11 +1,25 @@
-import { Box, Stack, Flex, VStack, HStack, BoxProps } from "@chakra-ui/react";
+import { Box, Stack, Flex, VStack, HStack, BoxProps, Skeleton } from "@chakra-ui/react";
 import { useRari } from "context/RariContext";
 import { usePoolContext } from "context/PoolContext";
 import { animate, useMotionValue } from "framer-motion";
-import { Card, Heading, Progress, Statistic, Text } from "rari-components";
+import { Card, Heading, Progress, Statistic as RariStatistic, Text } from "rari-components";
 import React, { useEffect, useMemo, useState } from "react";
 import { smallUsdFormatter } from "utils/formatters";
 import { utils } from "ethers";
+
+// TODO(nathanhleung)
+// Consider creating skeleton components for all components in rari-components
+// accessible at `<Component>.Skeleton`.
+const Statistic: typeof RariStatistic & {
+  Skeleton: React.FC;
+} = Object.assign(RariStatistic, {
+  Skeleton: () => (
+    <Stack mr={4}>
+      <Skeleton height={5} width={24} />
+      <Skeleton height={9} width={48} />
+    </Stack>
+  )
+});
 
 export const PoolOverview: React.FC<BoxProps> = (props) => {
   const { address } = useRari();
@@ -97,16 +111,16 @@ export const PoolOverview: React.FC<BoxProps> = (props) => {
       <VStack align="stretch">
         <HStack>
           <Card minWidth={48} p={4}>
-            <Statistic
+            {marketsDynamicData ? <Statistic
               title={supplyStatisticTitle}
               value={smallUsdFormatter(supplyStatisticDisplayedValue)}
-            />
+            /> : <Statistic.Skeleton />}
           </Card>
           <Card minWidth={48} p={4}>
-            <Statistic
+            {marketsDynamicData ? <Statistic
               title={borrowStatisticTitle}
               value={smallUsdFormatter(borrowStatisticDisplayedValue)}
-            />
+            /> : <Statistic.Skeleton />}
           </Card>
         </HStack>
         {!!address && (
