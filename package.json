@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "bump-rari-components": "rm -rf .next && npm i \"git+https://github.com/Rari-Capital/rari-components#$(git ls-remote https://github.com/Rari-Capital/rari-components.git HEAD | awk '{ print $1}')\"",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -18,7 +19,7 @@
     "ethers": "^5.5.4",
     "framer-motion": "^6",
     "next": "12.1.0",
-    "rari-components": "git+https://github.com/Rari-Capital/rari-components#428603bcc0f0c7f4414e06d5b72353e91a343dd0",
+    "rari-components": "github:Rari-Capital/rari-components#84e4e55c2cfb72fac60c465612ebb3114e1d22e0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-query": "^3.34.16",

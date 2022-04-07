@@ -113,7 +113,7 @@ const Header: React.FC<HeaderProps> = ({ contentSx, ...restProps }) => {
               Claim Rewards
             </Button>
             {/* <WarningIcon w={2} h={2} color="red.500" /> */}
-            <Button onClick={handleClick} bg={previewMode ? "warning" : ""}>
+            <Button onClick={handleClick} bg={previewMode ? "warning" : undefined}>
               {!!address ? truncate(address ?? "", 8) : "Connect"}
             </Button>
           </HStack>

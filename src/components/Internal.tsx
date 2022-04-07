@@ -129,7 +129,6 @@ export const Internal = ({
           size="lg"
           variant="light"
           value={amount}
-          tokenSymbol={tokenData?.symbol}
           tokenAddress={market.underlyingToken}
           onChange={(newValue: any) => setAmount(newValue)}
           onClickMax={maxClickHandle}
